@@ -1,0 +1,21 @@
+{
+	"name": "common",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"build": "npx tsc",
+		"test": "jest"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.5.12",
+		"jest": "^29.7.0",
+		"ts-jest": "^29.2.5",
+		"typescript": "^5.5.4"
+	},
+	"dependencies": {
+		"@types/node": "^22.5.0",
+		"express": "^4.19.2",
+		"typeorm": "^0.3.20",
+		"common": "file:../common"
+	}
+}
