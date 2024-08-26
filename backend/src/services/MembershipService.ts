@@ -1,33 +1,37 @@
 import express from "express";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
-import { BaseService } from "./BaseService";
-import { MembershipDto } from "common/src/models/MembershipDto";
 import { MembershipEntity } from "../data/MembershipEntity";
-import { CheckSecurity } from "./CheckSecurity";
+import { BaseService } from "./BaseService";
+
+export type Method<T> = (req: express.Request, ds: EntitiesDataSource) => Promise<T>;
 
 export class MembershipService extends BaseService {
 	public constructor(app: express.Express) {
 		super();
 
+		app.get("/api/v0/membership/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
 		app.get("/api/v0/memberships", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
 		app.put("/api/v0/membership", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
 		app.delete("/api/v0/membership/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
-	@CheckSecurity("Membership:List")
-	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<MembershipDto[]> {
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<MembershipEntity | null> {
+		const guid = req.params["guid"];
+
+		return await ds.membershipRepository().findOneBy({ guid: guid });
+	}
+
+	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<MembershipEntity[]> {
 		return await ds.membershipRepository().find();
 	}
 
-	@CheckSecurity("Membership:Save")
 	public async putSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
 		const entity = new MembershipEntity();
-		entity.copyFrom(req.body as MembershipDto);
+		entity.copyFrom(req.body as MembershipEntity);
 
 		await ds.membershipRepository().save([entity]);
 	}
 
-	@CheckSecurity("Membership:Delete")
 	public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
 		const guid = req.params["guid"];
 
