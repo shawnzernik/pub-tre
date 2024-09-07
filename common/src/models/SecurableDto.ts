@@ -1,4 +1,4 @@
 export interface SecurableDto {
-	guid: string;
-	displayName: string;
-  }
+    guid: string;
+    displayName: string;
+}

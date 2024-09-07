@@ -14,6 +14,13 @@ export class GroupService extends BaseService {
 		app.delete("/api/v0/group/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
+	@CheckSecurity("Group:Read")
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<GroupDto | null> {
+		const guid = req.params["guid"];
+
+		return await ds.groupRepository().findOneBy({ guid: guid });
+	}
+
 	@CheckSecurity("Group:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<GroupDto[]> {
 		return await ds.groupRepository().find();
