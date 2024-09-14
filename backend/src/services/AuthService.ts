@@ -1,7 +1,7 @@
 import express from "express";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
-import { GroupDto } from "common/src/models/GroupDto";
+import { AuthLogic } from "../logic/AuthLogic";
 
 export class AuthService extends BaseService {
 	public constructor(app: express.Express) {
@@ -11,14 +11,18 @@ export class AuthService extends BaseService {
 		app.post("/api/v0/auth/renew", (req, resp) => { this.methodWrapper(req, resp, this.postRenew) });
 	}
 
-	public async postLogin(req: express.Request, ds: EntitiesDataSource): Promise<GroupDto | null> {
-		const guid = req.params["guid"];
+	public async postLogin(req: express.Request, ds: EntitiesDataSource): Promise<string> {
+        const bodyString = req.body;
+        const bodyJson = JSON.parse(bodyString);
 
-		return await ds.groupRepository().findOneBy({ guid: guid });
+        const auth = await AuthLogic.passwordLogin(ds, bodyJson["emailAddress"], bodyJson["password"]);
+        return auth.tokenize();
 	}
-	public async postRenew(req: express.Request, ds: EntitiesDataSource): Promise<GroupDto | null> {
-		const guid = req.params["guid"];
+	public async postRenew(req: express.Request, ds: EntitiesDataSource): Promise<string> {
+        const bodyString = req.body;
+        const bodyJson = JSON.parse(bodyString);
 
-		return await ds.groupRepository().findOneBy({ guid: guid });
+        const auth = await AuthLogic.tokenLogin(bodyJson["token"]);
+        return auth.tokenize();
 	}
 }

@@ -74,17 +74,16 @@ export class AuthLogic {
             .createQueryBuilder("s")
             .where(`s.guid IN (
                 SELECT
-                    p.securables_guid 
-                FROM 
+                    p.securables_guid
+                FROM
                     "users" u
-                    JOIN "memberships" m ON u.guid = m.guid
-                    JOIN "groups" g ON g.guid  = m.groups_guid
-                    JOIN "permissions" p ON p.groups_guid  = m.groups_guid
+                    JOIN memberships m ON m.users_guid = u.guid AND m.is_included = TRUE
+                    JOIN permissions p ON p.groups_guid = m.groups_guid AND p.is_allowed = TRUE
                 WHERE
-                    p.is_allowed  = TRUE
-                    AND u.guid = :guid
-                GROUP BY p.securables_guid 
+                    u.guid = :guid
+                GROUP BY p.securables_guid
             )`, { guid: user.guid })
+            .orderBy("s.display_name", "ASC")
             .getMany();
 
         return ret || [];

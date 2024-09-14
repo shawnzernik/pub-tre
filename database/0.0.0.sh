@@ -25,6 +25,7 @@ SQL_FILES=(
     "foreignkeys/passwords.sql"
     "foreignkeys/permissions.sql"
     "data/securables.sql"
+    "data/administrator.sql"
 )
 
 for SQL_FILE in "${SQL_FILES[@]}"; do
