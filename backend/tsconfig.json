@@ -1,16 +1,16 @@
 {
-	"compilerOptions": {
-	  "target": "es6",                              
-	  "module": "commonjs",
-	  "rootDir": "./src",
-	  "outDir": "./dist",
-	  "esModuleInterop": true,
-	  "skipLibCheck": true,
-	  "strict": true,
-	  "moduleResolution": "node",                  /* Ensure module resolution is correct */
-	  "lib": ["es6", "dom"],                        /* Explicitly include necessary libraries */
-	  "forceConsistentCasingInFileNames": true,
-	  "emitDecoratorMetadata": true,
-	  "experimentalDecorators": true
-	}
-  }
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "moduleResolution": "node",
+        "lib": ["es6", "dom"],
+        "forceConsistentCasingInFileNames": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true
+    }
+}

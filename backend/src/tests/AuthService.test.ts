@@ -1,55 +1,140 @@
-import { ChildProcess, fork, spawn } from "child_process";
+import https from 'https';
+import fetch from "node-fetch";
 
 describe("AuthService", () => {
-    let webProcess: ChildProcess;
-    let webProcessReady: boolean = false;
-    let webProcessWait = 2000;
-    let webProcessRetires = 3;
+    let agent = new https.Agent({ rejectUnauthorized: false });
 
-    beforeAll(async () => {
-        const onOutOrError = (data: string) => {
-            console.log(data)
-            if (data.includes("Server listening on port")) 
-                webProcessReady = true;
-        };
-        
-        webProcess = spawn("npx tsc && node ./dist/index.js");
-        webProcess.stdout!.on("data", onOutOrError);
-        webProcess.stderr!.on("data", onOutOrError);
-
-        return new Promise<void>((resolve, reject) => {
-            let retries = 0;
-            const timeoutCallback = () => {
-                if (webProcessReady) {
-                    resolve();
-                    return;
-                }
-
-                retries++;
-                if (retries > webProcessRetires) { 
-                    reject("Max web process retries!");
-                    return;
-                }
-
-                setTimeout(timeoutCallback, webProcessWait);
-            };
-            setTimeout(timeoutCallback, webProcessWait);
+    test("POST /api/v0/auth/login should return token", async () => {
+        const body = JSON.stringify({ 
+            emailAddress: "administrator@localhost", 
+            password: "Welcome123" 
         });
-    }, 100000);
-    afterAll(() => {
-        webProcess.kill();
+        const response = await fetch(
+            "https://localhost:4433/api/v0/auth/login",
+            {
+                agent: agent,
+                method: "POST",
+                body: body,
+                headers: { "Content-Type": "application/json" }
+            }
+        );
+
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText}`);
+
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+
+        const obj = await response.json();
+        const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+        expect(jwtRegex.test(obj["data"])).toBeTruthy();
     });
-
-    it("should provide token on successful login", async () => {
-        const response = await fetch("https://localhost:4433", {
-            method: "POST",
-            body: JSON.stringify({
-                emailAddress: "administrator@localhost",
-                password: "Welcome123"
-            })
+    test("POST /api/v0/auth/login should error", async () => {
+        const body = JSON.stringify({ 
+            emailAddress: "administrator@localhost", 
+            password: "Welcome1234" 
         });
+        const response = await fetch(
+            "https://localhost:4433/api/v0/auth/login",
+            {
+                agent: agent,
+                method: "POST",
+                body: body,
+                headers: { "Content-Type": "application/json" }
+            }
+        );
 
-        const data = await response.json();
+        expect(!response.ok).toBeTruthy();
+        expect(response.status).toBe(400);
 
-    }, 100000);
+        const obj = await response.json();
+
+        expect(obj["error"]).toEqual("Error: Invalid login!")
+    });
+    test("POST /api/v0/auth/token should return token", async () => {
+        const body = JSON.stringify({ 
+            emailAddress: "administrator@localhost", 
+            password: "Welcome123" 
+        });
+        let response = await fetch(
+            "https://localhost:4433/api/v0/auth/login",
+            {
+                agent: agent,
+                method: "POST",
+                body: body,
+                headers: { "Content-Type": "application/json" }
+            }
+        );
+
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText}`);
+
+        let obj = await response.json();
+        const token = obj["data"];
+
+        response = await fetch(
+            "https://localhost:4433/api/v0/auth/renew",
+            {
+                agent: agent,
+                method: "GET",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText}`);
+
+        obj = await response.json();
+        const newToken = obj["data"];
+
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+
+        const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+        expect(jwtRegex.test(newToken)).toBeTruthy();
+        expect(newToken).not.toEqual(token);
+    });
+    test("POST /api/v0/auth/token should error", async () => {
+        const body = JSON.stringify({ 
+            emailAddress: "administrator@localhost", 
+            password: "Welcome123" 
+        });
+        let response = await fetch(
+            "https://localhost:4433/api/v0/auth/login",
+            {
+                agent: agent,
+                method: "POST",
+                body: body,
+                headers: { "Content-Type": "application/json" }
+            }
+        );
+
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText}`);
+
+        let obj = await response.json();
+        const token = obj["data"];
+
+        response = await fetch(
+            "https://localhost:4433/api/v0/auth/renew",
+            {
+                agent: agent,
+                method: "GET",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer bad${token}`
+                }
+            }
+        );
+
+        expect(!response.ok).toBeTruthy();
+        expect(response.status).toBe(400);
+
+        obj = await response.json();
+
+        expect(obj["error"]).toEqual("Error: Invalid token!")
+    });
 });

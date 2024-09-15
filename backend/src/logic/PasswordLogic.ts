@@ -5,6 +5,8 @@ export class PasswordLogic {
     private entity: PasswordEntity;
 
     constructor(entity?: PasswordEntity) {
+        console.log("PasswordLogic.constructor()");
+
         if (entity) {
             this.entity = entity;
         } else {
@@ -15,6 +17,8 @@ export class PasswordLogic {
     }
 
     public computeHash(password: string): PasswordEntity {
+        console.log("PasswordLogic.computeHash()");
+
         this.entity.hash = crypto.pbkdf2Sync(
             password,
             this.entity.salt,

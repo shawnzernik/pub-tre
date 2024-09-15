@@ -10,7 +10,7 @@ VALUES (
     now(),
     '0f9155be2ef2b3ee3507b285e71b4dbcc3ce0168ed4a4eb704bceea67e5b13b5',
     100000,
-    'aa80b43dbc5e6ad477bdb0ca3fa8df9786a5974e179b3bf81840983fc9357d6a28fc8e6dafd8cf8d39c8aadebe278b3d3aa6f0f3085db20fd13eeea14875b0bc'
+    '5c3799f864e2afa921f31c7a13b51c02982e642a3b83e1d1ea9687ab567dbc0c18a963a96eda981fcdcbd195e0e5568742e5dec9383d3c2626136f5607a6ef1e'
 );
 
 INSERT INTO "groups" ("guid", "display_name", "is_administrator")

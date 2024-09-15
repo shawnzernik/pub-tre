@@ -4,25 +4,31 @@ import { BaseService } from "./BaseService";
 import { AuthLogic } from "../logic/AuthLogic";
 
 export class AuthService extends BaseService {
-	public constructor(app: express.Express) {
-		super();
+    public constructor(app: express.Express) {
+        super();
 
-		app.post("/api/v0/auth/login", (req, resp) => { this.methodWrapper(req, resp, this.postLogin) });
-		app.post("/api/v0/auth/renew", (req, resp) => { this.methodWrapper(req, resp, this.postRenew) });
-	}
+        console.log("AuthService.constructor()");
 
-	public async postLogin(req: express.Request, ds: EntitiesDataSource): Promise<string> {
-        const bodyString = req.body;
-        const bodyJson = JSON.parse(bodyString);
+        app.post("/api/v0/auth/login", (req, resp) => { this.methodWrapper(req, resp, this.postLogin) });
+        app.get("/api/v0/auth/renew", (req, resp) => { this.methodWrapper(req, resp, this.postRenew) });
+    }
 
+    public async postLogin(req: express.Request, ds: EntitiesDataSource): Promise<string> {
+        console.log("AuthService.postLogin()");
+
+        const bodyJson = req.body;
         const auth = await AuthLogic.passwordLogin(ds, bodyJson["emailAddress"], bodyJson["password"]);
         return auth.tokenize();
-	}
-	public async postRenew(req: express.Request, ds: EntitiesDataSource): Promise<string> {
-        const bodyString = req.body;
-        const bodyJson = JSON.parse(bodyString);
+    }
+    public async postRenew(req: express.Request, ds: EntitiesDataSource): Promise<string> {
+        console.log("AuthService.postRenew()");
 
-        const auth = await AuthLogic.tokenLogin(bodyJson["token"]);
+        let bearer = req.headers["authorization"];
+        if(!bearer)
+            throw new Error("You must provide an Authorization header with the value of 'Bearer JWTTOKEN'!");
+        bearer = bearer.replace("Bearer ", "").trim();
+             
+        const auth = await AuthLogic.tokenLogin(bearer);
         return auth.tokenize();
-	}
+    }
 }

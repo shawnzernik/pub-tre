@@ -2,10 +2,16 @@ import { ResponseDto } from "common/src/models/ResponseDto";
 import express from "express";
 
 export function CheckSecurity(securableName: string) {
+    console.log(`CheckSecurity(${securableName})`);
+
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        console.log(`CheckSecurity(${securableName}) - function()`);
+
         const originalMethod = descriptor.value;
 
         descriptor.value = async function (req: express.Request, resp: express.Response, ...args: any[]) {
+            console.log(`CheckSecurity(${securableName}) - function() - function()`);
+
             const authHeader = req.headers["authorization"];
             const authToken = authHeader && authHeader.split(" ")[1];
 
@@ -28,9 +34,11 @@ export function CheckSecurity(securableName: string) {
 }
 
 async function checkAuthentication(token: string): Promise<boolean> {
+    console.log("checkAuthentication()");
     return true;
 }
 
 async function checkAuthorization(token: string, securableName: string): Promise<boolean> {
+    console.log("checkAuthentication()");
     return true;
 }

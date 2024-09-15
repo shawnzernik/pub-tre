@@ -17,6 +17,8 @@ export class AuthLogic {
     private constructor() { }
 
     public tokenize(): string {
+        console.log("AuthLogic.tokenize()");
+
         const key = fs.readFileSync(Config.jwtPrivateKeyFile, { encoding: "utf8" });
         const token = new JwtToken(this);
         const ret = token.sign(key);
@@ -24,6 +26,8 @@ export class AuthLogic {
     }
 
     public static async passwordLogin(eds: EntitiesDataSource, email: string, password: string): Promise<AuthLogic> {
+        console.log("AuthLogic.passwordLogin()");
+
         const user = await eds.userRepository().findOneBy({ emailAddress: email });
         if (!user)
             throw new Error(AuthLogic.invalidLoginMsg);
@@ -52,11 +56,13 @@ export class AuthLogic {
         return ret;
     }
     public static async tokenLogin(token: string): Promise<AuthLogic> {
+        console.log("AuthLogic.tokenLogin()");
+
         const key = fs.readFileSync(Config.jwtPrivateKeyFile, { encoding: "utf8" });
         let payload = null;
         try { payload = JwtToken.verify(token, key); }
         catch (err) {
-            console.log(`AuthLogic.tokenLogin ${token} - Error ${err}`);
+            console.log(`AuthLogic.tokenLogin() - ${token} - Error ${err}`);
             throw new Error(AuthLogic.invalidTokenMsg);
         }
 
@@ -70,6 +76,8 @@ export class AuthLogic {
     }
 
     private static async loadAllowedSecurablesForUser(eds: EntitiesDataSource, user: UserDto): Promise<SecurableDto[]> {
+        console.log("AuthLogic.loadAllowedSecurablesForUser()");
+
         const ret = await eds.securableRepository()
             .createQueryBuilder("s")
             .where(`s.guid IN (
