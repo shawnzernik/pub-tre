@@ -1,6 +1,5 @@
 import https from 'https';
 import fetch from "node-fetch";
-import { WebApp } from "../index";
 
 jest.setTimeout(0);
 

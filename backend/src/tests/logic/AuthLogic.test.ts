@@ -1,10 +1,10 @@
-import { AuthLogic } from "../logic/AuthLogic";
-import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { UserDto } from "common/src/models/UserDto";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
-import { UserEntity } from "../data/UserEntity";
 import { PasswordDto } from "common/src/models/PasswordDto";
 import { SecurableDto } from "common/src/models/SecurableDto";
+import { EntitiesDataSource } from "../../data/EntitiesDataSource";
+import { UserEntity } from "../../data/UserEntity";
+import { AuthLogic } from "../../logic/AuthLogic";
 
 jest.mock("../data/EntitiesDataSource");
 

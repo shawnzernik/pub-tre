@@ -1,5 +1,5 @@
-import { EntitiesDataSource } from "../data/EntitiesDataSource";
-import { AuthLogic } from "../logic/AuthLogic";
+import { EntitiesDataSource } from "../../data/EntitiesDataSource";
+import { AuthLogic } from "../../logic/AuthLogic";
 
 describe("AuthLogic", () => {
     it("should load the user from the database", async () => {

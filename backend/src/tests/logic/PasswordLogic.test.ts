@@ -1,4 +1,4 @@
-import { PasswordLogic } from "../logic/PasswordLogic";
+import { PasswordLogic } from "../../logic/PasswordLogic";
 
 test("Password Creator", () => {
 	const pl = new PasswordLogic();
