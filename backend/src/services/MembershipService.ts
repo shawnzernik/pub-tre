@@ -4,8 +4,6 @@ import { MembershipEntity } from "../data/MembershipEntity";
 import { BaseService } from "./BaseService";
 import { CheckSecurity } from "./CheckSecurity";
 
-export type Method<T> = (req: express.Request, ds: EntitiesDataSource) => Promise<T>;
-
 export class MembershipService extends BaseService {
 	public constructor(app: express.Express) {
 		super();
@@ -14,7 +12,7 @@ export class MembershipService extends BaseService {
 
 		app.get("/api/v0/membership/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
 		app.get("/api/v0/memberships", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.put("/api/v0/membership", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/membership", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
 		app.delete("/api/v0/membership/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 

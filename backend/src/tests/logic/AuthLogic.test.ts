@@ -6,7 +6,7 @@ import { EntitiesDataSource } from "../../data/EntitiesDataSource";
 import { UserEntity } from "../../data/UserEntity";
 import { AuthLogic } from "../../logic/AuthLogic";
 
-jest.mock("../data/EntitiesDataSource");
+jest.mock("../../data/EntitiesDataSource");
 
 describe("AuthLogic", () => {
     let userDtoMock: UserDto;

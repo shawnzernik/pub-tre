@@ -13,7 +13,7 @@ export class PasswordService extends BaseService {
 
 		app.get("/api/v0/password/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/passwords", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.put("/api/v0/password", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/password", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
 		app.delete("/api/v0/password/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 

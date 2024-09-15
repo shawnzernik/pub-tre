@@ -13,7 +13,7 @@ export class PermissionService extends BaseService {
 
 		app.get("/api/v0/permission/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/permissions", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.put("/api/v0/permission", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/permission", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
 		app.delete("/api/v0/permission/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 

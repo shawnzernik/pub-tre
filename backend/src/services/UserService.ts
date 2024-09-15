@@ -1,8 +1,8 @@
 import express from "express";
-import { UserDto } from "common/src/models/UserDto";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
-import { UserEntity } from "../data/UserEntity";
 import { BaseService } from "./BaseService";
+import { UserDto } from "common/src/models/UserDto";
+import { UserEntity } from "../data/UserEntity";
 import { CheckSecurity } from "./CheckSecurity";
 
 export class UserService extends BaseService {
@@ -13,7 +13,7 @@ export class UserService extends BaseService {
 
 		app.get("/api/v0/user/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/users", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.put("/api/v0/user", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/user", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
 		app.delete("/api/v0/user/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
