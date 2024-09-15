@@ -13,7 +13,7 @@ export class GroupService extends BaseService {
 
 		app.get("/api/v0/group/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
 		app.get("/api/v0/groups", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.put("/api/v0/group", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/group", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
 		app.delete("/api/v0/group/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 

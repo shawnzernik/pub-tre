@@ -23,12 +23,12 @@ export class AuthService extends BaseService {
     public async postRenew(req: express.Request, ds: EntitiesDataSource): Promise<string> {
         console.log("AuthService.postRenew()");
 
-        let bearer = req.headers["authorization"];
-        if(!bearer)
+        const authHeader = req.headers["authorization"];
+        const authToken = authHeader && authHeader.split(" ")[1];
+        if(!authToken)
             throw new Error("You must provide an Authorization header with the value of 'Bearer JWTTOKEN'!");
-        bearer = bearer.replace("Bearer ", "").trim();
              
-        const auth = await AuthLogic.tokenLogin(bearer);
+        const auth = await AuthLogic.tokenLogin(authToken);
         return auth.tokenize();
     }
 }

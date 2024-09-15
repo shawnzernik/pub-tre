@@ -44,8 +44,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
+            "console": "externalTerminal",
         },
         {
             "type": "node",

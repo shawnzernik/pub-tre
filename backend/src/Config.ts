@@ -16,4 +16,6 @@ export class Config {
 	
 	public static jwtPublicKeyFile = process.env.JWT_PUBLIC_KEY_FILE || "../frontend/static/public.key"
 	public static jwtPrivateKeyFile = process.env.JWT_PUBLIC_KEY_FILE || "./private.key"
+
+	public static jestTimeoutSeconds = Number.parseInt(process.env.JEST_TIMEOUT_SECONDS || "300");
 }

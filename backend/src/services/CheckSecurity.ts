@@ -1,5 +1,7 @@
 import { ResponseDto } from "common/src/models/ResponseDto";
 import express from "express";
+import { AuthLogic } from "../logic/AuthLogic";
+import { HttpStatus } from "common/src/models/HttpStatus";
 
 export function CheckSecurity(securableName: string) {
     console.log(`CheckSecurity(${securableName})`);
@@ -14,18 +16,17 @@ export function CheckSecurity(securableName: string) {
 
             const authHeader = req.headers["authorization"];
             const authToken = authHeader && authHeader.split(" ")[1];
-
-            if (!authToken)
-                return resp.status(401).json({ error: "Unauthorized: Missing token" } as ResponseDto<any>);
-
-            const isAuthenticated = await checkAuthentication(authToken);
-            if (!isAuthenticated)
-                return resp.status(401).json({ error: "Unauthorized: Invalid token" } as ResponseDto<any>);
-
-            const hasPermission = await checkAuthorization(authToken, securableName);
-            if (!hasPermission)
-                return resp.status(403).json({ message: "Forbidden: Insufficient permissions" });
-
+            if(!authToken)
+                return resp.status(401).json({ error: "Missing token" } as ResponseDto<any>);
+    
+            try {
+                const auth = await AuthLogic.tokenLogin(authToken);
+                await checkAuthorization(auth, securableName);
+            }
+            catch(err) {
+                resp.status(HttpStatus.FORBIDDEN).send({ error: `${err}` } as ResponseDto<any>);
+            }
+            
             return originalMethod.apply(this, [req, resp, ...args]);
         };
 
@@ -33,12 +34,16 @@ export function CheckSecurity(securableName: string) {
     };
 }
 
-async function checkAuthentication(token: string): Promise<boolean> {
+async function checkAuthorization(auth: AuthLogic, securableName: string): Promise<boolean> {
     console.log("checkAuthentication()");
-    return true;
-}
+    
+    if(!auth.securables || auth.securables.length < 1)
+        throw new Error("No securables!");
 
-async function checkAuthorization(token: string, securableName: string): Promise<boolean> {
-    console.log("checkAuthentication()");
-    return true;
+    for(let cnt = 0; cnt < auth.securables.length; cnt++) {
+        if(auth.securables[cnt].displayName.toLowerCase() === securableName.toLowerCase())
+            return true;
+    }
+
+    throw new Error("Access Denied");
 }
