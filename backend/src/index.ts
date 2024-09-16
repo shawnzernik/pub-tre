@@ -1,17 +1,17 @@
 import express from "express";
-import { Config } from "./Config";
 import fs from "fs";
-import https from "https";
-import { ResponseDto } from "common/src/models/ResponseDto";
-import { AuthService } from "./services/AuthService";
 import path from "path";
+import https from "https";
+import morgan from "morgan";
+import { ResponseDto } from "common/src/models/ResponseDto";
+import { Config } from "./Config";
+import { AuthService } from "./services/AuthService";
 import { GroupService } from "./services/GroupService";
 import { MembershipService } from "./services/MembershipService";
 import { PasswordService } from "./services/PasswordService";
 import { PermissionService } from "./services/PermissionService";
 import { SecurableService } from "./services/SecurableService";
 import { UserService } from "./services/UserService";
-import morgan from "morgan";
 
 export class WebApp {
     private app: express.Express = express();
@@ -27,7 +27,11 @@ export class WebApp {
 
         console.log(`WebApp.execute() - Static Directory: ${path.resolve(Config.staticDirectory)}`);
         this.app.use("/static", express.static(Config.staticDirectory));
-    
+
+        this.app.get('/', (req, res) => {
+            res.redirect('/static/index.html');
+        });
+
         console.log(`WebApp.execute() - JavaScript Directory: ${path.resolve(Config.javascriptDirectory)}`);
         this.app.use("/scripts", express.static(Config.javascriptDirectory));
 

@@ -28,11 +28,12 @@
             "type": "node",
             "request": "launch",
             "name": "backend website",
+            "runtimeExecutable": "npx",
             "runtimeArgs": [
+                "nodemon", // Use nodemon
+                "--inspect", // Enable Node.js inspector for debugging
                 "-r",
-                "ts-node/register"
-            ],
-            "args": [
+                "ts-node/register",
                 "${workspaceFolder}/backend/src/index.ts" // Path to your TypeScript file
             ],
             "sourceMaps": true, // Enable source maps support for TypeScript
@@ -44,7 +45,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "console": "externalTerminal",
+            "console": "integratedTerminal",
         },
         {
             "type": "node",
