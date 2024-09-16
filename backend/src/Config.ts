@@ -1,7 +1,7 @@
 import process from "process"
 
 export class Config {
-	public static javascriptDirectory = process.env.JAVASCRIPT_DIR || "../frontend/dist";
+	public static javascriptDirectory = process.env.JAVASCRIPT_DIR || "../frontend/scripts";
 	public static staticDirectory = process.env.STATIC_DIR || "../frontend/static";
 	
 	public static httpsPort = Number.parseInt(process.env.HTTPS_PORT || "4433");

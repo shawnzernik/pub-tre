@@ -29,7 +29,7 @@ export class WebApp {
         this.app.use("/static", express.static(Config.staticDirectory));
 
         this.app.get('/', (req, res) => {
-            res.redirect('/static/index.html');
+            res.redirect('/static/pages/login.html');
         });
 
         console.log(`WebApp.execute() - JavaScript Directory: ${path.resolve(Config.javascriptDirectory)}`);

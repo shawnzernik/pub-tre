@@ -1,0 +1,21 @@
+@font-face {
+    font-family: 'Serif';
+    src: url('./roboto-slab/RobotoSlab-VariableFont_wght.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'SansSerif';
+    src: url('./roboto/Roboto-Regular.ttf') format('truetype');
+}
+
+* {
+    font-family: "Serif";
+    font-size: 14px;
+    font-weight: 400;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+body {
+    border: 0;
+    margin: 0;
+}
