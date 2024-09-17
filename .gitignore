@@ -5,3 +5,4 @@ dist
 postgres/data
 coverage
 make-dataset/datasets
+frontend/scripts

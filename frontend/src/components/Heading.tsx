@@ -1,4 +1,5 @@
 import * as React from "react";
+import { HeadingTheme } from "./Heading.Theme";
 
 interface Props {
     children: React.ReactNode;
@@ -8,8 +9,6 @@ interface State { }
 
 export class Heading extends React.Component<Props, State> {
 	public render(): React.ReactNode {
-		return <span
-            style={{ fontSize: 7 - this.props.level + "em" }}
-        >{this.props.children}</span>
+		return <span style={HeadingTheme(this.props.level)} >{this.props.children}</span>
 	}
 }

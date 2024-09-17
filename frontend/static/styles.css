@@ -1,18 +1,19 @@
 @font-face {
-    font-family: 'Serif';
+    font-family: "HeadingText";
     src: url('./roboto-slab/RobotoSlab-VariableFont_wght.ttf') format('truetype');
 }
 @font-face {
-    font-family: 'SansSerif';
+    font-family: "BodyText";
     src: url('./roboto/Roboto-Regular.ttf') format('truetype');
 }
 
 * {
-    font-family: "Serif";
+    font-family: "BodyText";
     font-size: 14px;
     font-weight: 400;
     box-sizing: border-box;
     overflow: hidden;
+    color: #686868;
 }
 
 body {

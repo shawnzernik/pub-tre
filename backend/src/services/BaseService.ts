@@ -15,8 +15,8 @@ export class BaseService {
 			await ds.initialize();
 			const ret = await method(req, ds);
 			resp.status(HttpStatus.OK).send({ data: ret } as ResponseDto<any>);
-		} catch (err) {
-			resp.status(HttpStatus.BAD_REQUEST).send({ error: `${err}` } as ResponseDto<any>);
+		} catch (err: any) {
+			resp.status(HttpStatus.BAD_REQUEST).send({ error: err["message"] } as ResponseDto<any>);
 		} finally {
 			await ds.destroy();
 		}
