@@ -1,5 +1,5 @@
 import express from "express";
-import { HttpStatus } from "common/src/models/HttpStatus"
+import { HttpStatus } from "common/src/HttpStatus"
 import { ResponseDto } from "common/src/models/ResponseDto";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 
@@ -8,6 +8,11 @@ export type Method<T> = (req: express.Request, ds: EntitiesDataSource) => Promis
 export class BaseService {
 	public async methodWrapper<T>(req: express.Request, resp: express.Response, method: Method<T>): Promise<void> {
         console.log("BaseService.methodWrapper()");
+
+        if(!resp.status) {
+            console.log("BaseService.methodWrapper() - no resp.status");
+            return;
+        }
 
         const ds = new EntitiesDataSource();
 

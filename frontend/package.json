@@ -21,10 +21,11 @@
 		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
-		"common": "file:../common",
 		"@types/node": "^22.5.0",
 		"@types/react": "^18.3.4",
 		"@types/react-dom": "^18.3.0",
+		"common": "file:../common",
+		"jose": "^5.9.2",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"
 	}

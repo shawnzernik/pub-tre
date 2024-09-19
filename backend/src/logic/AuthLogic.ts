@@ -3,9 +3,10 @@ import { UserDto } from "common/src/models/UserDto";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { PasswordEntity } from "../data/PasswordEntity";
 import { PasswordLogic } from "./PasswordLogic";
-import { JwtToken } from "common/src/logic/JwtToken";
 import { Config } from "../Config";
 import { SecurableDto } from "common/src/models/SecurableDto";
+import { UserEntity } from "../data/UserEntity";
+import { JwtToken } from "./JwtToken";
 
 export class AuthLogic {
     private static invalidLoginMsg = "Invalid login!";
@@ -25,6 +26,16 @@ export class AuthLogic {
         return ret;
     }
 
+    public static async anonymousLogin(eds: EntitiesDataSource): Promise<AuthLogic> {
+        console.log("AuthLogic.anonymousLogin()");
+
+        const user = await eds.userRepository().findOneBy({ emailAddress: "anonymous@localhost" });
+        if (!user)
+            throw new Error(AuthLogic.invalidLoginMsg);
+
+        let ret = await AuthLogic.createLogic(eds, user);
+        return ret;
+    }
     public static async passwordLogin(eds: EntitiesDataSource, email: string, password: string): Promise<AuthLogic> {
         console.log("AuthLogic.passwordLogin()");
 
@@ -50,11 +61,16 @@ export class AuthLogic {
         if (passwords[0].hash !== rehashedPassword.hash)
             throw new Error(AuthLogic.invalidLoginMsg);
 
+        let ret = await AuthLogic.createLogic(eds, user);
+        return ret;
+    }
+    private static async createLogic(eds: EntitiesDataSource, user: UserEntity): Promise<AuthLogic> {
         const ret = new AuthLogic();
         ret.user = user;
         ret.securables = await AuthLogic.loadAllowedSecurablesForUser(eds, user);
         return ret;
     }
+
     public static async tokenLogin(token: string): Promise<AuthLogic> {
         console.log("AuthLogic.tokenLogin()");
 

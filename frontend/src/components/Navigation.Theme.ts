@@ -30,17 +30,18 @@ export class NavigationTheme {
         border: this.debugStage ? "1px solid black" : undefined,
         height: "fit-content",
         color: Theme.lightNeutral,
+        cursor: "pointer"
     };
     public static stageTopMenuIcon: CSSProperties = {
         border: this.debugStage ? "1px solid black" : undefined,
-        color: Theme.lightContrast
+        color: Theme.lightText
     };
     public static stageMiddle: CSSProperties = {
         border: this.debugStage ? "1px solid black" : undefined,
         display: "flex",
         flexDirection: "row",
         width: "100%",
-        height: "calc(100vh - 4em - 4em)"
+        height: "calc(100vh - 7.5em)"
     };
     public static stageMiddleMenu: CSSProperties = {
         display: "flex",

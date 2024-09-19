@@ -43,10 +43,10 @@ describe("PermissionsService", () => {
             headers: { "Content-Type": "application/json" }
         });
 
-        if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
-
         const obj = await response.json();
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
+
         if (!obj["data"])
             throw new Error("Return from login did not provide a 'data' with the token!");
 
@@ -83,8 +83,9 @@ describe("PermissionsService", () => {
             }
         });
 
+        const obj = await response.json();
         if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
 
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
@@ -112,8 +113,9 @@ describe("PermissionsService", () => {
             }
         });
 
+        const obj = await response.json();
         if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
 
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
@@ -134,10 +136,10 @@ describe("PermissionsService", () => {
             }
         });
 
-        if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
-
         const obj = await response.json();
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
+
         if (!obj["data"])
             throw new Error("No data returned!");
 
@@ -162,10 +164,10 @@ describe("PermissionsService", () => {
             }
         });
 
-        if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
-
         const obj = await response.json();
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
+
         if (!obj["data"])
             throw new Error("No data returned!");
 
@@ -186,8 +188,9 @@ describe("PermissionsService", () => {
             }
         });
 
+        const obj = await response.json();
         if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
 
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);

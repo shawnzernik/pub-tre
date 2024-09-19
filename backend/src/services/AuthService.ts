@@ -11,6 +11,7 @@ export class AuthService extends BaseService {
 
         app.post("/api/v0/auth/login", (req, resp) => { this.methodWrapper(req, resp, this.postLogin) });
         app.get("/api/v0/auth/renew", (req, resp) => { this.methodWrapper(req, resp, this.postRenew) });
+        app.get("/api/v0/auth/anonymous", (req, resp) => { this.methodWrapper(req, resp, this.getAnonymous) });
     }
 
     public async postLogin(req: express.Request, ds: EntitiesDataSource): Promise<string> {
@@ -18,6 +19,12 @@ export class AuthService extends BaseService {
 
         const bodyJson = req.body;
         const auth = await AuthLogic.passwordLogin(ds, bodyJson["emailAddress"], bodyJson["password"]);
+        return auth.tokenize();
+    }
+    public async getAnonymous(req: express.Request, ds: EntitiesDataSource): Promise<string> {
+        console.log("AuthService.postLogin()");
+
+        const auth = await AuthLogic.anonymousLogin(ds);
         return auth.tokenize();
     }
     public async postRenew(req: express.Request, ds: EntitiesDataSource): Promise<string> {

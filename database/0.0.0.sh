@@ -21,11 +21,15 @@ SQL_FILES=(
     "tables/permissions.sql"
     "tables/securables.sql"
     "tables/users.sql"
+    "tables/menus.sql"
     "foreignkeys/memberships.sql"
     "foreignkeys/passwords.sql"
     "foreignkeys/permissions.sql"
+    "foreignkeys/menus.sql"
     "data/securables.sql"
+    "data/menus.sql"
     "data/administrator.sql"
+    "data/anonymous.sql"
 )
 
 for SQL_FILE in "${SQL_FILES[@]}"; do

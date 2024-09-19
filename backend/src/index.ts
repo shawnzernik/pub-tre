@@ -12,6 +12,7 @@ import { PasswordService } from "./services/PasswordService";
 import { PermissionService } from "./services/PermissionService";
 import { SecurableService } from "./services/SecurableService";
 import { UserService } from "./services/UserService";
+import { MenuService } from "./services/MenusService";
 
 export class WebApp {
     private app: express.Express = express();
@@ -46,6 +47,7 @@ export class WebApp {
         new PermissionService(this.app);
         new SecurableService(this.app);
         new UserService(this.app);
+        new MenuService(this.app);
 
         console.log(`WebApp.execute() - HTTPS Cert Path: ${path.resolve(Config.httpsCertPath)}`);
         console.log(`WebApp.execute() - HTTPS Key Path: ${path.resolve(Config.httpsKeyPath)}`);

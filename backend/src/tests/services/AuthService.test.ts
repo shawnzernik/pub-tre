@@ -19,13 +19,13 @@ describe("AuthService", () => {
             }
         );
 
+        const obj = await response.json();
         if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
 
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        const obj = await response.json();
         const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
         expect(jwtRegex.test(obj["data"])).toBeTruthy();
     });
@@ -49,7 +49,7 @@ describe("AuthService", () => {
 
         const obj = await response.json();
 
-        expect(obj["error"]).toEqual("Error: Invalid login!")
+        expect(obj["error"]).toEqual("Invalid login!")
     });
     test("POST /api/v0/auth/token should return token", async () => {
         const body = JSON.stringify({ 
@@ -66,10 +66,10 @@ describe("AuthService", () => {
             }
         );
 
-        if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
-
         let obj = await response.json();
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
+
         const token = obj["data"];
 
         response = await fetch(
@@ -84,10 +84,10 @@ describe("AuthService", () => {
             }
         );
 
-        if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
-
         obj = await response.json();
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
+
         const newToken = obj["data"];
 
         expect(response.ok).toBeTruthy();
@@ -112,10 +112,10 @@ describe("AuthService", () => {
             }
         );
 
-        if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText}`);
-
         let obj = await response.json();
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
+
         const token = obj["data"];
 
         response = await fetch(
@@ -135,6 +135,6 @@ describe("AuthService", () => {
 
         obj = await response.json();
 
-        expect(obj["error"]).toEqual("Error: Invalid token!")
+        expect(obj["error"]).toEqual("Invalid token!")
     });
 });

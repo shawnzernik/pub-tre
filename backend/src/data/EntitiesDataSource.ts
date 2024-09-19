@@ -12,6 +12,8 @@ import { MembershipRepository } from "./MembershipsRepository";
 import { PasswordRepository } from "./PasswordRepository";
 import { PermissionRepository } from "./PermissionsRepository";
 import { SecurableRepository } from "./SecurableRepository";
+import { MenuEntity } from "./MenuEntity";
+import { MenuRepository } from "./MenuRepository";
 
 export class EntitiesDataSource extends DataSource {
 	public constructor() {
@@ -28,7 +30,8 @@ export class EntitiesDataSource extends DataSource {
 				PasswordEntity,
 				PermissionEntity,
 				SecurableEntity,
-				UserEntity
+				UserEntity,
+                MenuEntity
 			],
 		});
 	}
@@ -73,5 +76,12 @@ export class EntitiesDataSource extends DataSource {
 		if (!this._userRepository)
 			this._userRepository = new UserRepository(UserEntity, this.createEntityManager(), this.createQueryRunner());
 		return this._userRepository;
+	}
+
+	private _menuRepository: MenuRepository | undefined;
+	public menuRepository() {
+		if (!this._menuRepository)
+			this._menuRepository = new MenuRepository(MenuEntity, this.createEntityManager(), this.createQueryRunner());
+		return this._menuRepository;
 	}
 }

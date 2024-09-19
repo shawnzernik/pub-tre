@@ -1,7 +1,7 @@
 import { ResponseDto } from "common/src/models/ResponseDto";
 import express from "express";
 import { AuthLogic } from "../logic/AuthLogic";
-import { HttpStatus } from "common/src/models/HttpStatus";
+import { HttpStatus } from "common/src/HttpStatus";
 
 export function CheckSecurity(securableName: string) {
     console.log(`CheckSecurity(${securableName})`);
@@ -13,6 +13,11 @@ export function CheckSecurity(securableName: string) {
 
         descriptor.value = async function (req: express.Request, resp: express.Response, ...args: any[]) {
             console.log(`CheckSecurity(${securableName}) - function() - function()`);
+            
+            // Type assertion to ensure resp is of type express.Response
+            if (!(resp instanceof Response)) {
+                return originalMethod.apply(this, [req, resp, ...args]);
+            }
 
             const authHeader = req.headers["authorization"];
             const authToken = authHeader && authHeader.split(" ")[1];
@@ -24,7 +29,7 @@ export function CheckSecurity(securableName: string) {
                 await checkAuthorization(auth, securableName);
             }
             catch(err) {
-                resp.status(HttpStatus.FORBIDDEN).send({ error: `${err}` } as ResponseDto<any>);
+                return resp.status(HttpStatus.FORBIDDEN).send({ error: `${err}` } as ResponseDto<any>);
             }
             
             return originalMethod.apply(this, [req, resp, ...args]);

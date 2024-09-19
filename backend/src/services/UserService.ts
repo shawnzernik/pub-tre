@@ -13,7 +13,7 @@ export class UserService extends BaseService {
 
 		app.get("/api/v0/user/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/users", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.post("/api/v0/user", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/user", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
 		app.delete("/api/v0/user/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
@@ -21,18 +21,20 @@ export class UserService extends BaseService {
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<UserEntity | null> {
         console.log("UserService.getGuid()");
 		const guid = req.params["guid"];
-		return await ds.userRepository().findOneBy({ guid: guid });
+		const ret = await ds.userRepository().findOneBy({ guid: guid });
+        return ret;
 	}
 
 	@CheckSecurity("User:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<UserDto[]> {
         console.log("UserService.getList()");
-		return await ds.userRepository().find();
+		const ret = await ds.userRepository().find();
+        return ret;
 	}
 
 	@CheckSecurity("User:Save")
-	public async putSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("UserService.putSave()");
+	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        console.log("UserService.postSave()");
 		const entity = new UserEntity();
 		entity.copyFrom(req.body as UserDto);
 		await ds.userRepository().save([entity]);

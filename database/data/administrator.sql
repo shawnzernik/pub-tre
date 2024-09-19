@@ -8,9 +8,9 @@ VALUES (
     'ecb3185f-74eb-43b4-9b75-97975e312075',
     'ea042f97-c8f4-447d-a71b-f4c4e0c77cc7',
     now(),
-    '0f9155be2ef2b3ee3507b285e71b4dbcc3ce0168ed4a4eb704bceea67e5b13b5',
+    '7a2fd8236e85a7b61ad1647c1cb339d6bb8928a9280be136f099ebfddb4dd2ca',
     100000,
-    '5c3799f864e2afa921f31c7a13b51c02982e642a3b83e1d1ea9687ab567dbc0c18a963a96eda981fcdcbd195e0e5568742e5dec9383d3c2626136f5607a6ef1e'
+    '7ad7627a5addcea3379c367b0ad8f165d0d2bdba0aeb0dfd4f3825f685f036b513bdbd1ce4df4b4d0e277d85ef51868383b291a4acd86fd926150de5c15e34ea'
 );
 
 INSERT INTO "groups" ("guid", "display_name", "is_administrator")
@@ -25,4 +25,7 @@ SELECT
     '046499bd-1f75-4024-b7a9-307e6a99e1ec',
     s.guid,
     TRUE
-FROM "securables" s;
+FROM "securables" s
+WHERE s."guid" NOT IN (
+    'db0d6063-2266-4bfb-8c96-44dbb90cddf2' -- login
+);

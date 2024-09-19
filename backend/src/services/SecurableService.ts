@@ -13,7 +13,7 @@ export class SecurableService extends BaseService {
 
 		app.get("/api/v0/securable/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/securables", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.post("/api/v0/securable", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/securable", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
 		app.delete("/api/v0/securable/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
@@ -21,18 +21,20 @@ export class SecurableService extends BaseService {
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<SecurableEntity | null> {
         console.log("SecurableService.getGuid()");
 		const guid = req.params["guid"];
-		return await ds.securableRepository().findOneBy({ guid: guid });
+		const ret = await ds.securableRepository().findOneBy({ guid: guid });
+        return ret;
 	}
 
     @CheckSecurity("Securable:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<SecurableDto[]> {
         console.log("SecurableService.getList()");
-		return await ds.securableRepository().find();
+		const ret = await ds.securableRepository().find();
+        return ret;
 	}
 
 	@CheckSecurity("Securable:Save")
-	public async putSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("SecurableService.putSave()");
+	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        console.log("SecurableService.postSave()");
 		const entity = new SecurableEntity();
 		entity.copyFrom(req.body as SecurableDto);
 		await ds.securableRepository().save([entity]);

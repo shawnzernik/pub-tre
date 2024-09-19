@@ -13,7 +13,7 @@ export class PermissionService extends BaseService {
 
 		app.get("/api/v0/permission/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/permissions", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.post("/api/v0/permission", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/permission", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
 		app.delete("/api/v0/permission/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
@@ -21,18 +21,20 @@ export class PermissionService extends BaseService {
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<PermissionEntity | null> {
         console.log("PermissionService.getGuid()");
 		const guid = req.params["guid"];
-		return await ds.permissionRepository().findOneBy({ guid: guid });
+		const ret = await ds.permissionRepository().findOneBy({ guid: guid });
+        return ret;
 	}
 
 	@CheckSecurity("Permission:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
         console.log("PermissionService.getList()");
-		return await ds.permissionRepository().find();
+		const ret = await ds.permissionRepository().find();
+        return ret;
 	}
 
 	@CheckSecurity("Permission:Save")
-	public async putSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("PermissionService.putSave()");
+	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        console.log("PermissionService.postSave()");
 		const entity = new PermissionEntity();
 		entity.copyFrom(req.body as PermissionDto);
 		await ds.permissionRepository().save([entity]);

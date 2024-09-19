@@ -29,6 +29,8 @@ class Page extends BasePage<Props, State> {
         this.state = {
             ...BasePage.defaultState
         };
+
+        AuthService.setToken("");
     }
 
     public async login(): Promise<void> {
@@ -36,11 +38,8 @@ class Page extends BasePage<Props, State> {
 
         try {
             const token = await AuthService.login(this.model.emailAddress, this.model.password);
-            await this.events.setMessage({
-                title: "Logged In",
-                content: token,
-                buttons: [{ label: "OK", onClicked: () => { } }]
-            });
+            AuthService.setToken(token);
+            window.location.assign("copyright.html");
         }
         catch (err) {
             await this.events.setMessage({
@@ -57,7 +56,11 @@ class Page extends BasePage<Props, State> {
 
     public render(): React.ReactNode {
         return (
-            <Navigation state={this.state} events={this.events}>
+            <Navigation 
+                state={this.state} events={this.events}
+                activeTopMenuGuid="b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3"
+                activeLeftMenuGuid="db0d6063-2266-4bfb-8c96-44dbb90cddf2"
+            >
                 <Heading level={1}>Login</Heading>
                 <Form>
                     <Field size={3} label="Email Address"><StringInput model={this.model} property="emailAddress" /></Field>

@@ -1,5 +1,5 @@
-import * as jwt from 'jsonwebtoken';
-import { UUIDv4 } from './UUIDv4';
+import * as jwt from "jsonwebtoken";
+import { UUIDv4 } from "common/src/logic/UUIDv4";
 
 export class JwtToken implements jwt.JwtPayload {
     public static expiresIn = "1h";

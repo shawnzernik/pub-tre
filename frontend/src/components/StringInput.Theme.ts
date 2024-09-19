@@ -10,5 +10,6 @@ export const StringInputTheme: CSSProperties = {
     justifyContent: "center",
     padding: "0.5em",
     borderRadius: "0.25em",
-    border: "1px solid " + Theme.darkNeutral
+    border: "1px solid " + Theme.darkNeutral,
+    color: Theme.darkText
 };

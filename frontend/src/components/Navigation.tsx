@@ -1,9 +1,15 @@
 import * as React from "react";
+import { Dictionary } from "common/src/Dictionary";
+import { MenuDto } from "common/src/models/MenuDto";
 import { NavigationTheme } from "./Navigation.Theme";
 import { BootstrapIcon } from "./BootstrapIcon";
 import { Button } from "./Button";
 import { Message } from "./Message";
 import { Theme } from "./Theme";
+import { AuthService } from "../services/AuthService";
+import { MenuService } from "../services/MenuService";
+import { AuthLogic } from "../logic/AuthLogic";
+import { SecurableDto } from "common/src/models/SecurableDto";
 
 export interface NavigationMessageEvents {
     setLoading: (value: boolean) => Promise<void>;
@@ -21,34 +27,124 @@ interface Props {
     style?: React.CSSProperties;
     state: NavigationMessageState;
     events: NavigationMessageEvents;
+    activeTopMenuGuid: string;
+    activeLeftMenuGuid: string;
 }
 interface State {
     showMenu: boolean;
+    activeTopMenuGuid: string;
+    activeLeftMenuGuid: string;
 }
 
 export class Navigation extends React.Component<Props, State> {
+    private rootMenus: MenuDto[] = [];
+    private childMenus: Dictionary<MenuDto[]> = {}
+
     public constructor(props: Props) {
         super(props);
 
         this.state = {
             showMenu: true,
+            activeTopMenuGuid: this.props.activeTopMenuGuid,
+            activeLeftMenuGuid: this.props.activeLeftMenuGuid
         };
     }
 
+    public async componentDidMount(): Promise<void> {
+        this.props.events.setLoading(true);
+
+        try {
+            let token = AuthService.getToken();
+            if (!token) {
+                token = await AuthService.anonymous();
+                AuthService.setToken(token);
+            }
+
+            const key = await AuthService.publicKey();
+            let auth = await AuthLogic.tokenLogin(token, key);
+
+            const securables: Dictionary<SecurableDto> = {};
+            auth.securables.forEach((s) => {
+                securables[s.guid] = s;
+            });
+
+            let menus = await MenuService.list(AuthService.getToken());
+            menus.forEach((menu) => {
+                if (securables[menu.guid]) {
+                    if (menu.parentsGuid) {
+                        if (!this.childMenus[menu.parentsGuid])
+                            this.childMenus[menu.parentsGuid] = [];
+                        this.childMenus[menu.parentsGuid].push(menu);
+                    } else
+                        this.rootMenus.push(menu);
+                }
+            });
+
+            const menuComparer = (a: MenuDto, b: MenuDto): number => {
+                return a.order - b.order;
+            };
+            this.rootMenus.sort(menuComparer);
+            Object.keys(this.childMenus).forEach((key) => {
+                this.childMenus[key].sort(menuComparer);
+            });
+        }
+        catch (err) {
+            this.props.events.setMessage({
+                title: "Error",
+                content: err.toString(),
+                buttons: [{ label: "OK", onClicked: () => { } }]
+            });
+        }
+
+        this.props.events.setLoading(false);
+
+    }
+
     public render(): React.ReactNode {
-        let menu = undefined;
-        if (this.state.showMenu)
-            menu = <>
-                <div style={NavigationTheme.stageMiddleMenu}>
-                    <div style={NavigationTheme.stageMiddleMenuItem}><BootstrapIcon color={Theme.darkText} name="window" size={2} />&nbsp; Item 1</div>
-                    <div style={NavigationTheme.stageMiddleMenuItem}><BootstrapIcon color={Theme.darkText} name="window" size={2} />&nbsp; Item 2</div>
-                    <div style={NavigationTheme.stageMiddleMenuItem}><BootstrapIcon color={Theme.darkText} name="window" size={2} />&nbsp; Item 3</div>
-                    <div style={NavigationTheme.stageMiddleMenuItem}><BootstrapIcon color={Theme.darkText} name="window" size={2} />&nbsp; Item 4</div>
-                    <div style={NavigationTheme.stageMiddleMenuItem}><BootstrapIcon color={Theme.darkText} name="window" size={2} />&nbsp; Item 5</div>
-                    <div style={NavigationTheme.stageMiddleMenuItem}><BootstrapIcon color={Theme.darkText} name="window" size={2} />&nbsp; Item 6</div>
-                    <div style={NavigationTheme.stageMiddleMenuItem}><BootstrapIcon color={Theme.darkText} name="window" size={2} />&nbsp; Item 7</div>
+        if (!this.props.state) {
+            // alert("The page does not properly implement BasePage - make sure the constructor is overridden!");
+            return;
+        }
+
+        let topMenu: React.ReactNode[] = [];
+        this.rootMenus.forEach((menu) => {
+            let color = Theme.lightText;
+            if (menu.guid === this.state.activeTopMenuGuid)
+                color = Theme.lightPrimary;
+
+            topMenu.push(
+                <div
+                    key={menu.guid}
+                    style={NavigationTheme.stageTopMenu}
+                    onClick={() => { this.setState({ activeTopMenuGuid: menu.guid }); }}
+                >
+                    <BootstrapIcon name={menu.bootstrapIcon} size={2} color={color} />
+                    &nbsp; {menu.display}
                 </div>
-            </>;
+            );
+        });
+
+        let leftMenuItems: React.ReactNode[] = [];
+        if (this.state.showMenu && this.childMenus[this.state.activeTopMenuGuid])
+            this.childMenus[this.state.activeTopMenuGuid].forEach((menu) => {
+                let color = Theme.mediumText;
+                if (menu.guid === this.state.activeLeftMenuGuid)
+                    color = Theme.darkText;
+
+                leftMenuItems.push(
+                    <div
+                        key={menu.guid}
+                        style={{ ...NavigationTheme.stageMiddleMenuItem, color: color }}
+                        onClick={() => {
+                            window.location.assign(menu.url);
+                        }}
+                    >
+                        <BootstrapIcon color={color} name={menu.bootstrapIcon} size={2} />
+                        &nbsp; {menu.display}
+                    </div>
+                );
+            });
+        const leftMenu = <div style={NavigationTheme.stageMiddleMenu}>{leftMenuItems}</div>;
 
         let loading = undefined;
         if (this.props.state.loading) {
@@ -103,21 +199,10 @@ export class Navigation extends React.Component<Props, State> {
                         <BootstrapIcon style={NavigationTheme.stageTopMenuIcon} name="lightbulb-fill" size={2} />
                         &nbsp; TypeScript React Express
                     </div>
-                    <div style={NavigationTheme.stageTopMenu}>
-                        <BootstrapIcon name="person-fill" size={2} color={Theme.lightText} />
-                        &nbsp; Session
-                    </div>
-                    <div style={NavigationTheme.stageTopMenu}>
-                        <BootstrapIcon name="house" size={2} color={Theme.lightText} />
-                        &nbsp; Application
-                    </div>
-                    <div style={NavigationTheme.stageTopMenu}>
-                        <BootstrapIcon name="toggles" size={2} color={Theme.lightText} />
-                        &nbsp; System
-                    </div>
+                    {topMenu}
                 </div>
                 <div style={NavigationTheme.stageMiddle}>
-                    {menu}
+                    {leftMenu}
                     <div style={NavigationTheme.stageMiddleContent}>{this.props.children}</div>
                 </div>
                 <div style={NavigationTheme.stageBottom}>

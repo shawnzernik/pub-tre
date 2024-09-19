@@ -30,14 +30,14 @@
             "name": "backend website",
             "runtimeExecutable": "npx",
             "runtimeArgs": [
-                "nodemon", // Use nodemon
-                "--inspect", // Enable Node.js inspector for debugging
+                "nodemon",
+                "--inspect",
                 "-r",
                 "ts-node/register",
-                "${workspaceFolder}/backend/src/index.ts" // Path to your TypeScript file
+                "${workspaceFolder}/backend/src/index.ts"
             ],
-            "sourceMaps": true, // Enable source maps support for TypeScript
-            "cwd": "${workspaceFolder}/backend", // Ensure the working directory is set correctly
+            "sourceMaps": true,
+            "cwd": "${workspaceFolder}/backend",
             "protocol": "inspector",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
@@ -45,7 +45,21 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "console": "integratedTerminal",
+            "console": "integratedTerminal"
+        },
+        {
+            "type": "firefox",
+            "request": "launch",
+            "name": "Launch Firefox",
+            "url": "https://localhost:4433/",
+            "webRoot": "${workspaceFolder}",
+            "reAttach": true,
+            "pathMappings": [
+                {
+                    "url": "webpack://common/src",
+                    "path": "${workspaceFolder}/frontend/src"
+                }
+            ]
         },
         {
             "type": "node",

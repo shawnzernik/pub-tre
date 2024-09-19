@@ -30,4 +30,8 @@ INSERT INTO "securables" ("guid", "display_name") VALUES
 ('5f38b156-82e5-4d3c-812c-e52b174789f8', 'Self:User:List'),
 ('22b1a14c-13ab-4c71-bd11-3d8ec4f3c5b5', 'Self:User:Read'),
 ('6c7b3df7-7a8e-4500-a5c1-6a4a09e735c2', 'Self:User:Save'),
-('1c510776-14d0-42e5-8230-8e9a41dbd761', 'Self:User:Delete');
+('1c510776-14d0-42e5-8230-8e9a41dbd761', 'Self:User:Delete'),
+('1aa6ffbd-0c1d-4b05-913e-41bb9e30ad7b', 'Menu:List'),
+('2ae9ef6c-358a-4f7f-b4ac-cfe63b13a8f1', 'Menu:Read'),
+('7fd6e561-8912-4944-bc4d-61b8d6b054bf', 'Menu:Save'),
+('273f2409-4afc-4427-9fcf-f0de96e3bbff', 'Menu:Delete');

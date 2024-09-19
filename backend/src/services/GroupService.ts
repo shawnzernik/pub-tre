@@ -13,7 +13,7 @@ export class GroupService extends BaseService {
 
 		app.get("/api/v0/group/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
 		app.get("/api/v0/groups", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.post("/api/v0/group", (req, resp) => { this.methodWrapper(req, resp, this.putSave) });
+		app.post("/api/v0/group", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
 		app.delete("/api/v0/group/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
@@ -21,18 +21,20 @@ export class GroupService extends BaseService {
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<GroupDto | null> {
         console.log("GroupService.getGuid()");
         const guid = req.params["guid"];
-		return await ds.groupRepository().findOneBy({ guid: guid });
+		const ret = await ds.groupRepository().findOneBy({ guid: guid });
+        return ret;
 	}
 
 	@CheckSecurity("Group:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<GroupDto[]> {
         console.log("GroupService.getList()");
-		return await ds.groupRepository().find();
+		const ret = await ds.groupRepository().find();
+        return ret;
 	}
 
 	@CheckSecurity("Group:Save")
-	public async putSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("GroupService.putSave()");
+	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        console.log("GroupService.postSave()");
 		const entity = new GroupEntity();
 		entity.copyFrom(req.body as GroupDto);
 		await ds.groupRepository().save([entity]);
