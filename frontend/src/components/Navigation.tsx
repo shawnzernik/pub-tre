@@ -39,6 +39,8 @@ interface State {
 export class Navigation extends React.Component<Props, State> {
     private rootMenus: MenuDto[] = [];
     private childMenus: Dictionary<MenuDto[]> = {}
+    private securables: Dictionary<SecurableDto> = {};
+    private auth: AuthLogic;
 
     public constructor(props: Props) {
         super(props);
@@ -61,16 +63,16 @@ export class Navigation extends React.Component<Props, State> {
             }
 
             const key = await AuthService.publicKey();
-            let auth = await AuthLogic.tokenLogin(token, key);
+            this.auth = await AuthLogic.tokenLogin(token, key);
 
-            const securables: Dictionary<SecurableDto> = {};
-            auth.securables.forEach((s) => {
-                securables[s.guid] = s;
+            this.securables = {};
+            this.auth.securables.forEach((s) => {
+                this.securables[s.guid] = s;
             });
 
             let menus = await MenuService.list(AuthService.getToken());
             menus.forEach((menu) => {
-                if (securables[menu.guid]) {
+                if (this.securables[menu.guid]) {
                     if (menu.parentsGuid) {
                         if (!this.childMenus[menu.parentsGuid])
                             this.childMenus[menu.parentsGuid] = [];
@@ -125,7 +127,7 @@ export class Navigation extends React.Component<Props, State> {
         });
 
         let leftMenuItems: React.ReactNode[] = [];
-        if (this.state.showMenu && this.childMenus[this.state.activeTopMenuGuid])
+        if (this.childMenus[this.state.activeTopMenuGuid])
             this.childMenus[this.state.activeTopMenuGuid].forEach((menu) => {
                 let color = Theme.mediumText;
                 if (menu.guid === this.state.activeLeftMenuGuid)
@@ -144,7 +146,10 @@ export class Navigation extends React.Component<Props, State> {
                     </div>
                 );
             });
-        const leftMenu = <div style={NavigationTheme.stageMiddleMenu}>{leftMenuItems}</div>;
+
+        let leftMenu: React.ReactNode = <></>;
+        if (this.state.showMenu)
+            leftMenu = <div style={NavigationTheme.stageMiddleMenu}>{leftMenuItems}</div>;
 
         let loading = undefined;
         if (this.props.state.loading) {
@@ -208,7 +213,7 @@ export class Navigation extends React.Component<Props, State> {
                 <div style={NavigationTheme.stageBottom}>
                     <div style={NavigationTheme.stageBottomItem}>&copy; Copyright 2024, Shawn Zernik</div>
                     <div style={NavigationTheme.stageBottomItem}>v0.0.0</div>
-                    <div style={NavigationTheme.stageBottomItem}>administrator@localhost</div>
+                    <div style={NavigationTheme.stageBottomItem}>{this.auth && this.auth.user ? this.auth.user.emailAddress : "user not found"}</div>
                 </div>
             </div>
             {message ? message : loading ? loading : null}
