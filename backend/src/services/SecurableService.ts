@@ -18,7 +18,7 @@ export class SecurableService extends BaseService {
 	}
 
 	@CheckSecurity("Securable:Read")
-	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<SecurableEntity | null> {
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<SecurableDto | null> {
         console.log("SecurableService.getGuid()");
 		const guid = req.params["guid"];
 		const ret = await ds.securableRepository().findOneBy({ guid: guid });

@@ -34,4 +34,16 @@ INSERT INTO "securables" ("guid", "display_name") VALUES
 ('1aa6ffbd-0c1d-4b05-913e-41bb9e30ad7b', 'Menu:List'),
 ('2ae9ef6c-358a-4f7f-b4ac-cfe63b13a8f1', 'Menu:Read'),
 ('7fd6e561-8912-4944-bc4d-61b8d6b054bf', 'Menu:Save'),
-('273f2409-4afc-4427-9fcf-f0de96e3bbff', 'Menu:Delete');
+('273f2409-4afc-4427-9fcf-f0de96e3bbff', 'Menu:Delete'),
+('35c42064-f2b7-4d5f-9994-0d249f731d46', 'List:List'),
+('e02ae94c-4dc4-46b7-8418-6dc34585e73b', 'List:Read'),
+('d9a5a6f4-f94e-43e1-96a5-c1d514e20668', 'List:Save'),
+('1cf9412f-4b87-473f-9d7a-03f22c8a611b', 'List:Delete'),
+('3b578571-52a1-4cb1-89d3-15f812f9b02a', 'ListFilter:List'),
+('8c35c8b9-0e71-451e-94a1-3e0e2c3432cb', 'ListFilter:Read'),
+('89927653-b48f-44ef-84af-9cf53ff2d4f5', 'ListFilter:Save'),
+('c5eb0195-f4b3-4e4a-bdfb-04dfb2f36c56', 'ListFilter:Delete'),
+('602e60b0-2e1d-4220-a9f0-89feace76421', 'Setting:List'),
+('e7c18d15-e4d6-4ca5-9fa4-0ae9e2e4d589', 'Setting:Read'),
+('89b4b1f2-80d8-4099-b154-f6c3dc1d23df', 'Setting:Save'),
+('2f1f8f0a-b802-4d49-b143-2808c1bc1d94', 'Setting:Delete');

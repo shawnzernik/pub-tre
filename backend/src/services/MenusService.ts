@@ -18,7 +18,7 @@ export class MenuService extends BaseService {
 	}
 
     @CheckSecurity("Menu:Read")
-	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<MenuEntity | null> {
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<MenuDto | null> {
         console.log("MenuService.getGuid()");
 		const guid = req.params["guid"];
 		const ret = await ds.menuRepository().findOneBy({ guid: guid });

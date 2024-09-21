@@ -1,3 +1,86 @@
+# Prompt
+
+The following is my backend Menu service:
+
+```
+import express from "express";
+import { EntitiesDataSource } from "../data/EntitiesDataSource";
+import { BaseService } from "./BaseService";
+import { MenuDto } from "common/src/models/MenuDto";
+import { MenuEntity } from "../data/MenuEntity";
+import { CheckSecurity } from "./CheckSecurity";
+
+export class MenuService extends BaseService {
+	public constructor(app: express.Express) {
+		super();
+
+        console.log("MenuService.constructor()");
+
+		app.get("/api/v0/menu/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
+        app.get("/api/v0/menus", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
+		app.post("/api/v0/menu", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
+		app.delete("/api/v0/menu/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
+	}
+
+    @CheckSecurity("Menu:Read")
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<MenuEntity | null> {
+        console.log("MenuService.getGuid()");
+		const guid = req.params["guid"];
+		const ret = await ds.menuRepository().findOneBy({ guid: guid });
+        return ret;
+	}
+
+	@CheckSecurity("Menu:List")
+	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<MenuDto[]> {
+        console.log("MenuService.getList()");
+		const ret = await ds.menuRepository().find();
+        return ret;
+	}
+
+	@CheckSecurity("Menu:Save")
+	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        console.log("MenuService.postSave()");
+		const entity = new MenuEntity();
+		entity.copyFrom(req.body as MenuDto);
+		await ds.menuRepository().save([entity]);
+	}
+
+	@CheckSecurity("Menu:Delete")
+	public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        console.log("MenuService.deleteGuid()");
+		const guid = req.params["guid"];
+		await ds.menuRepository().delete({ guid: guid });
+	}
+}
+```
+
+And the following frontend Menu service was created to access the backend Menu service.  Not that the class name is singular.
+
+```
+import { MenuDto } from "common/src/models/MenuDto";
+import { FetchWrapper } from "./FetchWrapper";
+
+export class MenuService {
+    public static async get(token: string, guid: string): Promise<MenuDto> {
+        const ret = await FetchWrapper.get<MenuDto>("/api/v0/menu/" + guid, token);
+        return ret;
+    }
+    public static async list(token: string): Promise<MenuDto[]> {
+        const ret = await FetchWrapper.get<MenuDto[]>("/api/v0/menus", token);
+        return ret;
+    }
+    public static async save(dto: MenuDto, token: string): Promise<void> {
+        await FetchWrapper.post("/api/v0/menu", dto, token);
+    }
+    public static async delete(token: string, guid: string): Promise<void> {
+        await FetchWrapper.delete<MenuDto>("/api/v0/menu/" + guid, token);
+    }
+}
+```
+
+Please create me a frontend service for the following backend service:
+
+```
 import https from 'https';
 import fetch from "node-fetch";
 import { UserDto } from 'common/src/models/UserDto';
@@ -176,3 +259,4 @@ describe("UsersService", () => {
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });
+```

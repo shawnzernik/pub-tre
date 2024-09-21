@@ -18,7 +18,7 @@ export class UserService extends BaseService {
 	}
 
     @CheckSecurity("User:Read")
-	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<UserEntity | null> {
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<UserDto | null> {
         console.log("UserService.getGuid()");
 		const guid = req.params["guid"];
 		const ret = await ds.userRepository().findOneBy({ guid: guid });

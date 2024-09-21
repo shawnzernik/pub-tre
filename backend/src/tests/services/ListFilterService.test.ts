@@ -1,21 +1,33 @@
 import https from 'https';
 import fetch from "node-fetch";
-import { UserDto } from 'common/src/models/UserDto';
+import { ListFilterDto } from 'common/src/models/ListFilterDto';
 import { Config } from '../../Config';
 import { EntitiesDataSource } from '../../data/EntitiesDataSource';
-import { UserEntity } from '../../data/UserEntity';
+import { ListFilterEntity } from '../../data/ListFilterEntity';
+import { ListEntity } from '../../data/ListEntity';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
-describe("UsersService", () => {
+describe("ListFilterService", () => {
     let agent = new https.Agent({ rejectUnauthorized: false });
     let entityGuid = "faf76b3d-ed66-4182-a7c2-7ea6562785fe";
     let token: string | undefined;
     let eds: EntitiesDataSource;
 
+    let listEntity = new ListEntity();
+    listEntity.autoload = false;
+    listEntity.deleteUrl = "http://delete";
+    listEntity.editUrl = "http://edit";
+    listEntity.guid = entityGuid;
+    listEntity.listUrl = "http://list";
+    listEntity.sql = "SELECT 'hello'";
+    listEntity.title = "DELETE ME";
+
     beforeAll(async () => {
         eds = new EntitiesDataSource();
         await eds.initialize();
+
+        await eds.listRepository().save(listEntity);
 
         const body = JSON.stringify({
             emailAddress: "administrator@localhost",
@@ -38,22 +50,28 @@ describe("UsersService", () => {
 
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
+    
     afterAll(async () => {
-        try { await eds.userRepository().delete({ guid: entityGuid }); }
-        finally { await eds.destroy(); }
+        try { await eds.listFilterRepository().delete({ guid: entityGuid }); }
+        catch(err) { /* eat err */ }
+        try { await eds.listRepository().delete({ guid: entityGuid }); }
+        catch(err) { /* eat err */ }
+
+        await eds.destroy();
     }, Config.jestTimeoutSeconds * 1000);
 
-    test("POST /api/v0/user - save new should return 200", async () => {
+    test("POST /api/v0/list_filter - save new should return 200", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const entity = new UserEntity();
+        const entity = new ListFilterEntity();
         entity.guid = entityGuid;
-        entity.displayName = "Delete Me";
-        entity.emailAddress = "deleteme@localhost";
-        entity.smsPhone = "555-555-5555";
+        entity.listsGuid = entityGuid;
+        entity.label = "Filter Label";
+        entity.sqlColumn = "column_name";
+        entity.sqlType = "string";
 
-        const response = await fetch("https://localhost:4433/api/v0/user", {
+        const response = await fetch("https://localhost:4433/api/v0/list_filter", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -70,44 +88,15 @@ describe("UsersService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.userRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await eds.listFilterRepository().findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
-    test("POST /api/v0/user overwrite should return 200", async () => {
+
+    test("GET /api/v0/list_filters should return list of filters", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const entity = new UserEntity();
-        entity.guid = entityGuid;
-        entity.displayName = "Delete Me Dupe";
-        entity.emailAddress = "deleteme@localhost";
-        entity.smsPhone = "555-555-5555";
-
-        const response = await fetch("https://localhost:4433/api/v0/user", {
-            agent: agent,
-            method: "POST",
-            body: JSON.stringify(entity),
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            }
-        });
-
-        const obj = await response.json();
-        if (!response.ok)
-            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
-
-        expect(response.ok).toBeTruthy();
-        expect(response.status).toBe(200);
-
-        let reloaded = await eds.userRepository().findOneByOrFail({ guid: entityGuid });
-        expect(entity).toEqual(reloaded);
-    }, Config.jestTimeoutSeconds * 1000);
-    test("GET /api/v0/users should return user list", async () => {
-        if (!token)
-            throw new Error("No token - did beforeAll() fail?");
-
-        const response = await fetch("https://localhost:4433/api/v0/users", {
+        const response = await fetch("https://localhost:4433/api/v0/list_filters", {
             agent: agent,
             method: "GET",
             headers: {
@@ -123,16 +112,17 @@ describe("UsersService", () => {
         if (!obj["data"])
             throw new Error("No data returned!");
 
-        const data = obj["data"] as UserDto[];
+        const data = obj["data"] as ListFilterDto[];
 
         expect(data.length > 0).toBeTruthy();
         expect(data[0].guid).toBeTruthy();
     }, Config.jestTimeoutSeconds * 1000);
-    test("GET /api/v0/user/:guid should return user and 200", async () => {
+
+    test("GET /api/v0/list_filter/:guid should return filter and 200", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/user/" + entityGuid, {
+        const response = await fetch("https://localhost:4433/api/v0/list_filter/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -148,15 +138,16 @@ describe("UsersService", () => {
         if (!obj["data"])
             throw new Error("No data returned!");
 
-        const data = obj["data"] as UserDto;
+        const data = obj["data"] as ListFilterDto;
 
         expect(data.guid).toEqual(entityGuid);
     }, Config.jestTimeoutSeconds * 1000);
-    test("DELETE /api/v0/user/:guid should delete user and return 200", async () => {
+
+    test("DELETE /api/v0/list_filter/:guid should delete filter and return 200", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/user/" + entityGuid, {
+        const response = await fetch("https://localhost:4433/api/v0/list_filter/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -172,7 +163,7 @@ describe("UsersService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.userRepository().findBy({ guid: entityGuid });
+        let entity = await eds.listFilterRepository().findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

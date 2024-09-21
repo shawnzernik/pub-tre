@@ -3,6 +3,7 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { MembershipEntity } from "../data/MembershipEntity";
 import { BaseService } from "./BaseService";
 import { CheckSecurity } from "./CheckSecurity";
+import { MembershipDto } from "common/src/models/MembershipDto";
 
 export class MembershipService extends BaseService {
 	public constructor(app: express.Express) {
@@ -17,7 +18,7 @@ export class MembershipService extends BaseService {
 	}
 
 	@CheckSecurity("Membership:Read")
-	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<MembershipEntity | null> {
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<MembershipDto | null> {
         console.log("MembershipService.getGuid()");
 		const guid = req.params["guid"];
 		const ret = await ds.membershipRepository().findOneBy({ guid: guid });
@@ -25,7 +26,7 @@ export class MembershipService extends BaseService {
 	}
 
 	@CheckSecurity("Membership:List")
-	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<MembershipEntity[]> {
+	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<MembershipDto[]> {
         console.log("MembershipService.getList()");
 		const ret = await ds.membershipRepository().find();
         return ret;

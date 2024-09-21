@@ -60,6 +60,7 @@ class Page extends BasePage<Props, State> {
                 state={this.state} events={this.events}
                 activeTopMenuGuid="b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3"
                 activeLeftMenuGuid="db0d6063-2266-4bfb-8c96-44dbb90cddf2"
+                showMenu={false}
             >
                 <Heading level={1}>Login</Heading>
                 <Form>

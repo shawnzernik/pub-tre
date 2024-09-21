@@ -14,6 +14,12 @@ import { PermissionRepository } from "./PermissionsRepository";
 import { SecurableRepository } from "./SecurableRepository";
 import { MenuEntity } from "./MenuEntity";
 import { MenuRepository } from "./MenuRepository";
+import { ListRepository } from "./ListRepository";
+import { ListEntity } from "./ListEntity";
+import { ListFilterEntity } from "./ListFilterEntity";
+import { SettingEntity } from "./SettingEntity";
+import { ListFilterRepository } from "./ListFilterRepository";
+import { SettingRepository } from "./SettingRepository";
 
 export class EntitiesDataSource extends DataSource {
 	public constructor() {
@@ -31,7 +37,10 @@ export class EntitiesDataSource extends DataSource {
 				PermissionEntity,
 				SecurableEntity,
 				UserEntity,
-                MenuEntity
+                MenuEntity,
+                ListEntity,
+                ListFilterEntity,
+                SettingEntity
 			],
 		});
 	}
@@ -83,5 +92,26 @@ export class EntitiesDataSource extends DataSource {
 		if (!this._menuRepository)
 			this._menuRepository = new MenuRepository(MenuEntity, this.createEntityManager(), this.createQueryRunner());
 		return this._menuRepository;
+	}
+
+	private _listRepository: ListRepository | undefined;
+	public listRepository() {
+		if (!this._listRepository)
+			this._listRepository = new ListRepository(ListEntity, this.createEntityManager(), this.createQueryRunner());
+		return this._listRepository;
+	}
+
+	private _listFilterRepository: ListFilterRepository | undefined;
+	public listFilterRepository() {
+		if (!this._listFilterRepository)
+			this._listFilterRepository = new ListFilterRepository(ListFilterEntity, this.createEntityManager(), this.createQueryRunner());
+		return this._listFilterRepository;
+	}
+
+	private _settingRepository: SettingRepository | undefined;
+	public settingRepository() {
+		if (!this._settingRepository)
+			this._settingRepository = new SettingRepository(SettingEntity, this.createEntityManager(), this.createQueryRunner());
+		return this._settingRepository;
 	}
 }

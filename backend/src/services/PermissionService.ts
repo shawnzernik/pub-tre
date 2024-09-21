@@ -18,7 +18,7 @@ export class PermissionService extends BaseService {
 	}
 
     @CheckSecurity("Permission:Read")
-	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<PermissionEntity | null> {
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto | null> {
         console.log("PermissionService.getGuid()");
 		const guid = req.params["guid"];
 		const ret = await ds.permissionRepository().findOneBy({ guid: guid });

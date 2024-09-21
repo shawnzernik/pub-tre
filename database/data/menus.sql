@@ -31,7 +31,7 @@ BEGIN
         CASE
             WHEN m.parents_guid IS NULL THEN CONCAT('Menu:', m.display)
             ELSE CONCAT(
-                'Menu:',
+                'Menu:Item:',
                 COALESCE(
                     (SELECT p.display FROM "menus" p WHERE m.parents_guid = p.guid LIMIT 1),
                     'MISSING'

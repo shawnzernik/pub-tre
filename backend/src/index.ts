@@ -13,6 +13,9 @@ import { PermissionService } from "./services/PermissionService";
 import { SecurableService } from "./services/SecurableService";
 import { UserService } from "./services/UserService";
 import { MenuService } from "./services/MenusService";
+import { ListService } from "./services/ListService";
+import { ListFilterService } from "./services/ListFilterService";
+import { SettingService } from "./services/SettingService";
 
 export class WebApp {
     private app: express.Express = express();
@@ -48,6 +51,9 @@ export class WebApp {
         new SecurableService(this.app);
         new UserService(this.app);
         new MenuService(this.app);
+        new ListService(this.app);
+        new ListFilterService(this.app);
+        new SettingService(this.app);
 
         console.log(`WebApp.execute() - HTTPS Cert Path: ${path.resolve(Config.httpsCertPath)}`);
         console.log(`WebApp.execute() - HTTPS Key Path: ${path.resolve(Config.httpsKeyPath)}`);

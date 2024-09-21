@@ -1,6 +1,16 @@
 import { Dictionary } from "common/src/Dictionary";
 
 export class FetchWrapper {
+    static async delete<T>(url: string, token: string): Promise<void> {
+        const headers = FetchWrapper.defaultHeaders(token);
+
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: headers
+        });
+
+        FetchWrapper.handleResponse<T>(response);
+    }
     static async get<T>(url: string, token?: string): Promise<T> {
         const headers = FetchWrapper.defaultHeaders(token);
 

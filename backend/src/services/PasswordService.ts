@@ -18,7 +18,7 @@ export class PasswordService extends BaseService {
 	}
 
 	@CheckSecurity("Password:Read")
-	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<PasswordEntity | null> {
+	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<PasswordDto | null> {
         console.log("PasswordService.getGuid()");
 		const guid = req.params["guid"];
 		const ret = await ds.passwordRepository().findOneBy({ guid: guid });

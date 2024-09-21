@@ -29,6 +29,7 @@ interface Props {
     events: NavigationMessageEvents;
     activeTopMenuGuid: string;
     activeLeftMenuGuid: string;
+    showMenu?: boolean;
 }
 interface State {
     showMenu: boolean;
@@ -45,8 +46,12 @@ export class Navigation extends React.Component<Props, State> {
     public constructor(props: Props) {
         super(props);
 
+        let menu = true;
+        if(this.props.showMenu === false)
+            menu = false;
+
         this.state = {
-            showMenu: true,
+            showMenu: menu,
             activeTopMenuGuid: this.props.activeTopMenuGuid,
             activeLeftMenuGuid: this.props.activeLeftMenuGuid
         };
