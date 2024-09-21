@@ -4,6 +4,8 @@ import { BaseService } from "./BaseService";
 import { ListDto } from "common/src/models/ListDto";
 import { ListEntity } from "../data/ListEntity";
 import { CheckSecurity } from "./CheckSecurity";
+import { ListLogic } from "../logic/ListLogic";
+import { ListFilterDto } from "common/src/models/ListFilterDto";
 
 export class ListService extends BaseService {
     public constructor(app: express.Express) {
@@ -11,6 +13,7 @@ export class ListService extends BaseService {
 
         console.log("ListService.constructor()");
 
+        app.post("/api/v0/list/:guid/items", (req, resp) => { this.methodWrapper(req, resp, this.postItems) });
         app.get("/api/v0/list/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/list/url_key/:url_key", (req, resp) => { this.methodWrapper(req, resp, this.getUrlKey) });
         app.get("/api/v0/lists", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
@@ -18,6 +21,22 @@ export class ListService extends BaseService {
         app.delete("/api/v0/list/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
     }
 
+    @CheckSecurity("List:Items")
+    public async postItems(req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
+        console.log("ListService.postItems()");
+
+        const guid = req.params["guid"];
+        const listDto = await ds.listRepository().findOneBy({ guid: guid });
+        if (!listDto)
+            throw new Error(`Could not locate list GUID ${guid}!`);
+
+        const filters = req.body() as ListFilterDto[];
+
+        const listLogic = new ListLogic(listDto);
+        const ret = await listLogic.getItems(ds, filters);
+
+        return ret;
+    }
     @CheckSecurity("List:Read")
     public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
         console.log("ListService.getGuid()");
@@ -25,6 +44,7 @@ export class ListService extends BaseService {
         const ret = await ds.listRepository().findOneBy({ guid: guid });
         return ret;
     }
+    @CheckSecurity("List:Read")
     public async getUrlKey(req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
         console.log("ListService.getUrlKey()");
         const urlKey = req.params["url_key"];

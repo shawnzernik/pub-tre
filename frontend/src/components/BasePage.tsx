@@ -7,9 +7,14 @@ export interface BasePageState extends NavigationMessageState {
     message: Message | null;
 }
 
-export class BasePage<P, S extends BasePageState> extends React.Component<P, S>  {
+export class BasePage<P, S extends BasePageState> extends React.Component<P, S> {
     public constructor(props: P) {
         super(props);
+    }
+    protected queryString(key: string): string {
+        const url = new URL(window.location.href);
+        const value = url.searchParams.get(key);
+        return value;
     }
 
     protected static defaultState: BasePageState = {

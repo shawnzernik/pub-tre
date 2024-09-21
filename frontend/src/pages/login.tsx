@@ -7,7 +7,7 @@ import { BasePage, BasePageState } from "../components/BasePage";
 import { Form } from "../components/Form";
 import { LoginDto } from "common/src/models/LoginDto";
 import { Field } from "../components/Field";
-import { StringInput } from "../components/StringInput";
+import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { AuthService } from "../services/AuthService";
 
@@ -64,8 +64,8 @@ class Page extends BasePage<Props, State> {
             >
                 <Heading level={1}>Login</Heading>
                 <Form>
-                    <Field size={3} label="Email Address"><StringInput model={this.model} property="emailAddress" /></Field>
-                    <Field size={3} label="Password"><StringInput password={true} model={this.model} property="password" /></Field>
+                    <Field size={3} label="Email Address"><Input model={this.model} property="emailAddress" /></Field>
+                    <Field size={3} label="Password"><Input password={true} model={this.model} property="password" /></Field>
                 </Form>
                 <Form>
                     <Button label="Login" onClick={this.login.bind(this)} />

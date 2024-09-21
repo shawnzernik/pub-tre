@@ -1,3 +1,4 @@
+import { Dictionary } from "common/src/Dictionary";
 import { DataSource } from "typeorm";
 import { GroupEntity } from "./GroupEntity";
 import { MembershipEntity } from "./MembershipEntity";
@@ -44,6 +45,26 @@ export class EntitiesDataSource extends DataSource {
 			],
 		});
 	}
+
+    public async executeSql(sql: string, params: Dictionary<any> ): Promise<any[]> {
+        const queryRunner = this.createQueryRunner();
+
+        let newParams: any[] = [];
+        let newSql = sql;
+        Object.keys(params).forEach((key) => {
+            newSql = newSql.replace("@" + key, "$" + (newParams.length + 1));
+            newParams.push(params[key]);
+        });
+
+        try {
+            await queryRunner.connect();
+            const result = await queryRunner.query(newSql, newParams);
+            return result;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
 
 	private _groupRepository: GroupRepository | undefined;
 	public groupRepository() {

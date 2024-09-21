@@ -13,11 +13,14 @@ export class ListEntity implements ListDto, CopyInterface<ListDto> {
 	@Column({ name: 'url_key' })
 	public urlKey: string = "";
 
+	@Column({ name: 'top_menu_guid' })
+	public topMenuGuid: string = "";
+
+	@Column({ name: 'left_menu_guid' })
+	public leftMenuGuid: string = "";
+
 	@Column({ name: 'sql', type: 'text' })
 	public sql: string = "";
-
-	@Column({ name: 'list_url' })
-	public listUrl: string = "";
 
 	@Column({ name: 'edit_url', nullable: true })
 	public editUrl?: string = "";
@@ -32,6 +35,8 @@ export class ListEntity implements ListDto, CopyInterface<ListDto> {
 		this.guid = source.guid;
 		this.title = source.title;
         this.urlKey = source.urlKey;
+        this.topMenuGuid = source.topMenuGuid;
+        this.leftMenuGuid = source.leftMenuGuid;
 		this.sql = source.sql;
 		this.listUrl = source.listUrl;
 		this.editUrl = source.editUrl;
@@ -43,6 +48,8 @@ export class ListEntity implements ListDto, CopyInterface<ListDto> {
 		dest.guid = this.guid;
 		dest.title = this.title;
         dest.urlKey = this.urlKey;
+        dest.topMenuGuid = this.topMenuGuid;
+        dest.leftMenuGuid = this.leftMenuGuid;
 		dest.sql = this.sql;
 		dest.listUrl = this.listUrl;
 		dest.editUrl = this.editUrl;

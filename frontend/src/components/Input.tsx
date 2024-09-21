@@ -1,5 +1,5 @@
 import * as React from "react";
-import { StringInputTheme } from "./StringInput.Theme";
+import { InputTheme } from "./Input.Theme";
 import { Theme } from "./Theme";
 
 interface Props {
@@ -11,7 +11,7 @@ interface State {
     value: string;
 }
 
-export class StringInput extends React.Component<Props, State> {
+export class Input extends React.Component<Props, State> {
     public constructor(props: Props) {
         super(props);
 
@@ -22,7 +22,7 @@ export class StringInput extends React.Component<Props, State> {
     public render(): React.ReactNode {
         return <input
             type={this.props.password ? "password" : "text"}
-            style={StringInputTheme}
+            style={InputTheme}
             value={this.state.value}
             onChange={(e) => {
                 const newValue = e.target.value;
