@@ -40,18 +40,12 @@ module.exports = {
     entry: {
         login: "./src/pages/login.tsx",
         copyright: "./src/pages/copyright.tsx",
-        users: "./src/pages/users.tsx",
-        user: "./src/pages/user.tsx",
-        group: "./src/pages/group.tsx",
-        groups: "./src/pages/groups.tsx",
+        account: "./src/pages/account.tsx",
+        help: "./src/pages/help.tsx",
+        lists: "./src/pages/lists.tsx",
+        list: "./src/pages/list.tsx"
     },
     plugins: [
-        new HtmlWebpackPlugin({
-            template: "./src/template.html",
-            filename: "../static/pages/copyright.html",
-            chunks: ["common", "copyright"],
-            title: "Copyright & License"
-        }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
             filename: "../static/pages/login.html",
@@ -60,27 +54,33 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
-            filename: "../static/pages/users.html",
-            chunks: ["common", "users"],
-            title: "Users List"
+            filename: "../static/pages/copyright.html",
+            chunks: ["common", "copyright"],
+            title: "Copyright & License"
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
-            filename: "../static/pages/user.html",
-            chunks: ["common", "user"],
-            title: "User Edit"
+            filename: "../static/pages/account.html",
+            chunks: ["common", "account"],
+            title: "My Account"
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
-            filename: "../static/pages/groups.html",
-            chunks: ["common", "groups"],
-            title: "Groups List"
+            filename: "../static/pages/help.html",
+            chunks: ["common", "help"],
+            title: "Help"
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
-            filename: "../static/pages/group.html",
-            chunks: ["common", "group"],
-            title: "Group Edit"
+            filename: "../static/pages/lists.html",
+            chunks: ["common", "lists"],
+            title: "List View"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/list.html",
+            chunks: ["common", "list"],
+            title: "List Edit"
         })
     ]
 };

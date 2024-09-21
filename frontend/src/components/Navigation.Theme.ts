@@ -58,7 +58,8 @@ export class NavigationTheme {
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        color: Theme.darkText
+        color: Theme.darkText,
+        cursor: "pointer"
     };
     public static stageMiddleContent: CSSProperties = {
         display: "flex",

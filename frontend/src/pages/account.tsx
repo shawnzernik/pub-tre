@@ -6,7 +6,7 @@ interface State { }
 
 class Page extends React.Component<Props, State> {
 	public render(): React.ReactNode {
-		return <h1>Groups</h1>;
+		return <h1>My Account</h1>;
 	}
 }
 

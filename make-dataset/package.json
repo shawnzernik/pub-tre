@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "run": "node ./dist/index.js"
+    "run": "node ./dist/index.js",
+    "clean": "rm -R datasets dist package-lock.json node_modules"
   },
   "author": "",
   "license": "ISC",

@@ -6,7 +6,8 @@
 		"build": "npx tsc",
 		"test": "jest",
 		"run": "npx ts-node src/index.ts",
-		"debug": "npx nodemon"
+		"debug": "npx nodemon",
+        "clean": "rm -R node_modules package-lock.json dist coverage"
 	},
 	"devDependencies": {
 		"@types/bcrypt": "^5.0.2",

@@ -9,7 +9,8 @@ jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
 describe("ListService", () => {
     let agent = new https.Agent({ rejectUnauthorized: false });
-    let entityGuid = "c2c5b0f1-9627-4a78-b8c0-54d1236fbb0f";
+    let entityGuid = "faf76b3d-ed66-4182-a7c2-7ea6562785fe";
+    let entityUrlKey = "test-list";
     let token: string | undefined;
     let eds: EntitiesDataSource;
 
@@ -38,24 +39,23 @@ describe("ListService", () => {
 
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
-    
+
     afterAll(async () => {
         try { await eds.listRepository().delete({ guid: entityGuid }); }
         finally { await eds.destroy(); }
     }, Config.jestTimeoutSeconds * 1000);
 
     test("POST /api/v0/list - save new should return 200", async () => {
-        if (!token) throw new Error("No token - did beforeAll() fail?");
+        if (!token)
+            throw new Error("No token - did beforeAll() fail?");
 
         const entity = new ListEntity();
         entity.guid = entityGuid;
         entity.title = "Test List";
-        entity.sql = "SELECT * FROM test";
-        entity.listUrl = "http://localhost/list";
-        entity.editUrl = "http://localhost/edit";
-        entity.deleteUrl = "http://localhost/delete";
-        entity.autoload = true;
-
+        entity.urlKey = entityUrlKey;
+        entity.sql = "SELECT * FROM items;";
+        entity.listUrl = "https://example.com/list";
+        
         const response = await fetch("https://localhost:4433/api/v0/list", {
             agent: agent,
             method: "POST",
@@ -78,7 +78,8 @@ describe("ListService", () => {
     }, Config.jestTimeoutSeconds * 1000);
 
     test("GET /api/v0/lists should return list of lists", async () => {
-        if (!token) throw new Error("No token - did beforeAll() fail?");
+        if (!token)
+            throw new Error("No token - did beforeAll() fail?");
 
         const response = await fetch("https://localhost:4433/api/v0/lists", {
             agent: agent,
@@ -93,7 +94,8 @@ describe("ListService", () => {
         if (!response.ok)
             throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
 
-        if (!obj["data"]) throw new Error("No data returned!");
+        if (!obj["data"])
+            throw new Error("No data returned!");
 
         const data = obj["data"] as ListDto[];
 
@@ -102,9 +104,10 @@ describe("ListService", () => {
     }, Config.jestTimeoutSeconds * 1000);
 
     test("GET /api/v0/list/:guid should return list and 200", async () => {
-        if (!token) throw new Error("No token - did beforeAll() fail?");
+        if (!token)
+            throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch(`https://localhost:4433/api/v0/list/${entityGuid}`, {
+        const response = await fetch("https://localhost:4433/api/v0/list/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -117,17 +120,44 @@ describe("ListService", () => {
         if (!response.ok)
             throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
 
-        if (!obj["data"]) throw new Error("No data returned!");
+        if (!obj["data"])
+            throw new Error("No data returned!");
 
         const data = obj["data"] as ListDto;
 
         expect(data.guid).toEqual(entityGuid);
     }, Config.jestTimeoutSeconds * 1000);
 
-    test("DELETE /api/v0/list/:guid should delete list and return 200", async () => {
-        if (!token) throw new Error("No token - did beforeAll() fail?");
+    test("GET /api/v0/list/url_key/:url_key should return list by URL key and 200", async () => {
+        if (!token)
+            throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch(`https://localhost:4433/api/v0/list/${entityGuid}`, {
+        const response = await fetch(`https://localhost:4433/api/v0/list/url_key/${entityUrlKey}`, {
+            agent: agent,
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        const obj = await response.json();
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
+
+        if (!obj["data"])
+            throw new Error("No data returned!");
+
+        const data = obj["data"] as ListDto;
+
+        expect(data.urlKey).toEqual(entityUrlKey);
+    }, Config.jestTimeoutSeconds * 1000);
+
+    test("DELETE /api/v0/list/:guid should delete list and return 200", async () => {
+        if (!token)
+            throw new Error("No token - did beforeAll() fail?");
+
+        const response = await fetch("https://localhost:4433/api/v0/list/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {

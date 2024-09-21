@@ -6,7 +6,8 @@
 	"scripts": {
 		"build": "npx webpack --config webpack.config.js",
 		"watch": "npx webpack --config webpack.config.js --watch",
-		"test": "jest"
+		"test": "jest",
+        "clean": "rm -R scripts node_modules package-lock.json static/pages"
 	},
 	"author": "",
 	"license": "ISC",
