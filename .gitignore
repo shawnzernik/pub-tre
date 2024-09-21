@@ -7,3 +7,4 @@ coverage
 make-dataset/datasets
 frontend/scripts
 frontend/static/pages
+chat-maker/output.md

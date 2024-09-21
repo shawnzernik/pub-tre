@@ -1,15 +1,21 @@
 # Prompt
 
-I have the following JUnit test:
+ListService.test.ts:
 
 ```
 <!! ../backend/src/tests/services/ListService.test.ts !!/>
 ```
 
-The JUnit test tests the following service:
+ListService.ts:
 
 ```
 <!! ../backend/src/services/ListService.ts !!/>
 ```
 
-Please update the tests to include ``.
+ListFilterDto.ts:
+
+```
+<!! /Users/shawn/Projects/ts-react-express/common/src/models/ListFilterDto.ts !!/>
+```
+
+Please update the tests to include `postItems`.
