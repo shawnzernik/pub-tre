@@ -46,20 +46,16 @@ export class EntitiesDataSource extends DataSource {
 		});
 	}
 
-    public async executeSql(sql: string, params: Dictionary<any> ): Promise<any[]> {
+    public async executeSql(sql: string, params: any[]): Promise<any[]> {
         const queryRunner = this.createQueryRunner();
-
-        let newParams: any[] = [];
-        let newSql = sql;
-        Object.keys(params).forEach((key) => {
-            newSql = newSql.replace("@" + key, "$" + (newParams.length + 1));
-            newParams.push(params[key]);
-        });
 
         try {
             await queryRunner.connect();
-            const result = await queryRunner.query(newSql, newParams);
+            const result = await queryRunner.query(sql, params);
             return result;
+        }
+        catch(err) {
+            throw new Error(`Error executing:\n${sql}\n${err}`);
         }
         finally {
             await queryRunner.release();

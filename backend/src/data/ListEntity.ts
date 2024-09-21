@@ -38,7 +38,6 @@ export class ListEntity implements ListDto, CopyInterface<ListDto> {
         this.topMenuGuid = source.topMenuGuid;
         this.leftMenuGuid = source.leftMenuGuid;
 		this.sql = source.sql;
-		this.listUrl = source.listUrl;
 		this.editUrl = source.editUrl;
 		this.deleteUrl = source.deleteUrl;
 		this.autoload = source.autoload;
@@ -51,7 +50,6 @@ export class ListEntity implements ListDto, CopyInterface<ListDto> {
         dest.topMenuGuid = this.topMenuGuid;
         dest.leftMenuGuid = this.leftMenuGuid;
 		dest.sql = this.sql;
-		dest.listUrl = this.listUrl;
 		dest.editUrl = this.editUrl;
 		dest.deleteUrl = this.deleteUrl;
 		dest.autoload = this.autoload;

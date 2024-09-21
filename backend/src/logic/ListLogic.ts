@@ -10,15 +10,16 @@ export class ListLogic {
         this.entity = entity;
     }
 
-    public async getItems(eds: EntitiesDataSource, filters: ListFilterDto[]): Promise<any> {
+    public async getItems(eds: EntitiesDataSource, filters: ListFilterDto[]): Promise<any[]> {
         let sql = ` SELECT * FROM (${this.entity.sql}) WHERE 1=1 `;
         const params: any[] = [];
 
         filters.forEach((filter) => {
-            sql = sql + this.addFilter(filter, params);
+            sql = sql + this.addFilterToParams(filter, params);
         });
 
-        eds.executeSql(this.entity.sql);
+        const rows = await eds.executeSql(sql, params);
+        return rows;
     }
 
     private addFilterToParams(filter: ListFilterDto, params: any[]) {
@@ -31,32 +32,32 @@ export class ListLogic {
             case "e":
                 value = convertDefaultValueToJsType(filter);
                 params.push(value);
-                where = where + ` = ${params.length} `;
+                where = where + ` = $${params.length} `;
                 break;
             case "ne":
                 value = convertDefaultValueToJsType(filter);
                 params.push(value);
-                where = where + ` <> ${params.length} `;
+                where = where + ` <> $${params.length} `;
                 break;
             case "gt":
                 value = convertDefaultValueToJsType(filter);
                 params.push(value);
-                where = where + ` > ${params.length} `;
+                where = where + ` > $${params.length} `;
                 break;
             case "gte":
                 value = convertDefaultValueToJsType(filter);
                 params.push(value);
-                where = where + ` >= ${params.length} `;
+                where = where + ` >= $${params.length} `;
                 break;
             case "lt":
                 value = convertDefaultValueToJsType(filter);
                 params.push(value);
-                where = where + ` < ${params.length} `;
+                where = where + ` < $${params.length} `;
                 break;
             case "lte":
                 value = convertDefaultValueToJsType(filter);
                 params.push(value);
-                where = where + ` <= ${params.length} `;
+                where = where + ` <= $${params.length} `;
                 break;
             case "n":
                 where = where + ` IS NULL `;
@@ -67,12 +68,12 @@ export class ListLogic {
             case "c":
                 value = convertDefaultValueToJsType(filter);
                 params.push(value);
-                where = where + ` LIKE CONCAT('%', ${params.length}, '%")} `;
+                where = where + ` LIKE CONCAT('%', $${params.length}::text, '%') `;
                 break;
             case "dnc":
                 value = convertDefaultValueToJsType(filter);
                 params.push(value);
-                where = where + ` NOT LIKE CONCAT('%', ${params.length}, '%")} `;
+                where = where + ` NOT LIKE CONCAT('%', $${params.length}::text, '%') `;
                 break;
             default:
                 throw new Error(`Unknown compare - ${filter.defaultCompare}!`);

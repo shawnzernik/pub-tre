@@ -5,6 +5,7 @@ import { Config } from '../../Config';
 import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { ListFilterEntity } from '../../data/ListFilterEntity';
 import { ListEntity } from '../../data/ListEntity';
+import { UUIDv4 } from 'common/src/logic/UUIDv4';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -19,7 +20,8 @@ describe("ListFilterService", () => {
     listEntity.deleteUrl = "http://delete";
     listEntity.editUrl = "http://edit";
     listEntity.guid = entityGuid;
-    listEntity.listUrl = "http://list";
+    listEntity.leftMenuGuid = UUIDv4.generate();
+    listEntity.topMenuGuid = UUIDv4.generate();
     listEntity.sql = "SELECT 'hello'";
     listEntity.title = "DELETE ME";
 

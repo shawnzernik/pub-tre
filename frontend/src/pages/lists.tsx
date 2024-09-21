@@ -8,11 +8,12 @@ import { AuthService } from "../services/AuthService";
 import { ListDto } from "common/src/models/ListDto";
 
 interface Props { }
-interface State extends BasePageState { }
+interface State extends BasePageState { 
+    items: any[];
+}
 
 class Page extends BasePage<Props, State> {
     private list: ListDto;
-    private items: any[];
     
     public async componentDidMount(): Promise<void> {
         this.events.setLoading(true);
@@ -20,7 +21,9 @@ class Page extends BasePage<Props, State> {
         try {
             const token = AuthService.getToken();
             this.list = await ListService.getUrlKey(token, this.queryString("url_key"));
-            this.items = await ListService.getItems(token, this.list.guid);
+            const items = await ListService.getItems(token, this.list.guid, []);
+
+            this.setState({ items: items });
 
             this.events.setLoading(false);
         }
@@ -34,6 +37,9 @@ class Page extends BasePage<Props, State> {
     }
 
     public render(): React.ReactNode {
+        if(!this.list || !this.state.items)
+            return;
+
         return (
             <Navigation
                 state={this.state} events={this.events}

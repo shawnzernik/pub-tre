@@ -5,6 +5,7 @@ import { Config } from '../../Config';
 import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { ListEntity } from '../../data/ListEntity';
 import { ListFilterDto } from 'common/src/models/ListFilterDto';
+import { UUIDv4 } from 'common/src/logic/UUIDv4';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -54,8 +55,9 @@ describe("ListService", () => {
         entity.guid = entityGuid;
         entity.title = "Test List";
         entity.urlKey = entityUrlKey;
-        entity.sql = "SELECT * FROM lists;";
-        entity.listUrl = "https://example.com/list";
+        entity.leftMenuGuid = UUIDv4.generate();
+        entity.topMenuGuid = UUIDv4.generate();
+        entity.sql = "SELECT * FROM lists";
         
         const response = await fetch("https://localhost:4433/api/v0/list", {
             agent: agent,
@@ -82,19 +84,44 @@ describe("ListService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
+        const entity = new ListEntity();
+        entity.guid = entityGuid;
+        entity.title = "Test List";
+        entity.urlKey = entityUrlKey;
+        entity.leftMenuGuid = UUIDv4.generate();
+        entity.topMenuGuid = UUIDv4.generate();
+        entity.sql = "SELECT * FROM lists";
+        
+        let response = await fetch("https://localhost:4433/api/v0/list", {
+            agent: agent,
+            method: "POST",
+            body: JSON.stringify(entity),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        let obj = await response.json();
+        if (!response.ok)
+            throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
+
+        expect(response.ok).toBeTruthy();
+        expect(response.status).toBe(200);
+
         const filters: ListFilterDto[] = [
             {
                 guid: "78db2354-0b9e-43ef-8bc5-5a978d171cb2",
                 listsGuid: entityGuid,
                 label: "Filter Label",
                 sqlColumn: "title",
-                sqlType: "string",
+                sqlType: "varchar",
                 defaultCompare: "c",
                 defaultValue: "List"
             }
         ];
 
-        const response = await fetch(`https://localhost:4433/api/v0/list/${entityGuid}/items`, {
+        response = await fetch(`https://localhost:4433/api/v0/list/${entityGuid}/items`, {
             agent: agent,
             method: "POST",
             body: JSON.stringify(filters),
@@ -104,13 +131,14 @@ describe("ListService", () => {
             }
         });
 
-        const obj = await response.json();
+        obj = await response.json();
         if (!response.ok)
             throw new Error(`Response: ${response.status} - ${response.statusText} - ${obj.error}`);
 
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
-        expect(obj.data).toBeDefined(); // Adjust based on your actual response structure
+        expect(obj.data).toBeDefined();
+        expect(obj.data.length).toBeGreaterThan(0);
     }, Config.jestTimeoutSeconds * 1000);
 
     test("GET /api/v0/lists should return list of lists", async () => {

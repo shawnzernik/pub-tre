@@ -22,7 +22,7 @@ export class ListService extends BaseService {
     }
 
     @CheckSecurity("List:Items")
-    public async postItems(req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
+    public async postItems(req: express.Request, ds: EntitiesDataSource): Promise<ListDto[]> {
         console.log("ListService.postItems()");
 
         const guid = req.params["guid"];
@@ -30,7 +30,7 @@ export class ListService extends BaseService {
         if (!listDto)
             throw new Error(`Could not locate list GUID ${guid}!`);
 
-        const filters = req.body() as ListFilterDto[];
+        const filters = req.body as ListFilterDto[];
 
         const listLogic = new ListLogic(listDto);
         const ret = await listLogic.getItems(ds, filters);

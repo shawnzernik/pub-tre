@@ -1,9 +1,10 @@
 import { ListDto } from "common/src/models/ListDto";
 import { FetchWrapper } from "./FetchWrapper";
+import { ListFilterDto } from "common/src/models/ListFilterDto";
 
 export class ListService {
-    public static async getItems(token: string, guid: string): Promise<any[]> {
-        const ret = await FetchWrapper.get<any>("/api/v0/list/" + guid + "/items", token);
+    public static async getItems(token: string, guid: string, filters: ListFilterDto[]): Promise<any[]> {
+        const ret = await FetchWrapper.post<any>("/api/v0/list/" + guid + "/items", filters, token);
         return ret;
     }
     public static async get(token: string, guid: string): Promise<ListDto> {
