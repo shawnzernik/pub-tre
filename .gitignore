@@ -6,3 +6,4 @@ postgres/data
 coverage
 make-dataset/datasets
 frontend/scripts
+frontend/static/pages
