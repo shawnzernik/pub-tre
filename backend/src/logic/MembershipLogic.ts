@@ -28,7 +28,7 @@ FROM
 WHERE
 	g.guid = $1
 ORDER BY
-	g.display_name, u.display_name 
+	g.display_name, u.email_address 
         `;
         const params: any[] = [guid];
 
@@ -55,7 +55,7 @@ FROM
 WHERE
 	u.guid = $1
 ORDER BY
-	g.display_name, u.display_name 
+	g.display_name, u.email_address 
         `;
         const params: any[] = [guid];
 

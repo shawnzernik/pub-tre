@@ -107,15 +107,12 @@ class Page extends BasePage<Props, State> {
 
         await this.events.setLoading(false);
     }
+    private saveClicked() {}
 
     public render(): React.ReactNode {
         const rows: React.ReactElement[] = [];
         console.log(`models: ${JSON.stringify(this.state.models, null, 4)}`);
         this.state.models.forEach((model) => {
-            if (!this.state.groupMap[model.groupsGuid])
-                console.log(`model.groupsGuid: ${model.groupsGuid}\nGroup Map: ${JSON.stringify(this.state.groupMap, null, 4)}`);
-            if (!this.state.userMap[model.usersGuid])
-                console.log(`model.usersGuid: ${model.usersGuid}\User Map: ${JSON.stringify(this.state.userMap, null, 4)}`);
             if (!this.state.groupMap[model.groupsGuid] || !this.state.userMap[model.usersGuid])
                 return;
 
@@ -166,7 +163,7 @@ class Page extends BasePage<Props, State> {
                 <FlexRow gap="1em">
                     <Button label="Load" onClick={this.loadClicked.bind(this)} />
                 </FlexRow>
-
+                <div>
                 <table>
                     <thead>
                         <tr>
@@ -177,6 +174,10 @@ class Page extends BasePage<Props, State> {
                     </thead>
                     <tbody>{rows}</tbody>
                 </table>
+                </div>
+                <FlexRow gap="1em">
+                    <Button label="Save" onClick={this.saveClicked.bind(this)} />
+                </FlexRow>
             </Navigation>
         );
     }
