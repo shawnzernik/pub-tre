@@ -1,5 +1,0 @@
-File "NAME":
-
-```TYPE
-CONTENTS
-```
