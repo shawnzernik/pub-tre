@@ -36,6 +36,7 @@ INSERT INTO "securables" ("guid", "display_name") VALUES
 ('7fd6e561-8912-4944-bc4d-61b8d6b054bf', 'Menu:Save'),
 ('273f2409-4afc-4427-9fcf-f0de96e3bbff', 'Menu:Delete'),
 ('35c42064-f2b7-4d5f-9994-0d249f731d46', 'List:List'),
+('a18670c4-929e-4788-b31e-6bf0439c78bc', 'List:Items'),
 ('e02ae94c-4dc4-46b7-8418-6dc34585e73b', 'List:Read'),
 ('d9a5a6f4-f94e-43e1-96a5-c1d514e20668', 'List:Save'),
 ('1cf9412f-4b87-473f-9d7a-03f22c8a611b', 'List:Delete'),

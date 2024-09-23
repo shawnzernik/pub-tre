@@ -3,7 +3,6 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { PermissionDto } from "common/src/models/PermissionDto";
 import { PermissionEntity } from "../data/PermissionEntity";
-import { CheckSecurity } from "./CheckSecurity";
 
 export class PermissionService extends BaseService {
 	public constructor(app: express.Express) {
@@ -17,32 +16,33 @@ export class PermissionService extends BaseService {
 		app.delete("/api/v0/permission/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
-    @CheckSecurity("Permission:Read")
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto | null> {
         console.log("PermissionService.getGuid()");
+        await BaseService.checkSecurity("Permission:Read", req, ds);
+
 		const guid = req.params["guid"];
 		const ret = await ds.permissionRepository().findOneBy({ guid: guid });
         return ret;
 	}
-
-	@CheckSecurity("Permission:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
         console.log("PermissionService.getList()");
+        await BaseService.checkSecurity("Permission:List", req, ds);
+
 		const ret = await ds.permissionRepository().find();
         return ret;
 	}
-
-	@CheckSecurity("Permission:Save")
 	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("PermissionService.postSave()");
+        await BaseService.checkSecurity("Permission:Save", req, ds);
+
 		const entity = new PermissionEntity();
 		entity.copyFrom(req.body as PermissionDto);
 		await ds.permissionRepository().save([entity]);
 	}
-
-	@CheckSecurity("Permission:Delete")
 	public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("PermissionService.deleteGuid()");
+        await BaseService.checkSecurity("Permission:Delete", req, ds);
+
 		const guid = req.params["guid"];
 		await ds.permissionRepository().delete({ guid: guid });
 	}

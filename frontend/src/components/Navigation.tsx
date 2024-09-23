@@ -27,8 +27,8 @@ interface Props {
     style?: React.CSSProperties;
     state: NavigationMessageState;
     events: NavigationMessageEvents;
-    activeTopMenuGuid: string;
-    activeLeftMenuGuid: string;
+    topMenuGuid: string;
+    leftMenuGuid: string;
     showMenu?: boolean;
 }
 interface State {
@@ -46,14 +46,12 @@ export class Navigation extends React.Component<Props, State> {
     public constructor(props: Props) {
         super(props);
 
-        let menu = true;
-        if(this.props.showMenu === false)
-            menu = false;
+        let menu = this.props.showMenu === true;
 
         this.state = {
             showMenu: menu,
-            activeTopMenuGuid: this.props.activeTopMenuGuid,
-            activeLeftMenuGuid: this.props.activeLeftMenuGuid
+            activeTopMenuGuid: this.props.topMenuGuid,
+            activeLeftMenuGuid: this.props.leftMenuGuid
         };
     }
 
@@ -61,7 +59,7 @@ export class Navigation extends React.Component<Props, State> {
         this.props.events.setLoading(true);
 
         try {
-            let token = AuthService.getToken();
+            let token = await AuthService.getToken();
             if (!token) {
                 token = await AuthService.anonymous();
                 AuthService.setToken(token);
@@ -75,7 +73,7 @@ export class Navigation extends React.Component<Props, State> {
                 this.securables[s.guid] = s;
             });
 
-            let menus = await MenuService.list(AuthService.getToken());
+            let menus = await MenuService.list(token);
             menus.forEach((menu) => {
                 if (this.securables[menu.guid]) {
                     if (menu.parentsGuid) {
@@ -104,12 +102,10 @@ export class Navigation extends React.Component<Props, State> {
         }
 
         this.props.events.setLoading(false);
-
     }
 
     public render(): React.ReactNode {
         if (!this.props.state) {
-            // alert("The page does not properly implement BasePage - make sure the constructor is overridden!");
             return;
         }
 
@@ -123,7 +119,10 @@ export class Navigation extends React.Component<Props, State> {
                 <div
                     key={menu.guid}
                     style={NavigationTheme.stageTopMenu}
-                    onClick={() => { this.setState({ activeTopMenuGuid: menu.guid }); }}
+                    onClick={() => { this.setState({ 
+                        showMenu: true,
+                        activeTopMenuGuid: menu.guid 
+                    }); }}
                 >
                     <BootstrapIcon name={menu.bootstrapIcon} size={2} color={color} />
                     &nbsp; {menu.display}
@@ -134,19 +133,19 @@ export class Navigation extends React.Component<Props, State> {
         let leftMenuItems: React.ReactNode[] = [];
         if (this.childMenus[this.state.activeTopMenuGuid])
             this.childMenus[this.state.activeTopMenuGuid].forEach((menu) => {
-                let color = Theme.mediumText;
+                let iconColor = Theme.darkText;
                 if (menu.guid === this.state.activeLeftMenuGuid)
-                    color = Theme.darkText;
+                    iconColor = Theme.lightPrimary;
 
                 leftMenuItems.push(
                     <div
                         key={menu.guid}
-                        style={{ ...NavigationTheme.stageMiddleMenuItem, color: color }}
+                        style={NavigationTheme.stageMiddleMenuItem}
                         onClick={() => {
                             window.location.assign(menu.url);
                         }}
                     >
-                        <BootstrapIcon color={color} name={menu.bootstrapIcon} size={2} />
+                        <BootstrapIcon color={iconColor} name={menu.bootstrapIcon} size={2} />
                         &nbsp; {menu.display}
                     </div>
                 );

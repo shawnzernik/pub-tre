@@ -43,7 +43,13 @@ module.exports = {
         account: "./src/pages/account.tsx",
         help: "./src/pages/help.tsx",
         lists: "./src/pages/lists.tsx",
-        list: "./src/pages/list.tsx"
+        memberships: "./src/pages/memberships.tsx",
+        permissions: "./src/pages/permissions.tsx",
+        user: "./src/pages/user.tsx",
+        group: "./src/pages/group.tsx",
+        securable: "./src/pages/securable.tsx",
+        menu: "./src/pages/menu.tsx",
+        list: "./src/pages/list.tsx",
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -75,6 +81,48 @@ module.exports = {
             filename: "../static/pages/lists.html",
             chunks: ["common", "lists"],
             title: "List View"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/memberships.html",
+            chunks: ["common", "memberships"],
+            title: "Memberships"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/permissions.html",
+            chunks: ["common", "permissions"],
+            title: "Permissions"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/user.html",
+            chunks: ["common", "user"],
+            title: "User Edit"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/group.html",
+            chunks: ["common", "group"],
+            title: "Group Edit"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/list.html",
+            chunks: ["common", "list"],
+            title: "List Edit"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/securable.html",
+            chunks: ["common", "securable"],
+            title: "Securable Edit"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/menu.html",
+            chunks: ["common", "menu"],
+            title: "Menu Edit"
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",

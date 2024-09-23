@@ -6,6 +6,5 @@ export const FormTheme: CSSProperties = {
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: "1em",
     justifyContent: "start"
 };

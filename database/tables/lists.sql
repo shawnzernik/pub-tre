@@ -8,9 +8,6 @@ CREATE TABLE "lists" (
     "left_menu_guid" UUID NOT NULL,
 
     "sql" TEXT NOT NULL,
-
     "edit_url" VARCHAR(255),
-    "delete_url" VARCHAR(255),
-
     "autoload" BOOLEAN NOT NULL DEFAULT FALSE
 )

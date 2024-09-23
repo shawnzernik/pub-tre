@@ -3,31 +3,27 @@ import { InputTheme } from "./Input.Theme";
 import { Theme } from "./Theme";
 
 interface Props {
-    model: any;
-    property: string;
     password?: boolean;
+    readonly?: boolean;
+    value?: string;
+    onChange?: (value: string) => void;
 }
-interface State {
-    value: string;
-}
+interface State { }
 
 export class Input extends React.Component<Props, State> {
     public constructor(props: Props) {
         super(props);
-
-        this.state = {
-            value: this.props.model[this.props.property]
-        };
     }
+
     public render(): React.ReactNode {
         return <input
             type={this.props.password ? "password" : "text"}
             style={InputTheme}
-            value={this.state.value}
+            value={this.props.value ? this.props.value : ""}
+            readOnly={this.props.readonly}
             onChange={(e) => {
-                const newValue = e.target.value;
-                this.props.model[this.props.property] = newValue;
-                this.setState({ value: newValue });
+                if (this.props.onChange)
+                    this.props.onChange(e.target.value);
             }}
         />;
     }

@@ -2,48 +2,48 @@ import express from "express";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { MembershipEntity } from "../data/MembershipEntity";
 import { BaseService } from "./BaseService";
-import { CheckSecurity } from "./CheckSecurity";
 import { MembershipDto } from "common/src/models/MembershipDto";
 
 export class MembershipService extends BaseService {
-	public constructor(app: express.Express) {
-		super();
+    public constructor(app: express.Express) {
+        super();
 
         console.log("MembershipService.constructor()");
 
-		app.get("/api/v0/membership/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
-		app.get("/api/v0/memberships", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
-		app.post("/api/v0/membership", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
-		app.delete("/api/v0/membership/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
-	}
+        app.get("/api/v0/membership/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
+        app.get("/api/v0/memberships", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
+        app.post("/api/v0/membership", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
+        app.delete("/api/v0/membership/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
+    }
 
-	@CheckSecurity("Membership:Read")
-	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<MembershipDto | null> {
+    public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<MembershipDto | null> {
         console.log("MembershipService.getGuid()");
-		const guid = req.params["guid"];
-		const ret = await ds.membershipRepository().findOneBy({ guid: guid });
-        return ret;
-	}
+        await BaseService.checkSecurity("Membership:Read", req, ds);
 
-	@CheckSecurity("Membership:List")
-	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<MembershipDto[]> {
+        const guid = req.params["guid"];
+        const ret = await ds.membershipRepository().findOneBy({ guid: guid });
+        return ret;
+    }
+    public async getList(req: express.Request, ds: EntitiesDataSource): Promise<MembershipDto[]> {
         console.log("MembershipService.getList()");
-		const ret = await ds.membershipRepository().find();
+        await BaseService.checkSecurity("Membership:List", req, ds);
+
+        const ret = await ds.membershipRepository().find();
         return ret;
-	}
-
-	@CheckSecurity("Membership:Save")
-	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+    }
+    public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("MembershipService.postSave()");
-		const entity = new MembershipEntity();
-		entity.copyFrom(req.body as MembershipEntity);
-		await ds.membershipRepository().save([entity]);
-	}
+        await BaseService.checkSecurity("Membership:Save", req, ds);
 
-	@CheckSecurity("Membership:Delete")
-	public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        const entity = new MembershipEntity();
+        entity.copyFrom(req.body as MembershipEntity);
+        await ds.membershipRepository().save([entity]);
+    }
+    public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("MembershipService.deleteGuid()");
-		const guid = req.params["guid"];
-		await ds.membershipRepository().delete({ guid: guid });
-	}
+        await BaseService.checkSecurity("Membership:Delete", req, ds);
+
+        const guid = req.params["guid"];
+        await ds.membershipRepository().delete({ guid: guid });
+    }
 }

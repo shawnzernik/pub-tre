@@ -13,8 +13,8 @@ class Page extends BasePage<Props, State> {
         return (
             <Navigation
                 state={this.state} events={this.events}
-                activeTopMenuGuid="b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3"
-                activeLeftMenuGuid="c30341f3-f40e-4f94-96e5-1e63f9ac899e"
+                topMenuGuid="b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3"
+                leftMenuGuid="c30341f3-f40e-4f94-96e5-1e63f9ac899e"
             >
 <Markdown>{`
 # My Account

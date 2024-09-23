@@ -17,6 +17,7 @@ SELECT
     TRUE
 FROM "securables" s
 WHERE s."guid" IN (
+    '1aa6ffbd-0c1d-4b05-913e-41bb9e30ad7b', -- menu:list
     'b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3', -- session
     'db0d6063-2266-4bfb-8c96-44dbb90cddf2', -- session > login
     '5a8a209b-e6c1-42e4-8bc9-f144feec6d8e', -- session > copyright

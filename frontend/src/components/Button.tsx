@@ -3,7 +3,7 @@ import { ButtonTheme } from "./Button.Theme";
 
 interface Props {
     label: string;
-    onClick: () => void;
+    onClick?: () => void;
 }
 interface State { }
 

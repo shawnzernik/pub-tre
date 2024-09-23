@@ -3,7 +3,6 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { SecurableDto } from "common/src/models/SecurableDto";
 import { SecurableEntity } from "../data/SecurableEntity";
-import { CheckSecurity } from "./CheckSecurity";
 
 export class SecurableService extends BaseService {
 	public constructor(app: express.Express) {
@@ -17,32 +16,33 @@ export class SecurableService extends BaseService {
 		app.delete("/api/v0/securable/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
-	@CheckSecurity("Securable:Read")
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<SecurableDto | null> {
         console.log("SecurableService.getGuid()");
+        await BaseService.checkSecurity("Securable:Read", req, ds);
+
 		const guid = req.params["guid"];
 		const ret = await ds.securableRepository().findOneBy({ guid: guid });
         return ret;
 	}
-
-    @CheckSecurity("Securable:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<SecurableDto[]> {
         console.log("SecurableService.getList()");
+        await BaseService.checkSecurity("Securable:List", req, ds);
+
 		const ret = await ds.securableRepository().find();
         return ret;
 	}
-
-	@CheckSecurity("Securable:Save")
 	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("SecurableService.postSave()");
+        await BaseService.checkSecurity("Securable:Save", req, ds);
+
 		const entity = new SecurableEntity();
 		entity.copyFrom(req.body as SecurableDto);
 		await ds.securableRepository().save([entity]);
 	}
-
-	@CheckSecurity("Securable:Delete")
 	public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("SecurableService.deleteGuid()");
+        await BaseService.checkSecurity("Securable:Delete", req, ds);
+
 		const guid = req.params["guid"];
 		await ds.securableRepository().delete({ guid: guid });
 	}

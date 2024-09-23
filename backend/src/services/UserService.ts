@@ -3,7 +3,6 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { UserDto } from "common/src/models/UserDto";
 import { UserEntity } from "../data/UserEntity";
-import { CheckSecurity } from "./CheckSecurity";
 
 export class UserService extends BaseService {
 	public constructor(app: express.Express) {
@@ -17,32 +16,33 @@ export class UserService extends BaseService {
 		app.delete("/api/v0/user/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
-    @CheckSecurity("User:Read")
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<UserDto | null> {
         console.log("UserService.getGuid()");
+        await BaseService.checkSecurity("User:Read", req, ds);
+
 		const guid = req.params["guid"];
 		const ret = await ds.userRepository().findOneBy({ guid: guid });
         return ret;
 	}
-
-	@CheckSecurity("User:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<UserDto[]> {
         console.log("UserService.getList()");
+        await BaseService.checkSecurity("User:List", req, ds);
+
 		const ret = await ds.userRepository().find();
         return ret;
 	}
-
-	@CheckSecurity("User:Save")
 	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("UserService.postSave()");
+        await BaseService.checkSecurity("User:Save", req, ds);
+
 		const entity = new UserEntity();
 		entity.copyFrom(req.body as UserDto);
 		await ds.userRepository().save([entity]);
 	}
-
-	@CheckSecurity("User:Delete")
 	public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("UserService.deleteGuid()");
+        await BaseService.checkSecurity("User:Delete", req, ds);
+
 		const guid = req.params["guid"];
 		await ds.userRepository().delete({ guid: guid });
 	}

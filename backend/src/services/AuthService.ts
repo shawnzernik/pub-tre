@@ -1,7 +1,9 @@
+import fs from "fs";
 import express from "express";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { AuthLogic } from "../logic/AuthLogic";
+import { Config } from "../Config";
 
 export class AuthService extends BaseService {
     public constructor(app: express.Express) {
@@ -11,6 +13,7 @@ export class AuthService extends BaseService {
 
         app.post("/api/v0/auth/login", (req, resp) => { this.methodWrapper(req, resp, this.postLogin) });
         app.get("/api/v0/auth/renew", (req, resp) => { this.methodWrapper(req, resp, this.postRenew) });
+        app.get("/api/v0/auth/public_key", (req, resp) => { this.methodWrapper(req, resp, this.getPublicKey) });
         app.get("/api/v0/auth/anonymous", (req, resp) => { this.methodWrapper(req, resp, this.getAnonymous) });
     }
 
@@ -20,6 +23,12 @@ export class AuthService extends BaseService {
         const bodyJson = req.body;
         const auth = await AuthLogic.passwordLogin(ds, bodyJson["emailAddress"], bodyJson["password"]);
         return auth.tokenize();
+    }
+    public async getPublicKey(req: express.Request, ds: EntitiesDataSource): Promise<string> {
+        console.log("AuthService.getPublicKey()");
+
+        const content = fs.readFileSync(Config.jwtPublicKeyFile, { encoding: "utf8" });
+        return content;
     }
     public async getAnonymous(req: express.Request, ds: EntitiesDataSource): Promise<string> {
         console.log("AuthService.postLogin()");
@@ -32,9 +41,9 @@ export class AuthService extends BaseService {
 
         const authHeader = req.headers["authorization"];
         const authToken = authHeader && authHeader.split(" ")[1];
-        if(!authToken)
+        if (!authToken)
             throw new Error("You must provide an Authorization header with the value of 'Bearer JWTTOKEN'!");
-             
+
         const auth = await AuthLogic.tokenLogin(authToken);
         return auth.tokenize();
     }

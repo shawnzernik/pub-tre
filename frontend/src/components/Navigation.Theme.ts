@@ -8,15 +8,18 @@ export class NavigationTheme {
     public static topIconSizeEm = 2;
 
     public static stage: CSSProperties = {
-        border: this.debugStage ? "1px solid black" : undefined,
+        border: this.debugStage ? "1px solid yellow" : undefined,
         display: "flex",
         flexDirection: "column",
+        height: "calc(100vh)",
         zIndex: "0"
     };
     public static stageTop: CSSProperties = {
         border: this.debugStage ? "1px solid black" : undefined,
         display: "flex",
         flexDirection: "row",
+        flexGrow: 0,
+        flexShrink: 0,
         gap: "4em",
         alignItems: "center",
         width: "100%",
@@ -40,12 +43,16 @@ export class NavigationTheme {
         border: this.debugStage ? "1px solid black" : undefined,
         display: "flex",
         flexDirection: "row",
+        flexGrow: 1,
+        flexShrink: 1,
         width: "100%",
-        height: "calc(100vh - 7.5em)"
+        height: "calc(100vh - 4em - 4em)"
     };
     public static stageMiddleMenu: CSSProperties = {
         display: "flex",
         flexDirection: "column",
+        flexGrow: 0,
+        flexShrink: 0,
         gap: "1em",
         border: this.debugStage ? "1px solid black" : undefined,
         width:  this.menuWidthEm + "em",
@@ -64,10 +71,10 @@ export class NavigationTheme {
     public static stageMiddleContent: CSSProperties = {
         display: "flex",
         flexDirection: "column",
+        flexGrow: 1,
+        flexShrink: 1,
         gap: "1em",
         border: this.debugStage ? "1px solid black" : undefined,
-        width: "100%",
-        // width: "calc(100vw - " + this.menuWidthEm + "em" + ")",
         padding: "1em",
         overflow: "auto"
     };
@@ -75,6 +82,8 @@ export class NavigationTheme {
         border: this.debugStage ? "1px solid black" : undefined,
         display: "flex",
         flexDirection: "row",
+        flexGrow: 0,
+        flexShrink: 0,
         justifyContent: "space-between",
         width: "100%",
         padding: "1em",

@@ -14,7 +14,7 @@ export class Field extends React.Component<Props, State> {
         return (
             <div style={{
                 ...FieldTheme.field,
-                width: this.props.size ? this.props.size * Theme.FormLabelWidthEm + "em" : "100%"
+                width: this.props.size ? (this.props.size + 1) * Theme.FormLabelWidthEm + "em" : "100%"
             }}>
                 <span style={FieldTheme.fieldLabel}>{this.props.label}:</span>
                 {this.props.children}

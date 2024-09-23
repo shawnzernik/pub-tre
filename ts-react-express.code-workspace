@@ -8,6 +8,10 @@
         "cSpell.words": [
             "securables",
             "Zernik"
-        ]
+        ],
+        "emmet.showAbbreviationSuggestions": false,
+        "emmet.showExpandedAbbreviation": "never",
+        "emmet.showSuggestionsAsSnippets": false,
+        "editor.hover.delay": 1500
     }
 }

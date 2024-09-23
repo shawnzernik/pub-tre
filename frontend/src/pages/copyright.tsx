@@ -2,7 +2,6 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
-import { Heading } from "../components/Heading";
 import { Markdown } from "../components/Markdown";
 
 interface Props { }
@@ -13,8 +12,8 @@ class Page extends BasePage<Props, State> {
         return (
             <Navigation
                 state={this.state} events={this.events}
-                activeTopMenuGuid="b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3"
-                activeLeftMenuGuid="5a8a209b-e6c1-42e4-8bc9-f144feec6d8e"
+                topMenuGuid="b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3"
+                leftMenuGuid="5a8a209b-e6c1-42e4-8bc9-f144feec6d8e"
             >
 <Markdown>{`
 # TypeScript React Express

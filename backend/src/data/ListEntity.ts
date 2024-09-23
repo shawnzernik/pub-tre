@@ -25,9 +25,6 @@ export class ListEntity implements ListDto, CopyInterface<ListDto> {
 	@Column({ name: 'edit_url', nullable: true })
 	public editUrl?: string = "";
 
-	@Column({ name: 'delete_url', nullable: true })
-	public deleteUrl?: string = "";
-
 	@Column({ name: 'autoload', default: false })
 	public autoload: boolean = false;
 
@@ -39,7 +36,6 @@ export class ListEntity implements ListDto, CopyInterface<ListDto> {
         this.leftMenuGuid = source.leftMenuGuid;
 		this.sql = source.sql;
 		this.editUrl = source.editUrl;
-		this.deleteUrl = source.deleteUrl;
 		this.autoload = source.autoload;
 	}
 
@@ -51,7 +47,6 @@ export class ListEntity implements ListDto, CopyInterface<ListDto> {
         dest.leftMenuGuid = this.leftMenuGuid;
 		dest.sql = this.sql;
 		dest.editUrl = this.editUrl;
-		dest.deleteUrl = this.deleteUrl;
 		dest.autoload = this.autoload;
 	}
 }

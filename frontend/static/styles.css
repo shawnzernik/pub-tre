@@ -3,6 +3,10 @@
     src: url('./roboto-slab/RobotoSlab-VariableFont_wght.ttf') format('truetype');
 }
 @font-face {
+    font-family: "MonoText";
+    src: url('./roboto-mono/RobotoMono-VariableFont_wght.ttf') format('truetype');
+}
+@font-face {
     font-family: "BodyText";
     src: url('./roboto/Roboto-Regular.ttf') format('truetype');
 }
@@ -12,7 +16,7 @@
     font-size: 14px;
     font-weight: 400;
     box-sizing: border-box;
-    overflow: hidden;
+    /* overflow: hidden; */
     color: #686868;
     border: 0;
     margin: 0;
@@ -112,7 +116,7 @@ pre {
 }
 
 table {
-    width: 100%; /* Full width tables */
+    /* width: 100%; */
     border-collapse: collapse; /* Remove space between borders */
     margin: 1em 0; /* Margin for tables */
 }

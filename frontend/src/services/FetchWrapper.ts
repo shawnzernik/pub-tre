@@ -53,8 +53,8 @@ export class FetchWrapper {
         }
 
         if (!obj.data)
-            throw new Error("No data returned!");
-
-        return obj.data as T;
+            return;
+        else
+            return obj.data as T;
     }
 }

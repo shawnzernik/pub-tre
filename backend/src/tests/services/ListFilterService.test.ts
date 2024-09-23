@@ -17,7 +17,6 @@ describe("ListFilterService", () => {
 
     let listEntity = new ListEntity();
     listEntity.autoload = false;
-    listEntity.deleteUrl = "http://delete";
     listEntity.editUrl = "http://edit";
     listEntity.guid = entityGuid;
     listEntity.leftMenuGuid = UUIDv4.generate();

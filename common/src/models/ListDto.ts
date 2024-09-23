@@ -6,6 +6,5 @@ export interface ListDto {
     leftMenuGuid: string;
     sql: string;
     editUrl?: string;
-    deleteUrl?: string;
     autoload: boolean;
 }

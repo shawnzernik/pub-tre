@@ -3,7 +3,6 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { PasswordDto } from "common/src/models/PasswordDto";
 import { PasswordEntity } from "../data/PasswordEntity";
-import { CheckSecurity } from "./CheckSecurity";
 
 export class PasswordService extends BaseService {
 	public constructor(app: express.Express) {
@@ -17,32 +16,33 @@ export class PasswordService extends BaseService {
 		app.delete("/api/v0/password/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
 	}
 
-	@CheckSecurity("Password:Read")
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<PasswordDto | null> {
         console.log("PasswordService.getGuid()");
+        await BaseService.checkSecurity("Password:Read", req, ds);
+
 		const guid = req.params["guid"];
 		const ret = await ds.passwordRepository().findOneBy({ guid: guid });
         return ret;
 	}
-
-    @CheckSecurity("Password:List")
 	public async getList(req: express.Request, ds: EntitiesDataSource): Promise<PasswordDto[]> {
         console.log("PasswordService.getList()");
+        await BaseService.checkSecurity("Password:List", req, ds);
+
 		const ret = await ds.passwordRepository().find();
         return ret;
 	}
-
-	@CheckSecurity("Password:Save")
 	public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("PasswordService.postSave()");
+        await BaseService.checkSecurity("Password:Save", req, ds);
+
 		const entity = new PasswordEntity();
 		entity.copyFrom(req.body as PasswordDto);
 		await ds.passwordRepository().save([entity]);
 	}
-
-	@CheckSecurity("Password:Delete")
 	public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
         console.log("PasswordService.deleteGuid()");
+        await BaseService.checkSecurity("Password:Delete", req, ds);
+
 		const guid = req.params["guid"];
 		await ds.passwordRepository().delete({ guid: guid });
 	}
