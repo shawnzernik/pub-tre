@@ -10,7 +10,7 @@ export class MenuService {
         const ret = await FetchWrapper.get<MenuDto[]>("/api/v0/menus", token);
         return ret;
     }
-    public static async save(dto: MenuDto, token: string): Promise<void> {
+    public static async save(token: string, dto: MenuDto): Promise<void> {
         await FetchWrapper.post("/api/v0/menu", dto, token);
     }
     public static async delete(token: string, guid: string): Promise<void> {

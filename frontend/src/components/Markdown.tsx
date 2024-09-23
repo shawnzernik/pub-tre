@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MarkdownTheme } from "./Markdown.Theme";
+import { MarkdownTheme } from "./MarkdownTheme";
 import { marked } from "marked";
 
 interface Props {

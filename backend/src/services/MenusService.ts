@@ -44,6 +44,8 @@ export class MenuService extends BaseService {
         await BaseService.checkSecurity("Menu:Delete", req, ds);
 
 		const guid = req.params["guid"];
-		await ds.menuRepository().delete({ guid: guid });
+		const results = await ds.menuRepository().delete({ guid: guid });
+        if(results.affected != 1)
+            throw Error(`Affected rows = ${results.affected}!`);
 	}
 }

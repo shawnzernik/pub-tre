@@ -18,6 +18,7 @@ import { SelectOption } from "../components/SelectOption";
 import { Select } from "../components/Select";
 import { Dictionary } from "common/src/Dictionary";
 import { TextArea } from "../components/TextArea";
+import { FlexRow } from "../components/FlexRow";
 
 interface Props { }
 interface State extends BasePageState {
@@ -110,7 +111,7 @@ class Page extends BasePage<Props, State> {
         this.events.setLoading(true);
         try {
             const token = await AuthService.getToken();
-            await ListService.save(this.state.model, token);
+            await ListService.save(token, this.state.model);
             window.location.replace("/static/pages/list.html?guid=" + this.state.model.guid);
             return;
         }
@@ -118,14 +119,33 @@ class Page extends BasePage<Props, State> {
             this.events.setMessage({
                 title: "Error",
                 content: (err as Error).message,
-                buttons: [{ label: "OK", onClicked: () => { 
-                    this.events.setLoading(false);
-                } }]
+                buttons: [{
+                    label: "OK", onClicked: () => {
+                        this.events.setLoading(false);
+                    }
+                }]
             });
         }
     }
-    public deleteClicked() {
-
+    public async deleteClicked() {
+        this.events.setLoading(true);
+        try {
+            const token = await AuthService.getToken();
+            await ListService.delete(token, this.state.model.guid);
+            window.history.back();
+            return;
+        }
+        catch (err) {
+            this.events.setMessage({
+                title: "Error",
+                content: (err as Error).message,
+                buttons: [{
+                    label: "OK", onClicked: () => {
+                        this.events.setLoading(false);
+                    }
+                }]
+            });
+        }
     }
 
     public render(): React.ReactNode {
@@ -138,6 +158,7 @@ class Page extends BasePage<Props, State> {
                 <Heading level={1}>List Edit</Heading>
                 <Form>
                     <Field label="GUID" size={3}><Input
+                        readonly={true}
                         value={this.state.model.guid}
                         onChange={async (value) => {
                             const newModel = JSON.parse(JSON.stringify(this.state.model));
@@ -208,11 +229,11 @@ class Page extends BasePage<Props, State> {
                         }}
                     /></Field>
                 </Form>
-                <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
+                <FlexRow gap="1em">
                     <Button label="Save" onClick={this.saveClicked.bind(this)} />
                     <Button label="Delete" onClick={this.deleteClicked.bind(this)} />
-                </div>
-            </Navigation>
+                </FlexRow>
+            </Navigation >
         );
     }
 }
@@ -221,4 +242,9 @@ window.onload = () => {
     const element = document.getElementById('root');
     const root = createRoot(element);
     root.render(<Page />)
-}
+};
+window.onpageshow = (event) => {
+    if (event.persisted) {
+        window.location.reload();
+    }
+};

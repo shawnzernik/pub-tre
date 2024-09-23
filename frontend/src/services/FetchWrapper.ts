@@ -9,7 +9,7 @@ export class FetchWrapper {
             headers: headers
         });
 
-        FetchWrapper.handleResponse<T>(response);
+        await FetchWrapper.handleResponse<T>(response);
     }
     static async get<T>(url: string, token?: string): Promise<T> {
         const headers = FetchWrapper.defaultHeaders(token);
@@ -19,7 +19,7 @@ export class FetchWrapper {
             headers: headers
         });
 
-        const ret = FetchWrapper.handleResponse<T>(response);
+        const ret = await FetchWrapper.handleResponse<T>(response);
         return ret;
     }
     public static async post<T>(url: string, body: any, token?: string): Promise<T> {
@@ -31,7 +31,7 @@ export class FetchWrapper {
             headers: headers
         });
 
-        const ret = FetchWrapper.handleResponse<T>(response);
+        const ret = await FetchWrapper.handleResponse<T>(response);
         return ret;
     }
     private static defaultHeaders(token?: string): Dictionary<string> {
@@ -47,7 +47,7 @@ export class FetchWrapper {
 
         if (!response.ok) {
             if (obj && obj.error)
-                throw obj.error;
+                throw new Error(obj.error);
             else
                 throw new Error(`Response ${response.status} - ${response.statusText}`);
         }

@@ -20,7 +20,7 @@ export class ListService {
         return ret;
     }
 
-    public static async save(dto: ListDto, token: string): Promise<void> {
+    public static async save(token: string, dto: ListDto): Promise<void> {
         await FetchWrapper.post("/api/v0/list", dto, token);
     }
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FieldTheme } from "./Field.Theme";
+import { FieldTheme } from "./FieldTheme";
 import { Theme } from "./Theme";
 
 interface Props {

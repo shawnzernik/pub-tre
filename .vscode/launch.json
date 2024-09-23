@@ -4,29 +4,6 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "backend jest",
-            "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest",
-            "args": [
-                "--runInBand"
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "runtimeArgs": [
-                "--inspect-brk=9229"
-            ],
-            "port": 9229,
-            "sourceMaps": true,
-            "cwd": "${workspaceFolder}/backend",
-            "windows": {
-                "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest.cmd"
-            }
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "backend website",
             "runtimeExecutable": "npx",
             "runtimeArgs": [
@@ -50,22 +27,25 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "chat-maker",
-            "runtimeArgs": [
-                "-r",
-                "ts-node/register",
-                "${workspaceFolder}/chat-maker/src/index.ts"
+            "name": "backend jest",
+            "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand"
             ],
-            "sourceMaps": true,
-            "cwd": "${workspaceFolder}/chat-maker",
-            "protocol": "inspector",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "console": "integratedTerminal"
+            "runtimeArgs": [
+                "--inspect-brk=9229"
+            ],
+            "port": 9229,
+            "sourceMaps": true,
+            "cwd": "${workspaceFolder}/backend",
+            "windows": {
+                "program": "${workspaceFolder}/backend/node_modules/jest/bin/jest.cmd"
+            }
         },
         {
             "type": "firefox",
@@ -126,6 +106,26 @@
             "windows": {
                 "program": "${workspaceFolder}/frontend/node_modules/jest/bin/jest.cmd"
             }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "chat-maker",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register",
+                "${workspaceFolder}/chat-maker/src/index.ts"
+            ],
+            "sourceMaps": true,
+            "cwd": "${workspaceFolder}/chat-maker",
+            "protocol": "inspector",
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "console": "integratedTerminal"
         }
     ]
 }

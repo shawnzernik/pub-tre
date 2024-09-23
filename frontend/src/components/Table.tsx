@@ -1,7 +1,8 @@
 import * as React from "react";
-import { TableTheme } from "./Table.Theme";
+import { TableTheme } from "./TableTheme";
 import { BootstrapIcon } from "./BootstrapIcon";
 import { Button } from "./Button";
+import { Checkbox } from "./Checkbox";
 
 interface Props {
     items: any[];
@@ -36,14 +37,17 @@ export class Table extends React.Component<Props, State> {
             const row: React.ReactNode[] = [];
 
             if (this.props.editUrl)
-                row.push(<td 
-                    style={{...TableTheme.tableRowTd, textAlign: "center", cursor: "pointer" }}
+                row.push(<td
+                    style={{ ...TableTheme.tableRowTd, textAlign: "center", cursor: "pointer" }}
                     onClick={() => {
                         window.location.assign(this.props.editUrl + "?" + this.props.primaryKey + "=" + item[this.props.primaryKey]);
                     }}
                 ><BootstrapIcon style={TableTheme.tableRowTdIcon} name="pencil-fill" size={2} /></td>);
             keys.forEach((key) => {
-                row.push(<td style={TableTheme.tableRowTd}>{item[key]}</td>);
+                if (typeof (item[key]) === "boolean")
+                    row.push(<td style={TableTheme.tableRowTd}><Checkbox readonly={true} checked={item[key]} /></td>);
+                else
+                    row.push(<td style={TableTheme.tableRowTd}>{item[key]}</td>);
             });
             rows.push(<tr>{row}</tr>);
         });

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BootstrapIconTheme } from "./BootstrapIcon.Theme";
+import { BootstrapIconTheme } from "./BootstrapIconTheme";
 
 interface Props {
     name: string;

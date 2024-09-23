@@ -1,5 +1,5 @@
 import * as React from "react";
-import { HeadingTheme } from "./Heading.Theme";
+import { HeadingTheme } from "./HeadingTheme";
 
 interface Props {
     children: React.ReactNode;

@@ -87,8 +87,13 @@ class Page extends BasePage<Props, State> {
     }
 }
 
-window.addEventListener("load", () => {
+window.onload = () => {
     const element = document.getElementById('root');
     const root = createRoot(element);
     root.render(<Page />)
-});
+};
+window.onpageshow = (event) => {
+    if (event.persisted) {
+        window.location.reload();
+    }
+};

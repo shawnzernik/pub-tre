@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Dictionary } from "common/src/Dictionary";
 import { MenuDto } from "common/src/models/MenuDto";
-import { NavigationTheme } from "./Navigation.Theme";
+import { NavigationTheme } from "./NavigationTheme";
 import { BootstrapIcon } from "./BootstrapIcon";
 import { Button } from "./Button";
 import { Message } from "./Message";

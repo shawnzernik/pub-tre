@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ButtonTheme } from "./Button.Theme";
+import { ButtonTheme } from "./ButtonTheme";
 
 interface Props {
     label: string;

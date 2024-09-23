@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TextAreaTheme } from "./TextArea.Theme";
+import { TextAreaTheme } from "./TextAreaTheme";
 import { Theme } from "./Theme";
 import { CSSProperties } from "react";
 

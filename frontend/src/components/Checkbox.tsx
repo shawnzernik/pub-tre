@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CheckboxTheme } from "./Checkbox.Theme";
+import { CheckboxTheme } from "./CheckboxTheme";
 import { Theme } from "./Theme";
 import { validate } from "webpack";
 

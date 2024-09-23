@@ -12,7 +12,7 @@ export class UserService {
         return ret;
     }
 
-    public static async save(dto: UserDto, token: string): Promise<void> {
+    public static async save(token: string, dto: UserDto): Promise<void> {
         await FetchWrapper.post("/api/v0/user", dto, token);
     }
 

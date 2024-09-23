@@ -1,6 +1,5 @@
 import * as React from "react";
-import { InputTheme } from "./Input.Theme";
-import { Theme } from "./Theme";
+import { InputTheme } from "./InputTheme";
 
 interface Props {
     password?: boolean;
@@ -20,8 +19,9 @@ export class Input extends React.Component<Props, State> {
             type={this.props.password ? "password" : "text"}
             style={InputTheme}
             value={this.props.value ? this.props.value : ""}
-            readOnly={this.props.readonly}
             onChange={(e) => {
+                if (this.props.readonly)
+                    return;
                 if (this.props.onChange)
                     this.props.onChange(e.target.value);
             }}

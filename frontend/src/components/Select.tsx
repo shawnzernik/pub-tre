@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SelectTheme } from "./Select.Theme";
+import { SelectTheme } from "./SelectTheme";
 import { Theme } from "./Theme";
 
 interface Props {

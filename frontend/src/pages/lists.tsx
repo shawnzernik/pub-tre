@@ -7,7 +7,6 @@ import { AuthService } from "../services/AuthService";
 import { ListDto } from "common/src/models/ListDto";
 import { Heading } from "../components/Heading";
 import { Table } from "../components/Table";
-import { UUIDv4 } from "common/src/logic/UUIDv4";
 
 interface Props { }
 interface State extends BasePageState {
@@ -28,23 +27,14 @@ class Page extends BasePage<Props, State> {
     public async componentDidMount(): Promise<void> {
         this.events.setLoading(true);
 
-        try {
-            const token = await AuthService.getToken();
-            const list = await ListService.getUrlKey(token, this.queryString("url_key"));
-            await this.updateState({ list: list });
+        const token = await AuthService.getToken();
+        const list = await ListService.getUrlKey(token, this.queryString("url_key"));
+        await this.updateState({ list: list });
 
-            const items = await ListService.getItems(token, this.state.list.guid, []);
-            await this.updateState({ items: items });
+        const items = await ListService.getItems(token, this.state.list.guid, []);
+        await this.updateState({ items: items });
 
-            this.events.setLoading(false);
-        }
-        catch (err) {
-            this.events.setMessage({
-                title: "Error",
-                content: (err as Error).message,
-                buttons: [{ label: "OK", onClicked: () => { } }]
-            })
-        }
+        this.events.setLoading(false);
     }
 
     public render(): React.ReactNode {
@@ -94,4 +84,9 @@ window.onload = () => {
     const element = document.getElementById('root');
     const root = createRoot(element);
     root.render(<Page />)
-}
+};
+window.onpageshow = (event) => {
+    if (event.persisted) {
+        window.location.reload();
+    }
+};

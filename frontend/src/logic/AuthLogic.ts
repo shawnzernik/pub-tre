@@ -11,8 +11,6 @@ export class AuthLogic {
     private constructor() { }
 
     public static async tokenLogin(token: string, publicKey: string): Promise<AuthLogic> {
-        console.log("AuthLogic.tokenLogin()");
-
         let payload = null;
         try { 
             payload = await JwtToken.verify(token, publicKey); // Await the async function 

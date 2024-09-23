@@ -10,7 +10,7 @@ export class GroupService {
         const ret = await FetchWrapper.get<GroupDto[]>("/api/v0/groups", token);
         return ret;
     }
-    public static async save(dto: GroupDto, token: string): Promise<void> {
+    public static async save(token: string, dto: GroupDto): Promise<void> {
         await FetchWrapper.post("/api/v0/group", dto, token);
     }
     public static async delete(token: string, guid: string): Promise<void> {

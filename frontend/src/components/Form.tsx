@@ -1,6 +1,6 @@
 import * as React from "react";
-import { ButtonTheme } from "./Button.Theme";
-import { FormTheme } from "./Form.Theme";
+import { ButtonTheme } from "./ButtonTheme";
+import { FormTheme } from "./FormTheme";
 
 interface Props { 
     children?: React.ReactNode;

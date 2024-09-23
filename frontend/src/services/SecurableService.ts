@@ -12,7 +12,7 @@ export class SecurableService {
         return ret;
     }
 
-    public static async save(dto: SecurableDto, token: string): Promise<void> {
+    public static async save(token: string, dto: SecurableDto): Promise<void> {
         await FetchWrapper.post("/api/v0/securable", dto, token);
     }
 
