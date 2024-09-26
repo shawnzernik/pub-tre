@@ -107,7 +107,21 @@ class Page extends BasePage<Props, State> {
 
         await this.events.setLoading(false);
     }
-    private saveClicked() {}
+    private async saveClicked() {
+        await this.events.setLoading(true);
+
+        const token = await AuthService.getToken();
+
+        const promises: Promise<void>[] = [];
+        this.state.models.forEach((model) => {
+            promises.push(MembershipService.save(token, model));
+        });
+        await Promise.all(promises);
+
+        await this.loadClicked();
+
+        await this.events.setLoading(false);
+    }
 
     public render(): React.ReactNode {
         const rows: React.ReactElement[] = [];

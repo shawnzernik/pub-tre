@@ -19,7 +19,7 @@ export class MembershipService {
         return ret;
     }
 
-    public static async save(entity: MembershipDto, token: string): Promise<void> {
+    public static async save(token: string, entity: MembershipDto): Promise<void> {
         await FetchWrapper.post("/api/v0/membership", entity, token);
     }
 

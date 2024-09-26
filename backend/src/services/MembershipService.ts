@@ -20,7 +20,6 @@ export class MembershipService extends BaseService {
         app.get("/api/v0/user/:guid/memberships", (req, resp) => { this.methodWrapper(req, resp, this.getUserMemberships) });
     }
 
-
     public async getGroupMemberships(req: express.Request, ds: EntitiesDataSource): Promise<MembershipDto[]> {
         console.log("MembershipService.getGuid()");
         await BaseService.checkSecurity("Membership:Read", req, ds);
