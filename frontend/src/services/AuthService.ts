@@ -5,7 +5,7 @@ import { JwtToken } from "../logic/JwtToken";
 export class AuthService {
     private static myPublicKey: string;
     public static async publicKey(): Promise<string> {
-        if(AuthService.myPublicKey)
+        if (AuthService.myPublicKey)
             return AuthService.myPublicKey;
 
         const ret = await FetchWrapper.get<string>('/api/v0/auth/public_key');
@@ -48,16 +48,19 @@ export class AuthService {
     }
     public static async getToken(): Promise<string> {
         const token = window.localStorage.getItem("AuthService.token");
-        if(!token)
+        if (!token)
             return token;
-        
+
         const key = await AuthService.publicKey();
-        const jwt = await JwtToken.verify(token, key);
+        let jwt;
+        try { jwt = await JwtToken.verify(token, key); }
+        catch (err) { window.location.assign("/"); }
+
         const now = Date.now();
         const expiresMinutesLeft = (jwt.expires - now) / 1000 / 60;
-        if(expiresMinutesLeft > 2)
+        if (expiresMinutesLeft > 2)
             return token;
-        if(expiresMinutesLeft < 0)
+        if (expiresMinutesLeft < 0)
             throw new Error("Token has expired! Please log in again.");
 
         const newToken = await AuthService.renew(token);

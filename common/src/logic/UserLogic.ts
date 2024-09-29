@@ -1,4 +1,4 @@
-import { UserDto } from "common/src/models/UserDto";
+import { UserDto } from "../models/UserDto";
 
 export class UserLogic {
     public static compareEmailAddress(a: UserDto, b: UserDto): number {

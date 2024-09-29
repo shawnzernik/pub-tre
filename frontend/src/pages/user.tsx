@@ -10,13 +10,14 @@ import { Form } from "../components/Form";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { FlexRow } from "../components/FlexRow";
-import { Checkbox } from "../components/Checkbox";
 import { UserDto } from "common/src/models/UserDto";
 import { UserService } from "../services/UserService";
 
 interface Props { }
 interface State extends BasePageState {
     model: UserDto;
+    newPassword: string;
+    confirmPassword: string;
 }
 
 class Page extends BasePage<Props, State> {
@@ -30,7 +31,9 @@ class Page extends BasePage<Props, State> {
                 guid: UUIDv4.generate(),
                 emailAddress: "",
                 smsPhone: ""
-            }
+            },
+            newPassword: "",
+            confirmPassword: ""
         };
     }
 
@@ -90,6 +93,38 @@ class Page extends BasePage<Props, State> {
             });
         }
     }
+    public async changeClicked() {
+        this.events.setLoading(true);
+        try {
+            const token = await AuthService.getToken();
+            await UserService.resetPassword(
+                token,
+                this.state.model.guid,
+                this.state.newPassword,
+                this.state.confirmPassword
+            );
+            await this.events.setLoading(false);
+            await this.updateState({ newPassword: "", confirmPassword: "" });
+            await this.events.setMessage({
+                title: "Success",
+                content: "The users password has been changed.",
+                buttons: [{ label: "OK", onClicked: () => { } }]
+            });
+
+        }
+        catch (err) {
+            this.events.setMessage({
+                title: "Error",
+                content: (err as Error).message,
+                buttons: [{
+                    label: "OK", onClicked: () => {
+                        this.events.setLoading(false);
+                    }
+                }]
+            });
+        }
+    }
+
     public render(): React.ReactNode {
         return (
             <Navigation
@@ -136,6 +171,25 @@ class Page extends BasePage<Props, State> {
                 <FlexRow gap="1em">
                     <Button label="Save" onClick={this.saveClicked.bind(this)} />
                     <Button label="Delete" onClick={this.deleteClicked.bind(this)} />
+                </FlexRow>
+
+                <Heading level={2}>Reset Password</Heading>
+                <Form>
+                    <Field label="Password" size={2}><Input password={true}
+                        value={this.state.newPassword}
+                        onChange={async (value) => {
+                            await this.updateState({ newPassword: value });
+                        }}
+                    /></Field>
+                    <Field label="Confirm" size={2}><Input password={true}
+                        value={this.state.confirmPassword}
+                        onChange={async (value) => {
+                            await this.updateState({ confirmPassword: value });
+                        }}
+                    /></Field>
+                </Form>
+                <FlexRow gap="1em">
+                    <Button label="Change" onClick={this.changeClicked.bind(this)} />
                 </FlexRow>
             </Navigation>
         );

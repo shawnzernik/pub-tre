@@ -35,6 +35,7 @@ SQL_FILES=(
     "data/administrator.sql"
     "data/anonymous.sql"
     "data/lists.sql"
+    "data/settings.sql"
 )
 
 for SQL_FILE in "${SQL_FILES[@]}"; do

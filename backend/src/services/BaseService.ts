@@ -24,7 +24,7 @@ export class BaseService {
                 return auth;
         }
 
-        throw new Error("Access Denied");
+        throw new Error(`Access denied for securable '${securableName}'!`);
     }
 
     protected async methodWrapper<T>(req: express.Request, resp: express.Response, method: Method<T>): Promise<void> {

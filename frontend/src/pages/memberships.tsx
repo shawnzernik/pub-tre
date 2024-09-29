@@ -11,15 +11,15 @@ import { Select } from "../components/Select";
 import { UserService } from "../services/UserService";
 import { AuthService } from "../services/AuthService";
 import { UserDto } from "common/src/models/UserDto";
-import { UserLogic } from "../logic/UserLogic";
 import { GroupDto } from "common/src/models/GroupDto";
 import { SelectOption } from "../components/SelectOption";
-import { GroupLogic } from "../logic/GroupLogic";
 import { GroupService } from "../services/GroupService";
 import { Button } from "../components/Button";
 import { FlexRow } from "../components/FlexRow";
 import { MembershipService } from "../services/MembershipService";
 import { Checkbox } from "../components/Checkbox";
+import { UserLogic } from "common/src/logic/UserLogic";
+import { GroupLogic } from "common/src/logic/GroupLogic";
 
 interface Props { }
 interface State extends BasePageState {

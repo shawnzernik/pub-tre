@@ -2,6 +2,14 @@ import { PermissionDto } from "common/src/models/PermissionDto";
 import { FetchWrapper } from "./FetchWrapper";
 
 export class PermissionService {
+    public static async getForGroup(token: string, guid: string): Promise<PermissionDto[]> {
+        const ret = await FetchWrapper.get<PermissionDto[]>("/api/v0/group/" + guid + "/permissions", token);
+        return ret;
+    }
+    public static async getForSecurable(token: string, guid: string): Promise<PermissionDto[]> {
+        const ret = await FetchWrapper.get<PermissionDto[]>("/api/v0/securable/" + guid + "/permissions", token);
+        return ret;
+    }
     public static async get(token: string, guid: string): Promise<PermissionDto> {
         const ret = await FetchWrapper.get<PermissionDto>("/api/v0/permission/" + guid, token);
         return ret;
@@ -12,7 +20,7 @@ export class PermissionService {
         return ret;
     }
 
-    public static async save(dto: PermissionDto, token: string): Promise<void> {
+    public static async save(token: string, dto: PermissionDto): Promise<void> {
         await FetchWrapper.post("/api/v0/permission", dto, token);
     }
 

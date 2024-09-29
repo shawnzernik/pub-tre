@@ -17,6 +17,10 @@ export class UserService {
     }
 
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<UserDto>("/api/v0/user/" + guid, token);
+        await FetchWrapper.delete("/api/v0/user/" + guid, token);
+    }
+    public static async resetPassword(token: string, guid: string, newPassword: string, confirmPassword: string): Promise<void> {
+        const obj = { password: newPassword, confirm: confirmPassword };
+        await FetchWrapper.post("/api/v0/user/" + guid + "/password", obj, token);
     }
 }

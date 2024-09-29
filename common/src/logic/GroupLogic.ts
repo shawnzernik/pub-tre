@@ -1,4 +1,4 @@
-import { GroupDto } from "common/src/models/GroupDto";
+import { GroupDto } from "../models/GroupDto";
 
 export class GroupLogic {
     public static compareDisplayName(a: GroupDto, b: GroupDto): number {

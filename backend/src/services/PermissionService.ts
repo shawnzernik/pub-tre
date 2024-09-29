@@ -20,16 +20,16 @@ export class PermissionService extends BaseService {
         app.get("/api/v0/securable/:guid/permissions", (req, resp) => { this.methodWrapper(req, resp, this.getSecurablePermissions) });
     }
 
-    public async getGroupMemberships(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
-        console.log("PermissionService.getGroupMemberships()");
+    public async getGroupPermissions(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
+        console.log("PermissionService.getGroupPermissions()");
         await BaseService.checkSecurity("Permission:Read", req, ds);
 
         const guid = req.params["guid"];
         const ret = await PermissionLogic.getGroupPermissions(ds, guid);
         return ret;
     }
-    public async getSecurableMemberships(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
-        console.log("PermissionService.getSecurableMemberships()");
+    public async getSecurablePermissions(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
+        console.log("PermissionService.getSecurablePermissions()");
         await BaseService.checkSecurity("Permission:Read", req, ds);
 
         const guid = req.params["guid"];

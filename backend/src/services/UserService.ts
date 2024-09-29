@@ -3,6 +3,9 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { UserDto } from "common/src/models/UserDto";
 import { UserEntity } from "../data/UserEntity";
+import { PasswordLogic } from "../logic/PasswordLogic";
+import { PasswordEntity } from "../data/PasswordEntity";
+import { UUIDv4 } from "common/src/logic/UUIDv4";
 
 export class UserService extends BaseService {
 	public constructor(app: express.Express) {
@@ -14,6 +17,7 @@ export class UserService extends BaseService {
         app.get("/api/v0/users", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
 		app.post("/api/v0/user", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
 		app.delete("/api/v0/user/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
+		app.post("/api/v0/user/:guid/password", (req, resp) => { this.methodWrapper(req, resp, this.postPassword) });
 	}
 
 	public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<UserDto | null> {
@@ -45,5 +49,15 @@ export class UserService extends BaseService {
 
 		const guid = req.params["guid"];
 		await ds.userRepository().delete({ guid: guid });
+	}
+	public async postPassword(req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        console.log("UserService.postPassword()");
+        await BaseService.checkSecurity("User:Password", req, ds);
+
+		const guid = req.params["guid"];
+
+        const passLogic = new PasswordLogic();
+        const passEntity = await passLogic.reset(ds, guid, req.body["password"], req.body["confirm"]);
+        await ds.passwordRepository().save(passEntity);
 	}
 }

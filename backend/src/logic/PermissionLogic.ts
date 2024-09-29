@@ -19,7 +19,7 @@ SELECT
 	CASE 
 		WHEN p.guid IS NOT NULL THEN p.is_allowed
 		ELSE FALSE
-	END AS "isAllowed",
+	END AS "isAllowed"
 FROM 
 	"securables" s
 	LEFT JOIN "groups" g ON 1=1
@@ -46,14 +46,13 @@ SELECT
 	CASE 
 		WHEN p.guid IS NOT NULL THEN p.is_allowed
 		ELSE FALSE
-	END AS "isAllowed",
-	
+	END AS "isAllowed"	
 FROM 
 	"securables" s
 	LEFT JOIN "groups" g ON 1=1
 	LEFT JOIN permissions p ON p.groups_guid = g.guid AND p.securables_guid = s.guid
 WHERE 
-	g.guid = $1
+	s.guid = $1
 ORDER BY
 	s.display_name, g.display_name 
         `;

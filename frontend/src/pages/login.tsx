@@ -9,6 +9,7 @@ import { Field } from "../components/Field";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { AuthService } from "../services/AuthService";
+import { FlexRow } from "../components/FlexRow";
 
 interface Props { }
 interface State extends BasePageState {
@@ -66,7 +67,7 @@ class Page extends BasePage<Props, State> {
                         onChange={async (value) => {
                             const newModel = JSON.parse(JSON.stringify(this.state.model));
                             newModel.emailAddress = value;
-                            await this.updateState({ model: newModel});
+                            await this.updateState({ model: newModel });
                         }}
                     /></Field>
                     <Field size={2} label="Password"><Input
@@ -75,13 +76,13 @@ class Page extends BasePage<Props, State> {
                         onChange={async (value) => {
                             const newModel = JSON.parse(JSON.stringify(this.state.model));
                             newModel.password = value;
-                            await this.updateState({ model: newModel});
+                            await this.updateState({ model: newModel });
                         }}
                     /></Field>
                 </Form>
-                <Form>
+                <FlexRow gap="1em">
                     <Button label="Login" onClick={this.login.bind(this)} />
-                </Form>
+                </FlexRow>
             </Navigation>
         );
     }
