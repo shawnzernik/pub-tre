@@ -7,7 +7,7 @@ INSERT INTO "passwords" ("guid", "users_guid", "created", "salt", "iterations", 
 VALUES (
     'ecb3185f-74eb-43b4-9b75-97975e312075',
     'ea042f97-c8f4-447d-a71b-f4c4e0c77cc7',
-    now(),
+    '1970-01-01 00:00:00',
     '7a2fd8236e85a7b61ad1647c1cb339d6bb8928a9280be136f099ebfddb4dd2ca',
     100000,
     '7ad7627a5addcea3379c367b0ad8f165d0d2bdba0aeb0dfd4f3825f685f036b513bdbd1ce4df4b4d0e277d85ef51868383b291a4acd86fd926150de5c15e34ea'

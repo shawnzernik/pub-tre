@@ -1,6 +1,7 @@
 import { LoginDto } from "common/src/models/LoginDto";
 import { FetchWrapper } from "./FetchWrapper";
 import { JwtToken } from "../logic/JwtToken";
+import { UserDto } from "common/src/models/UserDto";
 
 export class AuthService {
     private static myPublicKey: string;
@@ -8,12 +9,12 @@ export class AuthService {
         if (AuthService.myPublicKey)
             return AuthService.myPublicKey;
 
-        const ret = await FetchWrapper.get<string>('/api/v0/auth/public_key');
+        const ret = await FetchWrapper.get<string>("/api/v0/auth/public_key");
         AuthService.myPublicKey = ret;
         return ret;
     }
     public static async anonymous(): Promise<string> {
-        const ret = await FetchWrapper.get<string>('/api/v0/auth/anonymous');
+        const ret = await FetchWrapper.get<string>("/api/v0/auth/anonymous");
 
         const key = await AuthService.publicKey();
         JwtToken.verify(ret, key);
@@ -26,16 +27,32 @@ export class AuthService {
             password: password
         };
 
-        const ret = await FetchWrapper.post<string>('/api/v0/auth/login', login);
+        const ret = await FetchWrapper.post<string>("/api/v0/auth/login", login);
 
         const key = await AuthService.publicKey();
         JwtToken.verify(ret, key);
 
         return ret;
     }
+    public static async getUser(): Promise<UserDto> {
+        const token = await this.getToken();
+        const ret = await FetchWrapper.get<UserDto>("/api/v0/auth/user", token);
+        return ret;
+    }
+    public static async postUser(user: UserDto): Promise<void> {
+        const token = await this.getToken();
+        const ret = await FetchWrapper.post("/api/v0/auth/user", user, token);
+    }
+    public static async postPassword(current: string, newPass: string, confirm: string): Promise<void> {
+        const obj = {
+            currentPassword: current, newPassword: newPass, confirmPassword: confirm
+        };
+        const token = await this.getToken();
+        await FetchWrapper.post("/api/v0/auth/password", obj, token);
+    }
 
     public static async renew(token: string): Promise<string> {
-        const ret = await FetchWrapper.get<string>('/api/v0/auth/renew', token);
+        const ret = await FetchWrapper.get<string>("/api/v0/auth/renew", token);
 
         const key = await AuthService.publicKey();
         JwtToken.verify(ret, key);

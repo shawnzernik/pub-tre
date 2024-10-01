@@ -1,4 +1,7 @@
 INSERT INTO "securables" ("guid", "display_name") VALUES
+('e173f56a-9bf0-4aad-9502-b2826aa2a1db', 'Auth:Get:User'),
+('4429aeda-4154-43de-933f-b60c2a7d8b2e', 'Auth:Post:User'),
+('f206ea51-c83d-4de4-b1fa-9bb0ca0486f0', 'Auth:Post:Password'),
 ('d291a1f1-2b60-4f3d-b81c-7d69b31460a0', 'Group:List'),
 ('83a42cfa-749b-4c9e-8e20-0b742cf516a3', 'Group:Read'),
 ('7b24f958-2187-4f9d-b5f8-4e965b16f35e', 'Group:Save'),

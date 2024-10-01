@@ -31,7 +31,7 @@ export class BasePage<P, S extends BasePageState> extends React.Component<P, S> 
         loading: false,
         message: null
     }
-    protected events: NavigationMessageEvents = {
+    public events: NavigationMessageEvents = {
         setLoading: (value) => {
             return new Promise<void>((resolve, reject) => {
                 this.setState({ loading: value }, () => { resolve(); })

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Navigation } from "../components/Navigation";
+import { Dialogue, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Heading } from "../components/Heading";
 import { Dictionary } from "common/src/Dictionary";
@@ -85,11 +85,7 @@ class Page extends BasePage<Props, State> {
 
     private async loadClicked() {
         if (!this.state.selectedGroup && !this.state.selectedSecurable) {
-            this.events.setMessage({
-                title: "Notice",
-                content: "No selections for securable or group were made!",
-                buttons: [{ label: "OK", onClicked: () => { } }]
-            });
+            await Dialogue(this, "Notice", "No selections for securable or group were made!", ["OK"]);
             return;
         }
 

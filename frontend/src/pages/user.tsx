@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Navigation } from "../components/Navigation";
+import { Dialogue, ErrorMessage, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Heading } from "../components/Heading";
 import { Field } from "../components/Field";
@@ -62,15 +62,8 @@ class Page extends BasePage<Props, State> {
             return;
         }
         catch (err) {
-            this.events.setMessage({
-                title: "Error",
-                content: (err as Error).message,
-                buttons: [{
-                    label: "OK", onClicked: () => {
-                        this.events.setLoading(false);
-                    }
-                }]
-            });
+            await ErrorMessage(this, err);
+            await this.events.setLoading(false);
         }
     }
     public async deleteClicked() {
@@ -82,15 +75,8 @@ class Page extends BasePage<Props, State> {
             return;
         }
         catch (err) {
-            this.events.setMessage({
-                title: "Error",
-                content: (err as Error).message,
-                buttons: [{
-                    label: "OK", onClicked: () => {
-                        this.events.setLoading(false);
-                    }
-                }]
-            });
+            await ErrorMessage(this, err);
+            await this.events.setLoading(false);
         }
     }
     public async changeClicked() {
@@ -105,23 +91,11 @@ class Page extends BasePage<Props, State> {
             );
             await this.events.setLoading(false);
             await this.updateState({ newPassword: "", confirmPassword: "" });
-            await this.events.setMessage({
-                title: "Success",
-                content: "The users password has been changed.",
-                buttons: [{ label: "OK", onClicked: () => { } }]
-            });
-
+            await Dialogue(this, "Success", "The users password has been changed.", ["OK"]);
         }
         catch (err) {
-            this.events.setMessage({
-                title: "Error",
-                content: (err as Error).message,
-                buttons: [{
-                    label: "OK", onClicked: () => {
-                        this.events.setLoading(false);
-                    }
-                }]
-            });
+            await ErrorMessage(this, err);
+            await this.events.setLoading(false);
         }
     }
 
@@ -132,7 +106,7 @@ class Page extends BasePage<Props, State> {
                 topMenuGuid="b1e3c680-0f62-4931-8a68-4be9b4b070f7"
                 leftMenuGuid="67fa4231-5b8e-4639-89cb-5f15a9207a83"
             >
-                <Heading level={1}>Group Edit</Heading>
+                <Heading level={1}>User Edit</Heading>
                 <Form>
                     <Field label="GUID" size={3}><Input
                         readonly={true}

@@ -1,5 +1,5 @@
 export interface MessageButton {
-    onClicked: () => void;
+    onClicked?: () => void;
     label: string;
 }
 

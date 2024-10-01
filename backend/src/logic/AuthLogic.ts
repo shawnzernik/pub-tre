@@ -47,7 +47,7 @@ export class AuthLogic {
         if (!passwords || passwords.length < 1)
             throw new Error(AuthLogic.invalidLoginMsg);
 
-        passwords.sort(PasswordLogic.compareCreated);
+        passwords.sort(PasswordLogic.compareCreatedDesc);
 
         const rehashedPassword = new PasswordEntity();
         rehashedPassword.iterations = passwords[0].iterations;

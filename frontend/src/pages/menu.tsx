@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Navigation } from "../components/Navigation";
+import { ErrorMessage, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Heading } from "../components/Heading";
 import { Form } from "../components/Form";
@@ -93,15 +93,8 @@ class Page extends BasePage<Props, State> {
             return;
         }
         catch (err) {
-            this.events.setMessage({
-                title: "Error",
-                content: (err as Error).message,
-                buttons: [{
-                    label: "OK", onClicked: () => {
-                        this.events.setLoading(false);
-                    }
-                }]
-            });
+            await ErrorMessage(this, err);
+            await this.events.setLoading(false);
         }
     }
     public async deleteClicked() {
@@ -113,15 +106,8 @@ class Page extends BasePage<Props, State> {
             return;
         }
         catch (err) {
-            this.events.setMessage({
-                title: "Error",
-                content: (err as Error).message,
-                buttons: [{
-                    label: "OK", onClicked: () => {
-                        this.events.setLoading(false);
-                    }
-                }]
-            });
+            await ErrorMessage(this, err);
+            await this.events.setLoading(false);
         }        
     }
 

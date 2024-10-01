@@ -4,12 +4,13 @@ import { MenuDto } from "common/src/models/MenuDto";
 import { NavigationTheme } from "./NavigationTheme";
 import { BootstrapIcon } from "./BootstrapIcon";
 import { Button } from "./Button";
-import { Message } from "./Message";
+import { Message, MessageButton } from "./Message";
 import { Theme } from "./Theme";
 import { AuthService } from "../services/AuthService";
 import { MenuService } from "../services/MenuService";
 import { AuthLogic } from "../logic/AuthLogic";
 import { SecurableDto } from "common/src/models/SecurableDto";
+import { BasePage, BasePageState } from "./BasePage";
 
 export interface NavigationMessageEvents {
     setLoading: (value: boolean) => Promise<void>;
@@ -19,6 +20,25 @@ export interface NavigationMessageEvents {
 export interface NavigationMessageState {
     loading: boolean;
     message?: Message;
+}
+
+export function ErrorMessage<P, S extends BasePageState>(page: BasePage<P, S>, err: any): Promise<string | void> {
+    const msg = typeof(err) === "string" ? err : err instanceof Error ? err.message : `${err}`;
+    return Dialogue<P, S>(page, "Error", msg, ["OK"]);
+}
+export function Dialogue<P, S extends BasePageState>(page: BasePage<P, S>, title: string, msg: string, buttons?: string[]): Promise<string | void> {
+    return new Promise((resolve, reject) => {
+        const buttonObjs: MessageButton[] = [];
+        buttons.forEach((label: string) => {
+            buttonObjs.push({label: label, onClicked: () => { resolve(label); }})
+        });
+
+        page.events.setMessage({
+            title: title,
+            content: msg,
+            buttons: buttonObjs
+        });
+    });
 }
 
 interface Props {
@@ -94,11 +114,7 @@ export class Navigation extends React.Component<Props, State> {
             });
         }
         catch (err) {
-            this.props.events.setMessage({
-                title: "Error",
-                content: err.toString(),
-                buttons: [{ label: "OK", onClicked: () => { } }]
-            });
+            await ErrorMessage(this as unknown as BasePage<any, BasePageState>, err);
         }
 
         this.props.events.setLoading(false);
@@ -119,10 +135,12 @@ export class Navigation extends React.Component<Props, State> {
                 <div
                     key={menu.guid}
                     style={NavigationTheme.stageTopMenu}
-                    onClick={() => { this.setState({ 
-                        showMenu: true,
-                        activeTopMenuGuid: menu.guid 
-                    }); }}
+                    onClick={() => {
+                        this.setState({
+                            showMenu: true,
+                            activeTopMenuGuid: menu.guid
+                        });
+                    }}
                 >
                     <BootstrapIcon name={menu.bootstrapIcon} size={2} color={color} />
                     &nbsp; {menu.display}
@@ -174,7 +192,8 @@ export class Navigation extends React.Component<Props, State> {
                     <Button
                         label={btn.label}
                         onClick={() => {
-                            btn.onClicked();
+                            if (btn.onClicked)
+                                btn.onClicked();
                             this.props.events.setMessage(null);
                         }}
                     />

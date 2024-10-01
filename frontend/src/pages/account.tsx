@@ -1,19 +1,78 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Navigation } from "../components/Navigation";
+import { Dialogue, ErrorMessage, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Heading } from "../components/Heading";
-import { Markdown } from "../components/Markdown";
 import { Form } from "../components/Form";
 import { Field } from "../components/Field";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { FlexRow } from "../components/FlexRow";
+import { UserDto } from "common/src/models/UserDto";
+import { AuthService } from "../services/AuthService";
 
 interface Props { }
-interface State extends BasePageState { }
+interface State extends BasePageState {
+    model: UserDto,
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword: string
+}
 
 class Page extends BasePage<Props, State> {
+    public constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            ...BasePage.defaultState,
+            model: {
+                guid: "",
+                displayName: "",
+                emailAddress: "",
+                smsPhone: ""
+            },
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: ""
+        };
+    }
+    public async componentDidMount(): Promise<void> {
+        await this.events.setLoading(true);
+
+        try {
+            const user = await AuthService.getUser();
+            await this.updateState({ model: user });
+            await this.events.setLoading(false);
+        }
+        catch(err) {
+            await ErrorMessage(this, err);
+        }
+    }
+    public async saveClicked(): Promise<void> {
+        await this.events.setLoading(true);
+
+        try {
+            await AuthService.postUser(this.state.model);
+            await this.componentDidMount();
+            await this.events.setLoading(false);
+            await Dialogue(this, "Success", "Changes have been saved!  You should log out and log back in for your changes to take effect.", ["OK"]);
+        }
+        catch(err) {
+            await ErrorMessage(this, err);
+        }
+    }
+    public async changeClicked(): Promise<void> {
+        await this.events.setLoading(true);
+
+        try {
+            await AuthService.postPassword(this.state.currentPassword, this.state.confirmPassword, this.state.newPassword);
+            await this.events.setLoading(false);
+            await Dialogue(this, "Success", "Your password has been changed.", ["OK"]);
+        }
+        catch(err) {
+            await ErrorMessage(this, err);
+        }
+    }
     public render(): React.ReactNode {
         return (
             <Navigation
@@ -23,23 +82,67 @@ class Page extends BasePage<Props, State> {
             >
                 <Heading level={1}>My Account</Heading>
                 <Form>
-                    <Field label="GUID" size={3}><Input /></Field>
-                    <Field label="Name" size={2}><Input /></Field>
-                    <Field label="Email" size={2}><Input /></Field>
-                    <Field label="Phone" size={2}><Input /></Field>
+                    <Field label="GUID" size={3}><Input
+                        readonly={true}
+                        value={this.state.model.guid}
+                        onChange={async (value) => {
+                            const newModel = this.jsonCopy(this.state.model);;
+                            newModel.guid = value;
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="Display" size={2}><Input
+                        value={this.state.model.displayName}
+                        onChange={async (value) => {
+                            const newModel = this.jsonCopy(this.state.model);;
+                            newModel.displayName = value;
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="Email" size={2}><Input
+                        value={this.state.model.emailAddress}
+                        onChange={async (value) => {
+                            const newModel = this.jsonCopy(this.state.model);;
+                            newModel.emailAddress = value;
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="Cell Phone" size={2}><Input
+                        value={this.state.model.smsPhone}
+                        onChange={async (value) => {
+                            const newModel = this.jsonCopy(this.state.model);;
+                            newModel.smsPhone = value;
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
                 </Form>
                 <FlexRow gap="1em">
-                    <Button label="Save" />
+                    <Button label="Save" onClick={this.saveClicked.bind(this)} />
                 </FlexRow>
 
                 <Heading level={2}>Change Password</Heading>
                 <Form>
-                    <Field label="Current" size={2}><Input password={true}/></Field>
-                    <Field label="New" size={2}><Input password={true}/></Field>
-                    <Field label="Confirm" size={2}><Input password={true}/></Field>
+                    <Field label="Current Password" size={2}><Input password={true}
+                        value={this.state.currentPassword}
+                        onChange={async (value) => {
+                            await this.updateState({ currentPassword: value });
+                        }}
+                    /></Field>
+                    <Field label="New Password" size={2}><Input password={true}
+                        value={this.state.newPassword}
+                        onChange={async (value) => {
+                            await this.updateState({ newPassword: value });
+                        }}
+                    /></Field>
+                    <Field label="Confirm Password" size={2}><Input password={true}
+                        value={this.state.confirmPassword}
+                        onChange={async (value) => {
+                            await this.updateState({ confirmPassword: value });
+                        }}
+                    /></Field>
                 </Form>
                 <FlexRow gap="1em">
-                    <Button label="Change" />
+                    <Button label="Change" onClick={this.changeClicked.bind(this)} />
                 </FlexRow>
             </Navigation>
         );

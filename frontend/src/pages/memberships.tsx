@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Navigation } from "../components/Navigation";
+import { Dialogue, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Heading } from "../components/Heading";
 import { Dictionary } from "common/src/Dictionary";
@@ -85,11 +85,7 @@ class Page extends BasePage<Props, State> {
 
     private async loadClicked() {
         if (!this.state.selectedGroup && !this.state.selectedUser) {
-            this.events.setMessage({
-                title: "Notice",
-                content: "No selections for user or group were made!",
-                buttons: [{ label: "OK", onClicked: () => { } }]
-            });
+            await Dialogue(this, "Notice", "No selections for user or group were made!", ["OK"]);
             return;
         }
 
@@ -178,16 +174,16 @@ class Page extends BasePage<Props, State> {
                     <Button label="Load" onClick={this.loadClicked.bind(this)} />
                 </FlexRow>
                 <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Group</th>
-                            <th>User</th>
-                            <th>Included</th>
-                        </tr>
-                    </thead>
-                    <tbody>{rows}</tbody>
-                </table>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Group</th>
+                                <th>User</th>
+                                <th>Included</th>
+                            </tr>
+                        </thead>
+                        <tbody>{rows}</tbody>
+                    </table>
                 </div>
                 <FlexRow gap="1em">
                     <Button label="Save" onClick={this.saveClicked.bind(this)} />

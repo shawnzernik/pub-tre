@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Heading } from "../components/Heading";
-import { Navigation } from "../components/Navigation";
+import { ErrorMessage, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Form } from "../components/Form";
 import { LoginDto } from "common/src/models/LoginDto";
@@ -40,14 +40,7 @@ class Page extends BasePage<Props, State> {
             window.location.assign("copyright.html");
         }
         catch (err) {
-            await this.events.setMessage({
-                title: "Error",
-                content: `${err}`,
-                buttons: [{
-                    label: "OK", onClicked: () => {
-                    }
-                }]
-            });
+            await ErrorMessage(this, err);
         }
         await this.events.setLoading(false);
     }

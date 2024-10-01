@@ -15,4 +15,11 @@ export class PasswordLogic {
             return 1;
         return 0;
     }
+    public static compareCreatedDesc(a: PasswordDto, b: PasswordDto): number {
+        if(a.created.getTime() < b.created.getTime())
+            return 1;
+        if(a.created.getTime() > b.created.getTime())
+            return -1;
+        return 0;
+    }
 }
