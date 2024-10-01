@@ -1,5 +1,7 @@
 {
-	"name": "common",
+    "author": "Shawn Zernik",
+    "license": "AGPL-3.0-only",
+	"name": "frontend",
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
@@ -9,8 +11,6 @@
 		"test": "jest",
 		"clean": "rm -R scripts node_modules package-lock.json static/pages"
 	},
-	"author": "",
-	"license": "ISC",
 	"devDependencies": {
 		"@types/jest": "^29.5.12",
 		"html-webpack-plugin": "^5.6.0",

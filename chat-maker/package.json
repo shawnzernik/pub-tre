@@ -1,18 +1,18 @@
 {
-  "name": "chat-maker",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "npx tsc",
-    "run": "node ./dist/index.js",
-    "clean": "rm -R datasets dist package-lock.json node_modules"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/node": "^22.5.2",
-    "typescript": "^5.5.4",
-    "ts-node": "latest"
-  }
+    "author": "Shawn Zernik",
+    "license": "AGPL-3.0-only",
+    "name": "chat-maker",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "npx tsc",
+        "run": "node ./dist/index.js",
+        "clean": "rm -R datasets dist package-lock.json node_modules"
+    },
+    "devDependencies": {
+        "@types/node": "^22.5.2",
+        "typescript": "^5.5.4",
+        "ts-node": "latest"
+    }
 }
