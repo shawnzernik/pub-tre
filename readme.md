@@ -43,7 +43,3 @@ The following is an outline of a TypeScript, React, and Postgres application fra
 ### Menus
 
 ![Menus](readme/menus.png)
-
-<!-- ### Settings
-
-![Settings](readme/settings.png) -->
