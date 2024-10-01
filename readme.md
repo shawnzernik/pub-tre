@@ -56,6 +56,8 @@ This is for use with Aici to create a training dataset to feed to Gemini 2 model
 
 Aici is an 'AI Continuous Improvement' web system that trains and run AI models.  It allows the saving of responses as "suggestions" so you can correct them and feed it back to train the AI from the correction.
 
+[shawnzernik/aici](https://github.com/shawnzernik/aici)
+
 ## Postgres
 
 This is a shell script that will boot up the Podman database.
