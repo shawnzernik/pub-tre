@@ -50,7 +50,24 @@ SELECT
 	u.sms_phone AS "Phone"
 FROM "users" u
 ORDER BY u.email_address
-', '/static/pages/user.html', 'false');
+', '/static/pages/user.html', 'false'),
+( '51ec361f-8a5c-46b2-8c51-68e8516b046f', 'Setting List', 'settings', 'b1e3c680-0f62-4931-8a68-4be9b4b070f7', 'ac781ba3-dd39-4c4f-a68b-4894d733cccb', '
+SELECT
+	"guid",
+	"key" AS "Key",
+	"value" AS "Value"
+FROM "settings"
+ORDER BY "key"
+', '/static/pages/setting.html', 'false'),
+('586aaa93-f0ee-4863-b595-56e8f71dd0ce', 'Dataset List', 'datasets', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', '6b8c801f-c6f9-42d6-8502-c2ea75287f26', '
+SELECT
+	"guid",
+    "include_in_training" AS "Train On",
+    "title" AS "Title",
+    LEFT("json", 150) AS "JSON"
+FROM "datasets"
+ORDER BY "title"
+', '/static/pages/dataset.html', 'false');
 
 INSERT INTO "securables" ("guid", "display_name")
 SELECT

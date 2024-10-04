@@ -21,13 +21,13 @@ The following is my jest unit test for my user service:
 Using the following entity:
 
 ```
-<!! /Users/shawn/Projects/ts-react-express/backend/src/data/ListEntity.ts !!/>
+<!! /Users/shawn/Projects/ts-react-express/backend/src/data/SettingEntity.ts !!/>
 ```
 
 And the following service:
 
 ```
-<!! /Users/shawn/Projects/ts-react-express/backend/src/services/ListService.ts !!/>
+<!! /Users/shawn/Projects/ts-react-express/backend/src/services/SettingService.ts !!/>
 ```
 
 Create me a jest unit test like I did for the user service.

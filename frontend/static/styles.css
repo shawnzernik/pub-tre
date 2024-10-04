@@ -103,7 +103,6 @@ img {
 code {
     font-family: "Courier New", Courier, monospace; /* Monospace font for inline code */
     background-color: #f5f5f5; /* Light background for code */
-    padding: 0.125em 0.25em; /* Padding for inline code */
     border-radius: 0.25em; /* Rounded corners */
 }
 

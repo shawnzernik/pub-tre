@@ -12,6 +12,7 @@ import { FlexRow } from "../components/FlexRow";
 import { Button } from "../components/Button";
 import { SelectOption } from "../components/SelectOption";
 import { MenuService } from "../services/MenuService";
+import { MenuLogic } from "common/src/logic/MenuLogic";
 import { AuthService } from "../services/AuthService";
 import { Select } from "../components/Select";
 
@@ -41,14 +42,6 @@ class Page extends BasePage<Props, State> {
     public async componentDidMount(): Promise<void> {
         await this.events.setLoading(true);
 
-        const menuCompare = (a: MenuDto, b: MenuDto) => {
-            if (a.display < b.display)
-                return -1;
-            if (a.display > b.display)
-                return 1;
-            return 0;
-        };
-
         const token = await AuthService.getToken();
 
         // load root menu options
@@ -58,7 +51,7 @@ class Page extends BasePage<Props, State> {
             if (!menu.parentsGuid)
                 rootMenus.push(menu);
         });
-        rootMenus = rootMenus.sort(menuCompare);
+        rootMenus = rootMenus.sort(MenuLogic.compareDisplay);
 
         // set root menu selection options
         const menuOptions: React.ReactElement[] = [];
@@ -123,11 +116,6 @@ class Page extends BasePage<Props, State> {
                     <Field label="GUID" size={3}><Input
                         readonly={true}
                         value={this.state.model.guid}
-                        onChange={async (value) => {
-                            const newModel = this.jsonCopy(this.state.model);;
-                            newModel.guid = value;
-                            await this.updateState({ model: newModel });
-                        }}
                     /></Field>
                     <Field label="Parent" size={2}>
                         <Select

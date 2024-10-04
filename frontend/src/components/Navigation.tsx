@@ -27,9 +27,13 @@ export function ErrorMessage<P, S extends BasePageState>(page: BasePage<P, S>, e
     return Dialogue<P, S>(page, "Error", msg, ["OK"]);
 }
 export function Dialogue<P, S extends BasePageState>(page: BasePage<P, S>, title: string, msg: string, buttons?: string[]): Promise<string | void> {
+    let buttonsToUse = ["OK"];
+    if(buttons)
+        buttonsToUse = buttons;
+    
     return new Promise((resolve, reject) => {
         const buttonObjs: MessageButton[] = [];
-        buttons.forEach((label: string) => {
+        buttonsToUse.forEach((label: string) => {
             buttonObjs.push({label: label, onClicked: () => { resolve(label); }})
         });
 
@@ -71,7 +75,7 @@ export class Navigation extends React.Component<Props, State> {
         this.state = {
             showMenu: menu,
             activeTopMenuGuid: this.props.topMenuGuid,
-            activeLeftMenuGuid: this.props.leftMenuGuid
+            activeLeftMenuGuid: this.props.leftMenuGuid,
         };
     }
 
@@ -224,8 +228,8 @@ export class Navigation extends React.Component<Props, State> {
                             });
                         }}
                     >
-                        <BootstrapIcon style={NavigationTheme.stageTopMenuIcon} name="lightbulb-fill" size={2} />
-                        &nbsp; TypeScript React Express
+                        <BootstrapIcon style={NavigationTheme.stageTopMenuIcon} name="list" size={2} />
+                        &nbsp; Lago Vista Technology
                     </div>
                     {topMenu}
                 </div>

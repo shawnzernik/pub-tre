@@ -10,6 +10,7 @@ interface Props {
     monospace?: boolean;
     rows?: number;
     onChange?: (value: string) => void;
+    style?: CSSProperties
 }
 interface State { }
 
@@ -20,7 +21,8 @@ export class TextArea extends React.Component<Props, State> {
 
     public render(): React.ReactNode {
         let style: CSSProperties = {
-            ...TextAreaTheme
+            ...TextAreaTheme,
+            ...this.props.style
         };
         if (this.props.monospace)
             style = {

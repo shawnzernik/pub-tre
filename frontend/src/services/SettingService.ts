@@ -12,7 +12,7 @@ export class SettingService {
         return ret;
     }
 
-    public static async save(dto: SettingDto, token: string): Promise<void> {
+    public static async save(token: string, dto: SettingDto): Promise<void> {
         await FetchWrapper.post("/api/v0/setting", dto, token);
     }
 

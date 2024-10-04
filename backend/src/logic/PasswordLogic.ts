@@ -12,8 +12,6 @@ export class PasswordLogic extends CommonPasswordLogic {
     public constructor(entity?: PasswordEntity) {
         super();
 
-        console.log("PasswordLogic.constructor()");
-
         if (entity) {
             this.entity = entity;
         } else {
@@ -25,8 +23,6 @@ export class PasswordLogic extends CommonPasswordLogic {
     }
 
     public computeHash(password: string): PasswordEntity {
-        console.log("PasswordLogic.computeHash()");
-
         this.entity.hash = crypto.pbkdf2Sync(
             password,
             this.entity.salt,
@@ -38,8 +34,6 @@ export class PasswordLogic extends CommonPasswordLogic {
     }
 
     public async reset(ds: EntitiesDataSource, usersGuid: string, password: string, confirm: string): Promise<PasswordEntity> {
-        console.log("PasswordLogic.reset()");
-
         const userEntity = await ds.userRepository().findOneBy({ guid: usersGuid });
         if(!userEntity)
             throw new Error(`COuld not locate user by GUID '${usersGuid}'!`);

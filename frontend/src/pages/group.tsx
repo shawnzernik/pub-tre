@@ -87,11 +87,6 @@ class Page extends BasePage<Props, State> {
                     <Field label="GUID" size={3}><Input
                         readonly={true}
                         value={this.state.model.guid}
-                        onChange={async (value) => {
-                            const newModel = this.jsonCopy(this.state.model);;
-                            newModel.guid = value;
-                            await this.updateState({ model: newModel });
-                        }}
                     /></Field>
                     <Field label="Display" size={2}><Input
                         value={this.state.model.displayName}

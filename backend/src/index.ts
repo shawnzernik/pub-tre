@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import https from "https";
 import morgan from "morgan";
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import { ResponseDto } from "common/src/models/ResponseDto";
 import { Config } from "./Config";
 import { AuthService } from "./services/AuthService";
@@ -16,6 +17,8 @@ import { MenuService } from "./services/MenusService";
 import { ListService } from "./services/ListService";
 import { ListFilterService } from "./services/ListFilterService";
 import { SettingService } from "./services/SettingService";
+import { AiciService } from "./services/AiciService";
+import { DatasetService } from "./services/DatasetService";
 
 export class WebApp {
     private app: express.Express = express();
@@ -26,14 +29,14 @@ export class WebApp {
         console.log(`WebApp.execute() - Version: 0.0.0`);
         console.log("WebApp.execute() - (c) Copyright Shawn Zernik 2024");
 
-        this.app.use(morgan('combined'));
+        this.app.use(morgan("combined"));
         this.app.use(express.json());
 
         console.log(`WebApp.execute() - Static Directory: ${path.resolve(Config.staticDirectory)}`);
         this.app.use("/static", express.static(Config.staticDirectory));
 
-        this.app.get('/', (req, res) => {
-            res.redirect('/static/pages/login.html');
+        this.app.get("/", (req, res) => {
+            res.redirect("/static/pages/login.html");
         });
 
         console.log(`WebApp.execute() - JavaScript Directory: ${path.resolve(Config.javascriptDirectory)}`);
@@ -55,10 +58,14 @@ export class WebApp {
         new ListFilterService(this.app);
         new SettingService(this.app);
 
+        new AiciService(this.app);
+        new DatasetService(this.app);
+
         console.log(`WebApp.execute() - HTTPS Cert Path: ${path.resolve(Config.httpsCertPath)}`);
         console.log(`WebApp.execute() - HTTPS Key Path: ${path.resolve(Config.httpsKeyPath)}`);
         const options = {
             key: fs.readFileSync(Config.httpsKeyPath),
+
             cert: fs.readFileSync(Config.httpsCertPath),
         };
         this.server = https.createServer(options, this.app);

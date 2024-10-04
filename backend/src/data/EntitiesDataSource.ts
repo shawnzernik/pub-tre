@@ -21,6 +21,8 @@ import { ListFilterEntity } from "./ListFilterEntity";
 import { SettingEntity } from "./SettingEntity";
 import { ListFilterRepository } from "./ListFilterRepository";
 import { SettingRepository } from "./SettingRepository";
+import { DatasetEntity } from "./DatasetEntity";
+import { DatasetRepository } from "./DatasetRepository";
 
 export class EntitiesDataSource extends DataSource {
 	public constructor() {
@@ -41,7 +43,8 @@ export class EntitiesDataSource extends DataSource {
                 MenuEntity,
                 ListEntity,
                 ListFilterEntity,
-                SettingEntity
+                SettingEntity,
+                DatasetEntity
 			],
 		});
 	}
@@ -130,5 +133,11 @@ export class EntitiesDataSource extends DataSource {
 		if (!this._settingRepository)
 			this._settingRepository = new SettingRepository(SettingEntity, this.createEntityManager(), this.createQueryRunner());
 		return this._settingRepository;
+	}
+	private _datasetRepository: DatasetRepository | undefined;
+	public datasetRepository() {
+		if (!this._datasetRepository)
+			this._datasetRepository = new DatasetRepository(DatasetEntity, this.createEntityManager(), this.createQueryRunner());
+		return this._datasetRepository;
 	}
 }

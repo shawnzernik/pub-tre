@@ -10,7 +10,7 @@ export class ListFilterService {
         const ret = await FetchWrapper.get<ListFilterDto[]>("/api/v0/list_filters", token);
         return ret;
     }
-    public static async save(dto: ListFilterDto, token: string): Promise<void> {
+    public static async save(token: string, dto: ListFilterDto): Promise<void> {
         await FetchWrapper.post("/api/v0/list_filter", dto, token);
     }
     public static async delete(token: string, guid: string): Promise<void> {
