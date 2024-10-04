@@ -146,11 +146,6 @@ class Page extends BasePage<Props, State> {
                     <Field label="GUID" size={3}><Input
                         readonly={true}
                         value={this.state.model.guid}
-                        onChange={async (value) => {
-                            const newModel = JSON.parse(JSON.stringify(this.state.model));
-                            newModel.guid = value;
-                            await this.updateState({ model: newModel });
-                        }}
                     /></Field>
                     <Field label="Title"><Input
                         value={this.state.model.title}

@@ -50,6 +50,11 @@ module.exports = {
         securable: "./src/pages/securable.tsx",
         menu: "./src/pages/menu.tsx",
         list: "./src/pages/list.tsx",
+        setting: "./src/pages/setting.tsx",
+
+        finetune: "./src/pages/finetune.tsx",
+        chat: "./src/pages/chat.tsx",
+        dataset: "./src/pages/dataset.tsx",
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -129,6 +134,30 @@ module.exports = {
             filename: "../static/pages/list.html",
             chunks: ["common", "list"],
             title: "List Edit"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/setting.html",
+            chunks: ["common", "setting"],
+            title: "Setting Edit"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/finetune.html",
+            chunks: ["common", "finetune"],
+            title: "Fine Tune"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/chat.html",
+            chunks: ["common", "chat"],
+            title: "Chat"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/dataset.html",
+            chunks: ["common", "dataset"],
+            title: "Data Set"
         })
     ]
 };

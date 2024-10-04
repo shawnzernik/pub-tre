@@ -4,7 +4,7 @@ import { Theme } from "./Theme";
 
 interface Props {
     children?: React.ReactNode;
-    label: string;
+    label?: string;
     size?: number;
 }
 interface State { }
@@ -16,7 +16,7 @@ export class Field extends React.Component<Props, State> {
                 ...FieldTheme.field,
                 width: this.props.size ? (this.props.size + 1) * Theme.FormLabelWidthEm + "em" : "100%"
             }}>
-                <span style={FieldTheme.fieldLabel}>{this.props.label}:</span>
+                <span style={FieldTheme.fieldLabel}>{this.props.label && this.props.label.length ? this.props.label + ":" : "" }</span>
                 {this.props.children}
             </div>
         );

@@ -12,7 +12,7 @@ export class PasswordService {
         return ret;
     }
 
-    public static async save(dto: PasswordDto, token: string): Promise<void> {
+    public static async save(token: string, dto: PasswordDto): Promise<void> {
         await FetchWrapper.post("/api/v0/password", dto, token);
     }
 

@@ -4,7 +4,8 @@ import { CSSProperties } from "react";
 
 interface Props {
     children?: React.ReactNode;
-    gap?: string
+    gap?: string,
+    style?: CSSProperties,
 }
 interface State { }
 
@@ -14,7 +15,7 @@ export class FlexRow extends React.Component<Props, State> {
     }
 
     public render(): React.ReactNode {
-        let style: CSSProperties = {...FlexRowTheme};
+        let style: CSSProperties = {...FlexRowTheme, ...this.props.style};
         if(this.props.gap)
             style = {...style, gap: this.props.gap }
         

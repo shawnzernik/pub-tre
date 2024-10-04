@@ -25,6 +25,7 @@ SQL_FILES=(
     "tables/settings.sql"
     "tables/lists.sql"
     "tables/list_filters.sql"
+    "tables/datasets.sql"
     "foreignkeys/memberships.sql"
     "foreignkeys/passwords.sql"
     "foreignkeys/permissions.sql"
