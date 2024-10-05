@@ -1,4 +1,3 @@
-import { Dictionary } from "common/src/Dictionary";
 import { DataSource } from "typeorm";
 import { GroupEntity } from "./GroupEntity";
 import { MembershipEntity } from "./MembershipEntity";

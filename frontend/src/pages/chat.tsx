@@ -50,7 +50,7 @@ class Page extends BasePage<Props, State> {
 
     public async componentDidMount(): Promise<void> {
         const resend = window.localStorage.getItem("Page.resendClicked");
-        if(!resend)
+        if (!resend)
             return;
 
         window.localStorage.removeItem("Page.resendClicked");
@@ -58,7 +58,7 @@ class Page extends BasePage<Props, State> {
         const resendMessages = JSON.parse(resend) as AiciMessage[];
         const newMessages: AiciMessage[] = [];
 
-        for(let cnt = 0; cnt < resendMessages.length - 1; cnt++) {
+        for (let cnt = 0; cnt < resendMessages.length - 1; cnt++) {
             newMessages.push(resendMessages[cnt]);
         }
 
@@ -175,6 +175,7 @@ class Page extends BasePage<Props, State> {
                     <span>T/S: {(this.state.outputTokens / this.state.seconds).toFixed(2)}</span>
                 </FlexRow>
                 <TextArea rows={10}
+                    monospace={true}
                     value={this.state.user}
                     onChange={async (value) => {
                         await this.updateState({ user: value });
