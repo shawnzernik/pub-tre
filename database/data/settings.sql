@@ -15,5 +15,28 @@ INSERT INTO "settings" ("guid", "key", "value") VALUES
 ('f4f96929-7e4f-46af-9977-d0b38f0ed9f3', 'Aici:Fine Tune:Epochs', '6'),
 ('7748eeee-1caa-4ee8-a2ad-2583552926d7', 'Aici:Fine Tune:Batch Size', '1'),
 ('a8fdf3fb-8726-437a-a8bd-bebd595d1a87', 'Aici:Fine Tune:LR Multiplier', '1.8'),
-('0277c73c-c228-4fce-ae31-4112a60c6946', 'Aici:Fine Tune:Seed', '0')
+('0277c73c-c228-4fce-ae31-4112a60c6946', 'Aici:Fine Tune:Seed', '0'),
+
+('96de4956-9018-47d2-a50d-fe071ac58338', 'Aici:Upload:Exclude', '
+\\.ts$
+\\.tsx$
+\\.sql$
+\\.json$
+\\.sh$
+\\.css$
+\\.js$
+\\.html$
+\\.md$
+\\.code-workspace$
+'),
+('f7abd78d-d495-4bc2-a753-1d780b789098', 'Aici:Upload:Include', '
+frontend/scripts
+node_modules
+bin
+obj
+dist
+coverage
+package-lock
+\\.ds\\.json$
+'),
 ;

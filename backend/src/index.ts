@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import https from "https";
 import morgan from "morgan";
-import { createProxyMiddleware } from 'http-proxy-middleware';
 import { ResponseDto } from "common/src/models/ResponseDto";
 import { Config } from "./Config";
 import { AuthService } from "./services/AuthService";
