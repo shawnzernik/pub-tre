@@ -230,6 +230,8 @@ class Page extends BasePage<Props, State> {
                         <Button label="Save" onClick={this.saveClicked.bind(this)} />
                         <Button label="Delete" onClick={this.deleteClicked.bind(this)} />
                     </Field>
+
+                    <Heading level={2}>Conversation</Heading>
                     {messages}
                 </Form>
             </Navigation>

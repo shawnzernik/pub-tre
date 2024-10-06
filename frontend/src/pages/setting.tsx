@@ -73,11 +73,11 @@ class Page extends BasePage<Props, State> {
                         readonly={true}
                         value={this.state.model.guid}
                     /></Field>
-                    <Field label="Key" size={1}><Input
+                    <Field label="Key" size={3}><Input
                         readonly={true}
                         value={this.state.model.key}
                     /></Field>
-                    <Field label="Value" size={2}><Input
+                    <Field label="Value"><Input
                         value={this.state.model.value}
                         onChange={async (value) => {
                             const newModel = this.jsonCopy(this.state.model);;

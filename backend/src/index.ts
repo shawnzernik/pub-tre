@@ -30,7 +30,7 @@ export class WebApp {
         console.log("WebApp.execute() - (c) Copyright Shawn Zernik 2024");
 
         this.app.use(morgan("combined"));
-        this.app.use(express.json());
+        this.app.use(express.json({ limit: Config.httpsLimit }));
 
         console.log(`WebApp.execute() - Static Directory: ${path.resolve(Config.staticDirectory)}`);
         this.app.use("/static", express.static(Config.staticDirectory));
