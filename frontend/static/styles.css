@@ -90,7 +90,6 @@ li {
 blockquote {
     border-left: 0.25em solid #ccc; /* Style for blockquotes */
     padding-left: 0.5em;
-    color: #555; /* Quote color */
     margin: 1em 0; /* Spacing for blockquotes */
 }
 
@@ -101,13 +100,14 @@ img {
 }
 
 code {
-    font-family: "Courier New", Courier, monospace; /* Monospace font for inline code */
-    background-color: #f5f5f5; /* Light background for code */
+    font-family: "MonoText", monospace; /* Monospace font for inline code */
+    background-color: #eee; /* Light background for code */
     border-radius: 0.25em; /* Rounded corners */
+    color: #000;
 }
 
 pre {
-    background-color: #f5f5f5; /* Background for code blocks */
+    background-color: #eee; /* Background for code blocks */
     padding: 0.625em; /* Padding for code blocks */
     overflow: auto; /* Scroll if overflow */
     border-radius: 0.25em; /* Rounded corners */
@@ -122,12 +122,17 @@ table {
 
 th,
 td {
-    border: 0.0625em solid #ccc; /* Border for table cells */
+    border: 0.0625em solid #bbb; /* Border for table cells */
     padding: 0.5em; /* Padding inside cells */
     text-align: left; /* Left align text */
 }
 
 th {
-    background-color: #f0f0f0; /* Light background for header */
+    background-color: #ddd; /* Light background for header */
     font-weight: bold; /* Bold text for header */
+}
+
+strong, b {
+    font-weight: bolder;
+    color: #000;
 }

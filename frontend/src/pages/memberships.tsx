@@ -126,7 +126,7 @@ class Page extends BasePage<Props, State> {
             if (!this.state.groupMap[model.groupsGuid] || !this.state.userMap[model.usersGuid])
                 return;
 
-            rows.push(<tr>
+            rows.push(<tr key={model.guid}>
                 <td>{this.state.groupMap[model.groupsGuid].displayName}</td>
                 <td>{this.state.userMap[model.usersGuid].emailAddress}</td>
                 <td><Checkbox

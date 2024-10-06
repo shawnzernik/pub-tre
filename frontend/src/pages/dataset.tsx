@@ -13,7 +13,6 @@ import { Checkbox } from "../components/Checkbox";
 import { TextArea } from "../components/TextArea";
 import { DatasetService } from "../services/DatasetService";
 import { AuthService } from "../services/AuthService";
-import { FlexRow } from "../components/FlexRow";
 import { Button } from "../components/Button";
 import { AiciService } from "../services/AiciService";
 
@@ -157,12 +156,13 @@ class Page extends BasePage<Props, State> {
         this.state.messages.forEach((msg, index) => {
             messages.push(
                 <>
-                    <Field label={msg.role}>
+                    <Field label={msg.role} key={index}>
                         <TextArea
                             style={{
                                 height: this.countLines(msg.content) * 1.4 + 2 + "em"
                             }}
                             monospace={true}
+                            showAll={true}
                             value={msg.content}
                             onChange={async (value) => {
                                 const newMessages = this.jsonCopy(this.state.messages);
@@ -178,7 +178,6 @@ class Page extends BasePage<Props, State> {
                             }}
                         />
                     </Field>
-
                     <Field>
                         <Button label="Resend" onClick={this.resendClicked.bind(this, index)} />
                         <Button label="Remove" onClick={this.removeClicked.bind(this, index)} />
@@ -231,6 +230,8 @@ class Page extends BasePage<Props, State> {
                         <Button label="Save" onClick={this.saveClicked.bind(this)} />
                         <Button label="Delete" onClick={this.deleteClicked.bind(this)} />
                     </Field>
+
+                    <Heading level={2}>Conversation</Heading>
                     {messages}
                 </Form>
             </Navigation>

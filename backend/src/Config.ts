@@ -18,4 +18,6 @@ export class Config {
 	public static jwtPrivateKeyFile = process.env.JWT_PUBLIC_KEY_FILE || "./private.key"
 
 	public static jestTimeoutSeconds = Number.parseInt(process.env.JEST_TIMEOUT_SECONDS || "300");
+    public static httpsLimit: string = process.env.HTTPS_LIMIT || "10mb";
+    public static tempDirectory: string = process.env.TEMP_DIRECTORY || "../temp";
 }

@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import https from "https";
 import morgan from "morgan";
-import { createProxyMiddleware } from 'http-proxy-middleware';
 import { ResponseDto } from "common/src/models/ResponseDto";
 import { Config } from "./Config";
 import { AuthService } from "./services/AuthService";
@@ -30,7 +29,7 @@ export class WebApp {
         console.log("WebApp.execute() - (c) Copyright Shawn Zernik 2024");
 
         this.app.use(morgan("combined"));
-        this.app.use(express.json());
+        this.app.use(express.json({ limit: Config.httpsLimit }));
 
         console.log(`WebApp.execute() - Static Directory: ${path.resolve(Config.staticDirectory)}`);
         this.app.use("/static", express.static(Config.staticDirectory));

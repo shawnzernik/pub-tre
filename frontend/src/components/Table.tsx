@@ -49,7 +49,7 @@ export class Table extends React.Component<Props, State> {
                 else
                     row.push(<td style={TableTheme.tableRowTd}>{item[key]}</td>);
             });
-            rows.push(<tr>{row}</tr>);
+            rows.push(<tr key={index}>{row}</tr>);
         });
 
         let buttons: React.ReactNode[] = [];

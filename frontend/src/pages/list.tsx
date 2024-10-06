@@ -23,7 +23,6 @@ import { FlexRow } from "../components/FlexRow";
 interface Props { }
 interface State extends BasePageState {
     model: ListDto;
-
 }
 
 class Page extends BasePage<Props, State> {
@@ -86,13 +85,13 @@ class Page extends BasePage<Props, State> {
         leftMenuList.sort(menuCompare);
 
         // load select options
-        this.topMenuOptions.push(<SelectOption display="" value="" />);
-        topMenuList.forEach((menu) => {
-            this.topMenuOptions.push(<SelectOption display={menu.display} value={menu.guid} />);
+        this.topMenuOptions.push(<SelectOption key="" display="" value="" />);
+        topMenuList.forEach((menu, index) => {
+            this.topMenuOptions.push(<SelectOption key={menu.guid} display={menu.display} value={menu.guid} />);
         });
-        this.leftMenuOptions.push(<SelectOption display="" value="" />);
-        leftMenuList.forEach((menu) => {
-            this.leftMenuOptions.push(<SelectOption display={menu.display} value={menu.guid} />);
+        this.leftMenuOptions.push(<SelectOption key="" display="" value="" />);
+        leftMenuList.forEach((menu, index) => {
+            this.leftMenuOptions.push(<SelectOption key={menu.guid} display={menu.display} value={menu.guid} />);
         });
 
         // if no guid provided, skip loading list item
