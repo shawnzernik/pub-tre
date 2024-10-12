@@ -76,9 +76,10 @@ class Page extends BasePage<Props, State> {
                 topMenuGuid="a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4"
                 leftMenuGuid="720fa4c9-20d0-407d-aff6-3dad45d155cc"
             >
-                <Heading level={1}>Upload ZIP File</Heading>
+                <Heading level={1}>Upload Source Code</Heading>
+                <p>Please upload a ZIP file - preferably from a GIT repo.  We will process the code by first asking the AI model to explain the code - this will be used for fine tuning.  Secondly, we'll generate embeddings for the file.</p>
                 <Form>
-                    <Field label="Upload File"><input
+                    <Field label="ZIP File"><input
                         type="file"
                         onChange={(e) => {
                             this.setState({

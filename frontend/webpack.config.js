@@ -146,7 +146,7 @@ module.exports = {
             template: "./src/template.html",
             filename: "../static/pages/upload.html",
             chunks: ["common", "upload"],
-            title: "Fine Tune"
+            title: "Upload Source Code"
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",

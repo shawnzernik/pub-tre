@@ -61,54 +61,63 @@ export class AiciLogic {
             const files = this.getFiles(logger, extractedZipFolder, includeRexExes, excludeRegExes);
             let logFile = "file,input,new,total,seconds,t/s\n";
 
-            for (let cnt = 0; cnt < files.length; cnt++) {
-                const file = files[cnt];
+            const promises: Promise<void>[] = [];
+            files.forEach((file, cnt) => {
+                promises.push(new Promise(async (resolve) => {
+                    try {
+                        await logger.log(`File ${cnt + 1} of ${files.length}`);
+                        await logger.log(`File ${cnt + 1} of ${files.length} - ${file}`);
 
-                logger.log(`File ${cnt + 1} of ${files.length}`);
-                logger.log(`File ${file}`);
+                        let userMarkdown = "Explain the file '%FILE%':\n\n```\n%CONTENT%\n```";
 
-                let userMarkdown = "Explain the file '%FILE%':\n\n```\n%CONTENT%\n```";
+                        const mdFileName = path.join("~", file);
+                        userMarkdown = userMarkdown.replace("%FILE%", mdFileName);
 
-                const mdFileName = path.join("~", file);
-                userMarkdown = userMarkdown.replace("%FILE%", mdFileName);
+                        const fileContents = fs.readFileSync(path.join(extractedZipFolder, file), { encoding: "utf8" });
+                        userMarkdown = userMarkdown.replace("%CONTENT%", fileContents.replace(/`/, "\\`"));
 
-                const fileContents = fs.readFileSync(path.join(extractedZipFolder, file), { encoding: "utf8" });
-                userMarkdown = userMarkdown.replace("%CONTENT%", fileContents.replace(/`/, "\\`"));
+                        const messages: Message[] = [{
+                            role: "user",
+                            content: userMarkdown
+                        }];
 
-                const messages: Message[] = [{
-                    role: "user",
-                    content: userMarkdown
-                }];
+                        await logger.log(`File ${cnt + 1} of ${files.length} - AI to Explain`);
+                        const started = Date.now();
+                        const response = await AiciLogic.chat(ds, messages);
+                        const ended = Date.now();
 
-                logger.log(`AI to Explain`);
-                const started = Date.now();
-                const response = await AiciLogic.chat(ds, messages);
-                const ended = Date.now();
+                        await logger.log(`File ${cnt + 1} of ${files.length} - Input: ${response.usage.prompt_tokens}; New: ${response.usage.completion_tokens}; Total: ${response.usage.total_tokens}`);
+                        await logger.log(`File ${cnt + 1} of ${files.length} - Seconds: ${(ended - started) / 1000}; T/S: ${response.usage.total_tokens / ((ended - started) / 1000)}`);
+                        logFile += `${mdFileName},${response.usage.prompt_tokens},${response.usage.completion_tokens},${response.usage.total_tokens},${ended - started / 1000},${response.usage.total_tokens / ((ended - started) / 1000)}\n`;
 
-                logger.log(`Input: ${response.usage.prompt_tokens}; New: ${response.usage.completion_tokens}; Total: ${response.usage.total_tokens}`);
-                logger.log(`Seconds: ${(ended - started) / 1000}; T/S: ${response.usage.total_tokens / ((ended - started) / 1000)}`);
-                logFile += `${mdFileName},${response.usage.prompt_tokens},${response.usage.completion_tokens},${response.usage.total_tokens},${ended - started / 1000},${response.usage.total_tokens / ((ended - started) / 1000)}\n`;
+                        await logger.log(`File ${cnt + 1} of ${files.length} - Load/Create Dataset`);
+                        messages.push({
+                            role: response.choices[0].message.role,
+                            content: response.choices[0].message.content
+                        });
 
-                logger.log(`Load/Create Dataset`);
-                messages.push({
-                    role: response.choices[0].message.role,
-                    content: response.choices[0].message.content
-                });
+                        let dataset = await ds.datasetRepository().findOneBy({ title: mdFileName });
+                        if (!dataset) {
+                            dataset = new DatasetEntity();
+                            dataset.guid = UUIDv4.generate();
+                            dataset.title = mdFileName;
+                            dataset.includeInTraining = true;
+                        }
+                        dataset.json = JSON.stringify(messages);
 
-                let dataset = await ds.datasetRepository().findOneBy({ title: mdFileName });
-                if (!dataset) {
-                    dataset = new DatasetEntity();
-                    dataset.guid = UUIDv4.generate();
-                    dataset.title = mdFileName;
-                    dataset.includeInTraining = true;
-                }
-                dataset.json = JSON.stringify(messages);
+                        await logger.log(`File ${cnt + 1} of ${files.length} - Saving`);
+                        await ds.datasetRepository().save(dataset);
+                        resolve();
+                    }
+                    catch (err) {
+                        await logger.error(err);
+                        resolve();
+                    }
+                }));
+            });
 
-                logger.log(`Saving`);
-                ds.datasetRepository().save(dataset);
-            }
-
-            logger.log("ALL DONE!");
+            await Promise.all(promises);
+            await logger.log("ALL DONE!");
         }
         finally {
             await ds.destroy();
