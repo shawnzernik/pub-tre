@@ -63,7 +63,6 @@ export class AiciLogic {
         const aiResponse = await fetchResponse.json();
         return aiResponse as Response;
     }
-
     public static async upload(logger: Logger, do_not_use: EntitiesDataSource, body: AiciUpload): Promise<void> {
         const ds = new EntitiesDataSource();
         await ds.initialize();
@@ -228,6 +227,7 @@ export class AiciLogic {
 
         return logs;
     }
+
     private static getFiles(logger: Logger, base: string, includeRexExes: RegExp[], excludeRexExes: RegExp[]): string[] {
         const ret: string[] = [];
 

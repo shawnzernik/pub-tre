@@ -55,6 +55,7 @@ module.exports = {
         upload: "./src/pages/upload.tsx",
         finetune: "./src/pages/finetune.tsx",
         chat: "./src/pages/chat.tsx",
+        search: "./src/pages/search.tsx",
         dataset: "./src/pages/dataset.tsx",
     },
     plugins: [
@@ -159,6 +160,12 @@ module.exports = {
             filename: "../static/pages/chat.html",
             chunks: ["common", "chat"],
             title: "Chat"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/search.html",
+            chunks: ["common", "search"],
+            title: "Search"
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
