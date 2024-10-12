@@ -121,7 +121,6 @@ class Page extends BasePage<Props, State> {
 
     public render(): React.ReactNode {
         const rows: React.ReactElement[] = [];
-        console.log(`models: ${JSON.stringify(this.state.models, null, 4)}`);
         this.state.models.forEach((model) => {
             if (!this.state.groupMap[model.groupsGuid] || !this.state.securableMap[model.securablesGuid])
                 return;

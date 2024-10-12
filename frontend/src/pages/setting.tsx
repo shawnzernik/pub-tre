@@ -11,6 +11,7 @@ import { Button } from "../components/Button";
 import { AuthService } from "../services/AuthService";
 import { SettingDto } from "common/src/models/SettingDto";
 import { SettingService } from "../services/SettingService";
+import { TextArea } from "../components/TextArea";
 
 interface Props { }
 interface State extends BasePageState {
@@ -41,7 +42,7 @@ class Page extends BasePage<Props, State> {
             await this.updateState({ model: setting });
             await this.events.setLoading(false);
         }
-        catch(err) {
+        catch (err) {
             await ErrorMessage(this, err);
         }
     }
@@ -77,7 +78,8 @@ class Page extends BasePage<Props, State> {
                         readonly={true}
                         value={this.state.model.key}
                     /></Field>
-                    <Field label="Value"><Input
+                    <Field label="Value"><TextArea
+                        showAll={true}
                         value={this.state.model.value}
                         onChange={async (value) => {
                             const newModel = this.jsonCopy(this.state.model);;

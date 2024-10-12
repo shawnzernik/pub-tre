@@ -63,7 +63,6 @@ export class AuthLogic {
         let payload = null;
         try { payload = JwtToken.verify(token, key); }
         catch (err) {
-            console.log(`AuthLogic.tokenLogin ${token} - Error ${err}`);
             throw new Error(AuthLogic.invalidTokenMsg);
         }
 

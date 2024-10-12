@@ -1,10 +1,17 @@
 import { Response as AiciResponse } from "common/src/models/aici/Response";
 import { Message as AiciMessage } from "common/src/models/aici/Message";
 import { FetchWrapper } from "./FetchWrapper";
+import { UUIDv4 } from "common/src/logic/UUIDv4";
+import { LogDto } from "common/src/models/LogDto";
 
 export class AiciService {
     public static async chat(token: string, messages: AiciMessage[]): Promise<AiciResponse> {
-        const ret = await FetchWrapper.post<AiciResponse>("/api/v0/aici/chat", messages, token);
+        const ret = await FetchWrapper.post<AiciResponse>({
+            url: "/api/v0/aici/chat",
+            body: messages,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
         return ret;
     }
 
@@ -18,7 +25,7 @@ export class AiciService {
         });
     }
 
-    public static async upload(token: string, file: File): Promise<void> {
+    public static async upload(token: string, file: File): Promise<string> {
         const buff = await this.readFile(file);
 
         const uint8Array = new Uint8Array(buff);
@@ -33,6 +40,23 @@ export class AiciService {
             contents: base64
         };
 
-        const ret = await FetchWrapper.post<AiciResponse>("/api/v0/aici/upload", obj, token);
+        const corelation = UUIDv4.generate();
+
+        await FetchWrapper.post<AiciResponse>({
+            url: "/api/v0/aici/upload",
+            body: obj,
+            corelation: corelation,
+            token: token
+        });
+        return corelation;
+    }
+
+    public static async uploadLogs(token: string, corelation: string): Promise<LogDto[]> {
+        const ret = await FetchWrapper.get<LogDto[]>({
+            url: "/api/v0/aici/upload/" + corelation,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
+        return ret;
     }
 }

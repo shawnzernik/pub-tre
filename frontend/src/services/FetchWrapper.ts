@@ -1,34 +1,41 @@
 import { Dictionary } from "common/src/Dictionary";
 
-export class FetchWrapper {
-    static async delete<T>(url: string, token: string): Promise<void> {
-        const headers = FetchWrapper.defaultHeaders(token);
+export interface FetchParameters {
+    url: string;
+    token?: string;
+    body?: any;
+    corelation: string;
+}
 
-        const response = await fetch(url, {
+export class FetchWrapper {
+    static async delete<T>(params: FetchParameters): Promise<void> {
+        const headers = FetchWrapper.defaultHeaders(params.token);
+
+        const response = await fetch(params.url, {
             method: "DELETE",
-            headers: headers
+            headers: { ...headers, "corelation": params.corelation }
         });
 
         await FetchWrapper.handleResponse<T>(response);
     }
-    static async get<T>(url: string, token?: string): Promise<T> {
-        const headers = FetchWrapper.defaultHeaders(token);
+    static async get<T>(params: FetchParameters): Promise<T> {
+        const headers = FetchWrapper.defaultHeaders(params.token);
 
-        const response = await fetch(url, {
+        const response = await fetch(params.url, {
             method: "GET",
-            headers: headers
+            headers: { ...headers, "corelation": params.corelation }
         });
 
         const ret = await FetchWrapper.handleResponse<T>(response);
         return ret;
     }
-    public static async post<T>(url: string, body: any, token?: string): Promise<T> {
-        const headers = FetchWrapper.defaultHeaders(token);
+    public static async post<T>(params: FetchParameters): Promise<T> {
+        const headers = FetchWrapper.defaultHeaders(params.token);
 
-        const response = await fetch(url, {
+        const response = await fetch(params.url, {
             method: "POST",
-            body: JSON.stringify(body),
-            headers: headers
+            body: JSON.stringify(params.body),
+            headers: { ...headers, "corelation": params.corelation }
         });
 
         const ret = await FetchWrapper.handleResponse<T>(response);

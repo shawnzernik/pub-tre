@@ -4,12 +4,13 @@ import { BaseService } from "./BaseService";
 import { PermissionDto } from "common/src/models/PermissionDto";
 import { PermissionEntity } from "../data/PermissionEntity";
 import { PermissionLogic } from "../logic/PermissionLogic";
+import { Logger } from "../Logger";
 
 export class PermissionService extends BaseService {
-    public constructor(app: express.Express) {
+    public constructor(logger: Logger, app: express.Express) {
         super();
 
-        console.log("PermissionService.constructor()");
+        logger.trace();
 
         app.get("/api/v0/permission/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/permissions", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
@@ -20,48 +21,48 @@ export class PermissionService extends BaseService {
         app.get("/api/v0/securable/:guid/permissions", (req, resp) => { this.methodWrapper(req, resp, this.getSecurablePermissions) });
     }
 
-    public async getGroupPermissions(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
-        console.log("PermissionService.getGroupPermissions()");
-        await BaseService.checkSecurity("Permission:Read", req, ds);
+    public async getGroupPermissions(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Permission:Read", req, ds);
 
         const guid = req.params["guid"];
         const ret = await PermissionLogic.getGroupPermissions(ds, guid);
         return ret;
     }
-    public async getSecurablePermissions(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
-        console.log("PermissionService.getSecurablePermissions()");
-        await BaseService.checkSecurity("Permission:Read", req, ds);
+    public async getSecurablePermissions(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Permission:Read", req, ds);
 
         const guid = req.params["guid"];
         const ret = await PermissionLogic.getSecurablePermissions(ds, guid);
         return ret;
     }
-    public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto | null> {
-        console.log("PermissionService.getGuid()");
-        await BaseService.checkSecurity("Permission:Read", req, ds);
+    public async getGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto | null> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Permission:Read", req, ds);
 
         const guid = req.params["guid"];
         const ret = await ds.permissionRepository().findOneBy({ guid: guid });
         return ret;
     }
-    public async getList(req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
-        console.log("PermissionService.getList()");
-        await BaseService.checkSecurity("Permission:List", req, ds);
+    public async getList(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Permission:List", req, ds);
 
         const ret = await ds.permissionRepository().find();
         return ret;
     }
-    public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("PermissionService.postSave()");
-        await BaseService.checkSecurity("Permission:Save", req, ds);
+    public async postSave(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Permission:Save", req, ds);
 
         const entity = new PermissionEntity();
         entity.copyFrom(req.body as PermissionDto);
         await ds.permissionRepository().save([entity]);
     }
-    public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("PermissionService.deleteGuid()");
-        await BaseService.checkSecurity("Permission:Delete", req, ds);
+    public async deleteGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Permission:Delete", req, ds);
 
         const guid = req.params["guid"];
         await ds.permissionRepository().delete({ guid: guid });

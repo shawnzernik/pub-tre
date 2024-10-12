@@ -1,19 +1,37 @@
 import { GroupDto } from "common/src/models/GroupDto";
 import { FetchWrapper } from "./FetchWrapper";
+import { UUIDv4 } from "common/src/logic/UUIDv4";
 
 export class GroupService {
     public static async get(token: string, guid: string): Promise<GroupDto> {
-        const ret = await FetchWrapper.get<GroupDto>("/api/v0/group/" + guid, token);
+        const ret = await FetchWrapper.get<GroupDto>({
+            url: "/api/v0/group/" + guid,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
         return ret;
     }
     public static async list(token: string): Promise<GroupDto[]> {
-        const ret = await FetchWrapper.get<GroupDto[]>("/api/v0/groups", token);
+        const ret = await FetchWrapper.get<GroupDto[]>({
+            url: "/api/v0/groups",
+            corelation: UUIDv4.generate(),
+            token: token
+        });
         return ret;
     }
     public static async save(token: string, dto: GroupDto): Promise<void> {
-        await FetchWrapper.post("/api/v0/group", dto, token);
+        await FetchWrapper.post({
+            url: "/api/v0/group",
+            body: dto,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
     }
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<GroupDto>("/api/v0/group/" + guid, token);
+        await FetchWrapper.delete<GroupDto>({
+            url: "/api/v0/group/" + guid,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
     }
 }

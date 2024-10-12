@@ -5,9 +5,10 @@ import { Config } from "../Config";
 import path from "path";
 import fs from "fs";
 import AdmZip from "adm-zip";
-import { DatasetDto } from "common/src/models/DatasetDto";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { DatasetEntity } from "../data/DatasetEntity";
+import { Logger } from "../Logger";
+import { LogEntity } from "../data/LogEntity";
 
 export interface AiciUpload {
     file: string;
@@ -43,66 +44,86 @@ export class AiciLogic {
         return aiResponse as Response;
     }
 
-    public static async upload(ds: EntitiesDataSource, body: AiciUpload): Promise<void> {
-        const uploadedFile = this.saveUpload(body, "zip");
-        const extractedZipFolder = this.extractZip(uploadedFile);
+    public static async upload(logger: Logger, do_not_use: EntitiesDataSource, body: AiciUpload): Promise<void> {
+        const ds = new EntitiesDataSource();
+        await ds.initialize();
+        try {
 
-        const includeSettingDto = await ds.settingRepository().findByKey("Aici:Upload:Include");
-        const includeRexExes = this.createRegExes(includeSettingDto.value);
+            const uploadedFile = this.saveUpload(body, "zip");
+            const extractedZipFolder = await this.extractZip(uploadedFile);
 
-        const excludeSettingDto = await ds.settingRepository().findByKey("Aici:Upload:Exclude");
-        const excludeRegExes = this.createRegExes(excludeSettingDto.value);
+            const includeSettingDto = await ds.settingRepository().findByKey("Aici:Upload:Include");
+            const includeRexExes = this.createRegExes(includeSettingDto.value);
 
-        const files = this.getFiles(extractedZipFolder, includeRexExes, excludeRegExes);
-        let logFile = "file,input,new,total,seconds,t/s\n";
+            const excludeSettingDto = await ds.settingRepository().findByKey("Aici:Upload:Exclude");
+            const excludeRegExes = this.createRegExes(excludeSettingDto.value);
 
-        let cnt = 0
-        for (let file in files) {
-            console.log(`AiciLogic.upload() - ${cnt++} of ${file.length}`);
-            console.log(`AiciLogic.upload() - File - ${file}`);
+            const files = this.getFiles(logger, extractedZipFolder, includeRexExes, excludeRegExes);
+            let logFile = "file,input,new,total,seconds,t/s\n";
 
-            let userMarkdown = "Explain the file '%FILE%':\n\n```\n%CONTENT%\n```";
+            for (let cnt = 0; cnt < files.length; cnt++) {
+                const file = files[cnt];
 
-            const mdFileName = path.join("~", uploadedFile, file.replace(extractedZipFolder, ""))
-            userMarkdown = userMarkdown.replace("%FILE%", mdFileName);
+                logger.log(`File ${cnt + 1} of ${files.length}`);
+                logger.log(`File ${file}`);
 
-            const fileContents = fs.readFileSync(file, { encoding: "utf8" });
-            userMarkdown = userMarkdown.replace("%CONTENT%", fileContents);
+                let userMarkdown = "Explain the file '%FILE%':\n\n```\n%CONTENT%\n```";
 
-            const messages: Message[] = [{
-                role: "user",
-                content: userMarkdown
-            }];
+                const mdFileName = path.join("~", file);
+                userMarkdown = userMarkdown.replace("%FILE%", mdFileName);
 
-            console.log(`AiciLogic.upload() - AI to Explain`);
-            const started = Date.now();
-            const response = await AiciLogic.chat(ds, messages);
-            const ended = Date.now();
+                const fileContents = fs.readFileSync(path.join(extractedZipFolder, file), { encoding: "utf8" });
+                userMarkdown = userMarkdown.replace("%CONTENT%", fileContents.replace(/`/, "\\`"));
 
-            console.log(`Input: ${response.usage.prompt_tokens}; New: ${response.usage.completion_tokens}; Total: ${response.usage.total_tokens}`);
-            console.log(`Seconds: ${(ended - started) / 1000}; T/S: ${response.usage.total_tokens / ((ended - started) / 1000)}`);
-            logFile += `${mdFileName},${response.usage.prompt_tokens},${response.usage.completion_tokens},${response.usage.total_tokens},${ended - started / 1000},${response.usage.total_tokens / ((ended - started) / 1000)}\n`;
+                const messages: Message[] = [{
+                    role: "user",
+                    content: userMarkdown
+                }];
 
-            console.log(`AiciLogic.upload() - Load/Create Dataset`);
-            messages.push({
-                role: response.choices[0].message.role,
-                content: response.choices[0].message.content
-            });
+                logger.log(`AI to Explain`);
+                const started = Date.now();
+                const response = await AiciLogic.chat(ds, messages);
+                const ended = Date.now();
 
-            let dataset = await ds.datasetRepository().findOneBy({ title: mdFileName });
-            if (!dataset) {
-                dataset = new DatasetEntity();
-                dataset.guid = UUIDv4.generate();
-                dataset.title = mdFileName;
-                dataset.includeInTraining = true;
+                logger.log(`Input: ${response.usage.prompt_tokens}; New: ${response.usage.completion_tokens}; Total: ${response.usage.total_tokens}`);
+                logger.log(`Seconds: ${(ended - started) / 1000}; T/S: ${response.usage.total_tokens / ((ended - started) / 1000)}`);
+                logFile += `${mdFileName},${response.usage.prompt_tokens},${response.usage.completion_tokens},${response.usage.total_tokens},${ended - started / 1000},${response.usage.total_tokens / ((ended - started) / 1000)}\n`;
+
+                logger.log(`Load/Create Dataset`);
+                messages.push({
+                    role: response.choices[0].message.role,
+                    content: response.choices[0].message.content
+                });
+
+                let dataset = await ds.datasetRepository().findOneBy({ title: mdFileName });
+                if (!dataset) {
+                    dataset = new DatasetEntity();
+                    dataset.guid = UUIDv4.generate();
+                    dataset.title = mdFileName;
+                    dataset.includeInTraining = true;
+                }
+                dataset.json = JSON.stringify(messages);
+
+                logger.log(`Saving`);
+                ds.datasetRepository().save(dataset);
             }
-            dataset.json = JSON.stringify(messages);
 
-            console.log(`AiciLogic.upload() - Saving`);
-            ds.datasetRepository().save(dataset);
+            logger.log("ALL DONE!");
+        }
+        finally {
+            await ds.destroy();
         }
     }
-    private static getFiles(base: string, includeRexExes: RegExp[], excludeRexExes: RegExp[]): string[] {
+    public static async getUploadLogs(logger: Logger, ds: EntitiesDataSource, corelation: string): Promise<LogEntity[]> {
+        const logs = await ds.logRepository().find({ where: { corelation: corelation }, order: { epoch: "DESC", order: "DESC" } });
+
+        logs.forEach((log) => {
+            log.caller = "";
+        });
+
+        return logs;
+    }
+    private static getFiles(logger: Logger, base: string, includeRexExes: RegExp[], excludeRexExes: RegExp[]): string[] {
         const ret: string[] = [];
 
         const files = fs.readdirSync(base, { recursive: true, encoding: "utf8" });
@@ -113,9 +134,8 @@ export class AiciLogic {
             includeRexExes.forEach((regex) => {
                 include = include || regex.test(name.toLowerCase());
             });
-
             if (!include) {
-                console.log("AiciLogic.getFiles() - Not Included - " + name);
+                logger.log("Not Included - " + name);
                 return;
             }
 
@@ -123,13 +143,12 @@ export class AiciLogic {
             excludeRexExes.forEach((regex) => {
                 exclude = exclude || regex.test(name.toLowerCase());
             });
-
             if (exclude) {
-                console.log("AiciLogic.getFiles() - Excluded - " + name);
+                logger.log("Excluded - " + name);
                 return;
             }
 
-            console.log("AiciLogic.getFiles() - Included - " + name);
+            logger.log("Included - " + name);
             ret.push(name);
         });
 
@@ -146,17 +165,19 @@ export class AiciLogic {
 
         return regexes;
     }
-    private static extractZip(zipFileName: string): string {
+    private static async extractZip(zipFileName: string): Promise<string> {
         const uploadFolder = path.join(Config.tempDirectory, zipFileName.replace(path.extname(zipFileName), ""));
 
         if (fs.existsSync(uploadFolder))
             fs.rmSync(uploadFolder, { recursive: true, force: true });
         fs.mkdirSync(uploadFolder, { recursive: true });
 
-        const zip = new AdmZip(zipFileName);
-        zip.extractAllToAsync(uploadFolder, true, false);
-
-        return uploadFolder;
+        return new Promise((resolve, reject) => {
+            const zip = new AdmZip(zipFileName);
+            zip.extractAllToAsync(uploadFolder, true, false, () => {
+                resolve(uploadFolder);
+            });
+        });
     }
     private static saveUpload(upload: AiciUpload, extension: string | undefined): string {
         const fileName = upload.file;

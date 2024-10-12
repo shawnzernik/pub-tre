@@ -2,7 +2,6 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import https from "https";
-import morgan from "morgan";
 import { ResponseDto } from "common/src/models/ResponseDto";
 import { Config } from "./Config";
 import { AuthService } from "./services/AuthService";
@@ -18,69 +17,89 @@ import { ListFilterService } from "./services/ListFilterService";
 import { SettingService } from "./services/SettingService";
 import { AiciService } from "./services/AiciService";
 import { DatasetService } from "./services/DatasetService";
+import { Logger } from "./Logger";
+import { UUIDv4 } from "common/src/logic/UUIDv4";
 
 export class WebApp {
     private app: express.Express = express();
     public server: https.Server | undefined;
 
-    public execute() {
-        console.log("WebApp.execute() - ts-react-express");
-        console.log(`WebApp.execute() - Version: 0.0.0`);
-        console.log("WebApp.execute() - (c) Copyright Shawn Zernik 2024");
+    public async execute() {
+        const logger = new Logger(UUIDv4.generate());
 
-        this.app.use(morgan("combined"));
+        await logger.always("ts-react-express");
+        await logger.always(`Version: 0.0.0`);
+        await logger.always("(c) Copyright Shawn Zernik 2024");
+
+        this.app.use(async (req, res, next) => {
+            let corelation = "";
+            if (req.headers["corelation"] && req.headers["corelation"].length === 36) {
+                corelation = req.headers["corelation"] as string;
+            } else if (req.headers["corelation"] && req.headers["corelation"][0] && req.headers["corelation"][0].length === 36) {
+                corelation = req.headers["corelation"]![0] as string;
+            } else {
+                corelation = UUIDv4.generate();
+                await logger.always(`Injecting Corelation ${corelation}`);
+            }
+            req.headers["corelation"] = [corelation];
+
+            const newLogger = new Logger(req.headers["corelation"][0]);
+            await newLogger.always(`${req.method} ${req.originalUrl}`);
+
+            next();
+        });
+
         this.app.use(express.json({ limit: Config.httpsLimit }));
 
-        console.log(`WebApp.execute() - Static Directory: ${path.resolve(Config.staticDirectory)}`);
+        logger.log(`Static Directory: ${path.resolve(Config.staticDirectory)}`);
         this.app.use("/static", express.static(Config.staticDirectory));
 
         this.app.get("/", (req, res) => {
             res.redirect("/static/pages/login.html");
         });
 
-        console.log(`WebApp.execute() - JavaScript Directory: ${path.resolve(Config.javascriptDirectory)}`);
+        logger.log(`JavaScript Directory: ${path.resolve(Config.javascriptDirectory)}`);
         this.app.use("/scripts", express.static(Config.javascriptDirectory));
 
-        this.app.get("/api/v0/health", this.getHealth.bind(this));
-        this.app.get("/api/v0/liveness", this.getLiveliness.bind(this));
+        this.app.get("/api/v0/health", (req, res) => this.getHealth(logger, req, res));
+        this.app.get("/api/v0/liveness", (req, res) => this.getLiveliness(logger, req, res));
 
-        // Initialize services
-        new AuthService(this.app);
-        new GroupService(this.app);
-        new MembershipService(this.app);
-        new PasswordService(this.app);
-        new PermissionService(this.app);
-        new SecurableService(this.app);
-        new UserService(this.app);
-        new MenuService(this.app);
-        new ListService(this.app);
-        new ListFilterService(this.app);
-        new SettingService(this.app);
+        new AuthService(logger, this.app);
+        new GroupService(logger, this.app);
+        new MembershipService(logger, this.app);
+        new PasswordService(logger, this.app);
+        new PermissionService(logger, this.app);
+        new SecurableService(logger, this.app);
+        new UserService(logger, this.app);
+        new MenuService(logger, this.app);
+        new ListService(logger, this.app);
+        new ListFilterService(logger, this.app);
+        new SettingService(logger, this.app);
 
-        new AiciService(this.app);
-        new DatasetService(this.app);
+        new AiciService(logger, this.app);
+        new DatasetService(logger, this.app);
 
-        console.log(`WebApp.execute() - HTTPS Cert Path: ${path.resolve(Config.httpsCertPath)}`);
-        console.log(`WebApp.execute() - HTTPS Key Path: ${path.resolve(Config.httpsKeyPath)}`);
+        logger.log(`HTTPS Cert Path: ${path.resolve(Config.httpsCertPath)}`);
+        logger.log(`HTTPS Key Path: ${path.resolve(Config.httpsKeyPath)}`);
         const options = {
             key: fs.readFileSync(Config.httpsKeyPath),
 
             cert: fs.readFileSync(Config.httpsCertPath),
         };
         this.server = https.createServer(options, this.app);
-        this.server.listen(Config.httpsPort, () => {
-            console.log(`WebApp.execute() - HTTPS Port: ${Config.httpsPort}`);
-            console.log("WebApp.execute() - Started");
+        this.server.listen(Config.httpsPort, async () => {
+            await logger.always(`HTTPS Port: ${Config.httpsPort}`);
+            await logger.always("Started");
         });
     }
 
-    public getHealth(req: express.Request, res: express.Response) {
-        console.log("WebApp.getHealth()");
+    public async getHealth(logger: Logger, req: express.Request, res: express.Response) {
+        await logger.trace();
         res.status(200).send({ data: "OK" } as ResponseDto<string>)
     }
 
-    public getLiveliness(req: express.Request, res: express.Response) {
-        console.log("WebApp.getLiveliness()");
+    public async getLiveliness(logger: Logger, req: express.Request, res: express.Response) {
+        await logger.trace();
         res.status(200).send({ data: "OK" } as ResponseDto<string>)
     }
 }
