@@ -30,6 +30,7 @@ SQL_FILES=(
     "tables/list_filters.sql"
     "tables/datasets.sql"
     "tables/logs.sql"
+    "tables/embeddings.sql"
     "foreignkeys/memberships.sql"
     "foreignkeys/passwords.sql"
     "foreignkeys/permissions.sql"

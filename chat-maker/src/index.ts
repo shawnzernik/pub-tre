@@ -1,7 +1,7 @@
 import fs from "fs";
 
 class Program {
-    private document = "docs/FrontendService.md";
+    private document = "docs/DataAccess.md";
     private regex = /<!!\s([^\s]+\/[^\s]+\.[^\s]+)\s!!\/>/g;
 
     public execute() {

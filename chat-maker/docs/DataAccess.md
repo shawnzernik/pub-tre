@@ -25,7 +25,7 @@ The data transfer object, user entity, and user repository created from the foll
 Create me a data transfer object, entity, and repository for the following table:
 
 ```sql
-<!! /Users/shawn/Projects/ts-react-express/database/tables/datasets.sql !!/>
+<!! /Users/shawn/Projects/ts-react-express/database/tables/embeddings.sql !!/>
 ```
 
 Only provide the files and do not provide an explanation.

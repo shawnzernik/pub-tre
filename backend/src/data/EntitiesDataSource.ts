@@ -24,6 +24,8 @@ import { DatasetEntity } from "./DatasetEntity";
 import { DatasetRepository } from "./DatasetRepository";
 import { LogRepository } from "./LogRepository";
 import { LogEntity } from "./LogEntity";
+import { EmbeddingEntity } from "./EmbeddingEntity";
+import { EmbeddingRepository } from "./EmbeddingRepository";
 
 export class EntitiesDataSource extends DataSource {
     public constructor() {
@@ -46,7 +48,8 @@ export class EntitiesDataSource extends DataSource {
                 ListFilterEntity,
                 SettingEntity,
                 DatasetEntity,
-                LogEntity
+                LogEntity,
+                EmbeddingEntity
             ],
         });
     }
@@ -147,5 +150,11 @@ export class EntitiesDataSource extends DataSource {
         if (!this._logRepository)
             this._logRepository = new LogRepository(LogEntity, this.createEntityManager(), this.createQueryRunner());
         return this._logRepository;
+    }
+    private _embeddingRepository: EmbeddingRepository | undefined;
+    public embeddingRepository() {
+        if (!this._embeddingRepository)
+            this._embeddingRepository = new EmbeddingRepository(EmbeddingEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._embeddingRepository;
     }
 }

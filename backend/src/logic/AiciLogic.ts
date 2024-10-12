@@ -9,10 +9,30 @@ import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { DatasetEntity } from "../data/DatasetEntity";
 import { Logger } from "../Logger";
 import { LogEntity } from "../data/LogEntity";
+import { EmbeddingEntity } from "../data/EmbeddingEntity";
 
 export interface AiciUpload {
     file: string;
     contents: string;
+}
+
+interface EmbeddingRequest {
+    model: "text-embedding-3-small" | "text-embedding-3-large" | "text-embedding-ada-002";
+    input: string | string[] | number[] | number[][];
+}
+interface EmbeddingList {
+    object: string;
+    data: Embedding[];
+    model: string;
+    usage: {
+        prompt_tokens: number;
+        total_tokens: number;
+    }
+}
+interface Embedding {
+    object: string;
+    embedding: number[];
+    index: number;
 }
 
 export class AiciLogic {
@@ -48,7 +68,6 @@ export class AiciLogic {
         const ds = new EntitiesDataSource();
         await ds.initialize();
         try {
-
             const uploadedFile = this.saveUpload(body, "zip");
             const extractedZipFolder = await this.extractZip(uploadedFile);
 
@@ -61,12 +80,12 @@ export class AiciLogic {
             const files = this.getFiles(logger, extractedZipFolder, includeRexExes, excludeRegExes);
             let logFile = "file,input,new,total,seconds,t/s\n";
 
-            const promises: Promise<void>[] = [];
+            let promises: Promise<void>[] = [];
             files.forEach((file, cnt) => {
                 promises.push(new Promise(async (resolve) => {
                     try {
-                        await logger.log(`File ${cnt + 1} of ${files.length}`);
-                        await logger.log(`File ${cnt + 1} of ${files.length} - ${file}`);
+                        await logger.log(`Explain ${cnt + 1} of ${files.length}`);
+                        await logger.log(`Explain ${cnt + 1} of ${files.length} - ${file}`);
 
                         let userMarkdown = "Explain the file '%FILE%':\n\n```\n%CONTENT%\n```";
 
@@ -81,16 +100,16 @@ export class AiciLogic {
                             content: userMarkdown
                         }];
 
-                        await logger.log(`File ${cnt + 1} of ${files.length} - AI to Explain`);
+                        await logger.log(`Explain ${cnt + 1} of ${files.length} - AI to Explain`);
                         const started = Date.now();
                         const response = await AiciLogic.chat(ds, messages);
                         const ended = Date.now();
 
-                        await logger.log(`File ${cnt + 1} of ${files.length} - Input: ${response.usage.prompt_tokens}; New: ${response.usage.completion_tokens}; Total: ${response.usage.total_tokens}`);
-                        await logger.log(`File ${cnt + 1} of ${files.length} - Seconds: ${(ended - started) / 1000}; T/S: ${response.usage.total_tokens / ((ended - started) / 1000)}`);
+                        await logger.log(`Explain ${cnt + 1} of ${files.length} - Input: ${response.usage.prompt_tokens}; New: ${response.usage.completion_tokens}; Total: ${response.usage.total_tokens}`);
+                        await logger.log(`Explain ${cnt + 1} of ${files.length} - Seconds: ${(ended - started) / 1000}; T/S: ${response.usage.total_tokens / ((ended - started) / 1000)}`);
                         logFile += `${mdFileName},${response.usage.prompt_tokens},${response.usage.completion_tokens},${response.usage.total_tokens},${ended - started / 1000},${response.usage.total_tokens / ((ended - started) / 1000)}\n`;
 
-                        await logger.log(`File ${cnt + 1} of ${files.length} - Load/Create Dataset`);
+                        await logger.log(`Explain ${cnt + 1} of ${files.length} - Load/Create Dataset`);
                         messages.push({
                             role: response.choices[0].message.role,
                             content: response.choices[0].message.content
@@ -105,23 +124,100 @@ export class AiciLogic {
                         }
                         dataset.json = JSON.stringify(messages);
 
-                        await logger.log(`File ${cnt + 1} of ${files.length} - Saving`);
+                        await logger.log(`Explain ${cnt + 1} of ${files.length} - Saving`);
                         await ds.datasetRepository().save(dataset);
                         resolve();
                     }
                     catch (err) {
+                        new Error(`Explain ${cnt + 1} of ${files.length} - ${(err as Error).message}`);
                         await logger.error(err);
                         resolve();
                     }
                 }));
             });
-
             await Promise.all(promises);
+
+            promises = [];
+            files.forEach((file, cnt) => {
+                promises.push(new Promise(async (resolve) => {
+                    try {
+                        await logger.log(`Embedding ${cnt + 1} of ${files.length}`);
+                        await logger.log(`Embedding ${cnt + 1} of ${files.length} - ${file}`);
+
+                        let userMarkdown = "File '%FILE%':\n\n```\n%CONTENT%\n```";
+
+                        const mdFileName = path.join("~", file);
+                        userMarkdown = userMarkdown.replace("%FILE%", mdFileName);
+
+                        const fileContents = fs.readFileSync(path.join(extractedZipFolder, file), { encoding: "utf8" });
+                        userMarkdown = userMarkdown.replace("%CONTENT%", fileContents.replace(/`/, "\\`"));
+
+                        const request: EmbeddingRequest = {
+                            model: "text-embedding-3-small",
+                            input: userMarkdown
+                        };
+
+                        await logger.log(`Embedding ${cnt + 1} of ${files.length} - AI to Embed`);
+                        const started = Date.now();
+                        const response: EmbeddingList = await AiciLogic.embedding(ds, request);
+                        const ended = Date.now();
+
+                        await logger.log(`Embedding ${cnt + 1} of ${files.length} - Input: ${response.usage.prompt_tokens}; Total: ${response.usage.total_tokens}`);
+                        await logger.log(`Embedding ${cnt + 1} of ${files.length} - Seconds: ${(ended - started) / 1000}; T/S: ${response.usage.total_tokens / ((ended - started) / 1000)}`);
+
+                        await logger.log(`Embedding ${cnt + 1} of ${files.length} - Load/Create Dataset`);
+
+                        let embedding = await ds.embeddingRepository().findOneBy({ title: mdFileName });
+                        if (!embedding) {
+                            embedding = new EmbeddingEntity();
+                            embedding.guid = UUIDv4.generate();
+                            embedding.title = mdFileName;
+                        }
+                        embedding.input = request.input as string;
+                        embedding.promptTokens = response.usage.prompt_tokens;
+                        embedding.totalTokens = response.usage.total_tokens;
+                        embedding.embeddingJson = JSON.stringify(response.data[0].embedding);
+
+                        await logger.log(`Embedding ${cnt + 1} of ${files.length} - Saving`);
+                        await ds.embeddingRepository().save(embedding);
+                        resolve();
+                    }
+                    catch (err) {
+                        new Error(`Explain ${cnt + 1} of ${files.length} - ${(err as Error).message}`);
+                        await logger.error(err);
+                        resolve();
+                    }
+                }));
+            });
+            await Promise.all(promises);
+
             await logger.log("ALL DONE!");
         }
         finally {
             await ds.destroy();
         }
+    }
+    public static async embedding(ds: EntitiesDataSource, request: EmbeddingRequest): Promise<EmbeddingList> {
+        const modelSetting = await ds.settingRepository().findByKey("Aici:Model");
+        const urlSetting = await ds.settingRepository().findByKey("Aici:URL");
+        const apiKeySetting = await ds.settingRepository().findByKey("Aici:API Key");
+
+        const fetchResponse = await fetch(`${urlSetting.value}/v1/embeddings`, {
+            method: "POST",
+            body: JSON.stringify(request),
+            headers: {
+                "Authorization": `Bearer ${apiKeySetting.value}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!fetchResponse.ok) {
+            const details = await fetchResponse.text();
+            throw new Error(`HTTP Status ${fetchResponse.status} - ${fetchResponse.statusText} - ${details}`);
+        }
+
+        const aiResponse = await fetchResponse.json();
+        return aiResponse as EmbeddingList;
     }
     public static async getUploadLogs(logger: Logger, ds: EntitiesDataSource, corelation: string): Promise<LogEntity[]> {
         const logs = await ds.logRepository().find({ where: { corelation: corelation }, order: { epoch: "DESC", order: "DESC" } });

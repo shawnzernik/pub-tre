@@ -63,8 +63,7 @@ ORDER BY "key"
 SELECT
 	"guid",
     "include_in_training" AS "Train On",
-    "title" AS "Title",
-    LEFT("json", 150) AS "JSON"
+    "title" AS "Title"
 FROM "datasets"
 ORDER BY "title"
 ', '/static/pages/dataset.html', 'false');

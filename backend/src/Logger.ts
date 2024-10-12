@@ -163,14 +163,25 @@ export class Logger {
 
         const epoch = JSON.stringify(new Date(Date.now()).toISOString());
 
-        await Logger.ds.logRepository().save([{
-            guid: UUIDv4.generate(),
-            corelation: this.corelation,
-            epoch: epoch,
-            level: entry.level,
-            caller: entry.caller,
-            message: entry.msg
-        }]);
+        if (entry.msg instanceof Error)
+            await Logger.ds.logRepository().save([{
+                guid: UUIDv4.generate(),
+                corelation: this.corelation,
+                epoch: epoch,
+                level: entry.level,
+                caller: entry.caller,
+                message: entry.msg.message
+            }]);
+        else
+            await Logger.ds.logRepository().save([{
+                guid: UUIDv4.generate(),
+                corelation: this.corelation,
+                epoch: epoch,
+                level: entry.level,
+                caller: entry.caller,
+                message: entry.msg
+            }]);
+
 
         if (!entry.msg)
             return;
@@ -192,7 +203,11 @@ export class Logger {
             out += this.ansi_white(": ");
             out += this.ansi_red(JSON.stringify(entry.level, null, Config.logIndent));
         }
-        if (entry.msg) {
+        if (entry.msg instanceof Error) {
+            out += this.ansi_blue(", message");
+            out += this.ansi_white(": ");
+            out += this.ansi_red(JSON.stringify(entry.msg.message, null, Config.logIndent));
+        } else {
             out += this.ansi_blue(", message");
             out += this.ansi_white(": ");
             out += this.ansi_red(JSON.stringify(entry.msg, null, Config.logIndent));
