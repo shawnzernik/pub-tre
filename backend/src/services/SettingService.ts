@@ -3,12 +3,13 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { SettingDto } from "common/src/models/SettingDto";
 import { SettingEntity } from "../data/SettingEntity";
+import { Logger } from "../Logger";
 
 export class SettingService extends BaseService {
-    public constructor(app: express.Express) {
+    public constructor(logger: Logger, app: express.Express) {
         super();
 
-        console.log("SettingService.constructor()");
+        logger.trace();
 
         app.get("/api/v0/setting/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/settings", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
@@ -16,32 +17,32 @@ export class SettingService extends BaseService {
         app.delete("/api/v0/setting/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
     }
 
-    public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<SettingDto | null> {
-        console.log("SettingService.getGuid()");
-        await BaseService.checkSecurity("Setting:Read", req, ds);
+    public async getGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<SettingDto | null> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Setting:Read", req, ds);
 
         const guid = req.params["guid"];
         const ret = await ds.settingRepository().findOneBy({ guid: guid });
         return ret;
     }
-    public async getList(req: express.Request, ds: EntitiesDataSource): Promise<SettingDto[]> {
-        console.log("SettingService.getList()");
-        await BaseService.checkSecurity("Setting:List", req, ds);
+    public async getList(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<SettingDto[]> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Setting:List", req, ds);
 
         const ret = await ds.settingRepository().find();
         return ret;
     }
-    public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("SettingService.postSave()");
-        await BaseService.checkSecurity("Setting:Save", req, ds);
+    public async postSave(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Setting:Save", req, ds);
 
         const entity = new SettingEntity();
         entity.copyFrom(req.body as SettingDto);
         await ds.settingRepository().save([entity]);
     }
-    public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("SettingService.deleteGuid()");
-        await BaseService.checkSecurity("Setting:Delete", req, ds);
+    public async deleteGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Setting:Delete", req, ds);
 
         const guid = req.params["guid"];
         await ds.settingRepository().delete({ guid: guid });

@@ -52,6 +52,7 @@ module.exports = {
         list: "./src/pages/list.tsx",
         setting: "./src/pages/setting.tsx",
 
+        upload: "./src/pages/upload.tsx",
         finetune: "./src/pages/finetune.tsx",
         chat: "./src/pages/chat.tsx",
         dataset: "./src/pages/dataset.tsx",
@@ -140,6 +141,12 @@ module.exports = {
             filename: "../static/pages/setting.html",
             chunks: ["common", "setting"],
             title: "Setting Edit"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/upload.html",
+            chunks: ["common", "upload"],
+            title: "Fine Tune"
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",

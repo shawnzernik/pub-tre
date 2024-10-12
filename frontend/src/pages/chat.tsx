@@ -143,7 +143,10 @@ class Page extends BasePage<Props, State> {
         if (this.state.messages && this.state.messages.length > 0) {
             this.state.messages.forEach((msg) => {
                 markdown += `\n`;
-                markdown += `## '${msg.role}'\n`;
+                if (msg.role === "user")
+                    markdown += `## User\n`;
+                else
+                    markdown += `## Assistant\n`;
                 markdown += `\n`;
                 markdown += `\n`;
                 markdown += msg.content + "\n";

@@ -2,6 +2,7 @@ import { LoginDto } from "common/src/models/LoginDto";
 import { FetchWrapper } from "./FetchWrapper";
 import { JwtToken } from "../logic/JwtToken";
 import { UserDto } from "common/src/models/UserDto";
+import { UUIDv4 } from "common/src/logic/UUIDv4";
 
 export class AuthService {
     private static myPublicKey: string;
@@ -9,12 +10,18 @@ export class AuthService {
         if (AuthService.myPublicKey)
             return AuthService.myPublicKey;
 
-        const ret = await FetchWrapper.get<string>("/api/v0/auth/public_key");
+        const ret = await FetchWrapper.get<string>({
+            url: "/api/v0/auth/public_key",
+            corelation: UUIDv4.generate()
+        });
         AuthService.myPublicKey = ret;
         return ret;
     }
     public static async anonymous(): Promise<string> {
-        const ret = await FetchWrapper.get<string>("/api/v0/auth/anonymous");
+        const ret = await FetchWrapper.get<string>({
+            url: "/api/v0/auth/anonymous",
+            corelation: UUIDv4.generate()
+        });
 
         const key = await AuthService.publicKey();
         JwtToken.verify(ret, key);
@@ -27,7 +34,11 @@ export class AuthService {
             password: password
         };
 
-        const ret = await FetchWrapper.post<string>("/api/v0/auth/login", login);
+        const ret = await FetchWrapper.post<string>({
+            url: "/api/v0/auth/login",
+            body: login,
+            corelation: UUIDv4.generate()
+        });
 
         const key = await AuthService.publicKey();
         JwtToken.verify(ret, key);
@@ -36,23 +47,41 @@ export class AuthService {
     }
     public static async getUser(): Promise<UserDto> {
         const token = await this.getToken();
-        const ret = await FetchWrapper.get<UserDto>("/api/v0/auth/user", token);
+        const ret = await FetchWrapper.get<UserDto>({
+            url: "/api/v0/auth/user",
+            corelation: UUIDv4.generate(),
+            token: token
+        });
         return ret;
     }
     public static async postUser(user: UserDto): Promise<void> {
         const token = await this.getToken();
-        const ret = await FetchWrapper.post("/api/v0/auth/user", user, token);
+        const ret = await FetchWrapper.post({
+            url: "/api/v0/auth/user",
+            body: user,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
     }
     public static async postPassword(current: string, newPass: string, confirm: string): Promise<void> {
         const obj = {
             currentPassword: current, newPassword: newPass, confirmPassword: confirm
         };
         const token = await this.getToken();
-        await FetchWrapper.post("/api/v0/auth/password", obj, token);
+        await FetchWrapper.post({
+            url: "/api/v0/auth/password",
+            body: obj,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
     }
 
     public static async renew(token: string): Promise<string> {
-        const ret = await FetchWrapper.get<string>("/api/v0/auth/renew", token);
+        const ret = await FetchWrapper.get<string>({
+            url: "/api/v0/auth/renew",
+            corelation: UUIDv4.generate(),
+            token: token
+        });
 
         const key = await AuthService.publicKey();
         JwtToken.verify(ret, key);

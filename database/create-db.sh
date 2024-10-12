@@ -8,6 +8,9 @@ DB_PASSWORD="postgres"
 
 export PGPASSWORD="$DB_PASSWORD"
 
+echo "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$DB_NAME' AND pid <> pg_backend_pid()"
+psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$DB_NAME' AND pid <> pg_backend_pid();" -q
+
 echo "DROP DATABASE IF EXISTS \"$DB_NAME\""
 psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -c "DROP DATABASE IF EXISTS \"$DB_NAME\";" -q
 
@@ -26,6 +29,7 @@ SQL_FILES=(
     "tables/lists.sql"
     "tables/list_filters.sql"
     "tables/datasets.sql"
+    "tables/logs.sql"
     "foreignkeys/memberships.sql"
     "foreignkeys/passwords.sql"
     "foreignkeys/permissions.sql"

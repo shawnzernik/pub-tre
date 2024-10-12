@@ -5,12 +5,13 @@ import { ListDto } from "common/src/models/ListDto";
 import { ListEntity } from "../data/ListEntity";
 import { ListLogic } from "../logic/ListLogic";
 import { ListFilterDto } from "common/src/models/ListFilterDto";
+import { Logger } from "../Logger";
 
 export class ListService extends BaseService {
-    public constructor(app: express.Express) {
+    public constructor(logger: Logger, app: express.Express) {
         super();
 
-        console.log("ListService.constructor()");
+        logger.trace();
 
         app.post("/api/v0/list/:guid/items", (req, resp) => { this.methodWrapper(req, resp, this.postItems) });
         app.get("/api/v0/list/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
@@ -20,9 +21,9 @@ export class ListService extends BaseService {
         app.delete("/api/v0/list/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
     }
 
-    public async postItems(req: express.Request, ds: EntitiesDataSource): Promise<ListDto[]> {
-        console.log("ListService.postItems()");
-        await BaseService.checkSecurity("List:Items", req, ds);
+    public async postItems(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListDto[]> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "List:Items", req, ds);
 
         const guid = req.params["guid"];
         const listDto = await ds.listRepository().findOneBy({ guid: guid });
@@ -36,40 +37,40 @@ export class ListService extends BaseService {
 
         return ret;
     }
-    public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
-        console.log("ListService.getGuid()");
-        await BaseService.checkSecurity("List:Read", req, ds);
+    public async getGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "List:Read", req, ds);
 
         const guid = req.params["guid"];
         const ret = await ds.listRepository().findOneBy({ guid: guid });
         return ret;
     }
-    public async getUrlKey(req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
-        console.log("ListService.getUrlKey()");
-        await BaseService.checkSecurity("List:Read", req, ds);
+    public async getUrlKey(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "List:Read", req, ds);
 
         const urlKey = req.params["url_key"];
         const ret = await ds.listRepository().findOneBy({ urlKey: urlKey });
         return ret;
     }
-    public async getList(req: express.Request, ds: EntitiesDataSource): Promise<ListDto[]> {
-        console.log("ListService.getList()");
-        await BaseService.checkSecurity("List:List", req, ds);
+    public async getList(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListDto[]> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "List:List", req, ds);
 
         const ret = await ds.listRepository().find();
         return ret;
     }
-    public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("ListService.postSave()");
-        await BaseService.checkSecurity("List:Save", req, ds);
+    public async postSave(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "List:Save", req, ds);
 
         const entity = new ListEntity();
         entity.copyFrom(req.body as ListDto);
         await ds.listRepository().save([entity]);
     }
-    public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("ListService.deleteGuid()");
-        await BaseService.checkSecurity("List:Delete", req, ds);
+    public async deleteGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "List:Delete", req, ds);
 
         const guid = req.params["guid"];
         await ds.listRepository().delete({ guid: guid });

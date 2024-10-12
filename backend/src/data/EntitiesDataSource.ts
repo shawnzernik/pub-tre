@@ -22,31 +22,34 @@ import { ListFilterRepository } from "./ListFilterRepository";
 import { SettingRepository } from "./SettingRepository";
 import { DatasetEntity } from "./DatasetEntity";
 import { DatasetRepository } from "./DatasetRepository";
+import { LogRepository } from "./LogRepository";
+import { LogEntity } from "./LogEntity";
 
 export class EntitiesDataSource extends DataSource {
-	public constructor() {
-		super({
-			type: "postgres",
-			host: Config.dbHost,
-			port: Config.dbPort,
-			database: Config.dbName,
-			username: Config.dbUsername,
-			password: Config.dbPassword,
-			entities: [
-				GroupEntity,
-				MembershipEntity,
-				PasswordEntity,
-				PermissionEntity,
-				SecurableEntity,
-				UserEntity,
+    public constructor() {
+        super({
+            type: "postgres",
+            host: Config.dbHost,
+            port: Config.dbPort,
+            database: Config.dbName,
+            username: Config.dbUsername,
+            password: Config.dbPassword,
+            entities: [
+                GroupEntity,
+                MembershipEntity,
+                PasswordEntity,
+                PermissionEntity,
+                SecurableEntity,
+                UserEntity,
                 MenuEntity,
                 ListEntity,
                 ListFilterEntity,
                 SettingEntity,
-                DatasetEntity
-			],
-		});
-	}
+                DatasetEntity,
+                LogEntity
+            ],
+        });
+    }
 
     public async executeSql(sql: string, params: any[]): Promise<any[]> {
         const queryRunner = this.createQueryRunner();
@@ -56,7 +59,7 @@ export class EntitiesDataSource extends DataSource {
             const result = await queryRunner.query(sql, params);
             return result;
         }
-        catch(err) {
+        catch (err) {
             throw new Error(`Error executing:\n${sql}\n${err}`);
         }
         finally {
@@ -64,79 +67,85 @@ export class EntitiesDataSource extends DataSource {
         }
     }
 
-	private _groupRepository: GroupRepository | undefined;
-	public groupRepository() {
-		if (!this._groupRepository)
-			this._groupRepository = new GroupRepository(GroupEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._groupRepository;
-	}
+    private _groupRepository: GroupRepository | undefined;
+    public groupRepository() {
+        if (!this._groupRepository)
+            this._groupRepository = new GroupRepository(GroupEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._groupRepository;
+    }
 
-	private _membershipRepository: MembershipRepository | undefined;
-	public membershipRepository() {
-		if (!this._membershipRepository)
-			this._membershipRepository = new MembershipRepository(MembershipEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._membershipRepository;
-	}
+    private _membershipRepository: MembershipRepository | undefined;
+    public membershipRepository() {
+        if (!this._membershipRepository)
+            this._membershipRepository = new MembershipRepository(MembershipEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._membershipRepository;
+    }
 
-	private _passwordRepository: PasswordRepository | undefined;
-	public passwordRepository() {
-		if (!this._passwordRepository)
-			this._passwordRepository = new PasswordRepository(PasswordEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._passwordRepository;
-	}
+    private _passwordRepository: PasswordRepository | undefined;
+    public passwordRepository() {
+        if (!this._passwordRepository)
+            this._passwordRepository = new PasswordRepository(PasswordEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._passwordRepository;
+    }
 
-	private _permissionRepository: PermissionRepository | undefined;
-	public permissionRepository() {
-		if (!this._permissionRepository)
-			this._permissionRepository = new PermissionRepository(PermissionEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._permissionRepository;
-	}
+    private _permissionRepository: PermissionRepository | undefined;
+    public permissionRepository() {
+        if (!this._permissionRepository)
+            this._permissionRepository = new PermissionRepository(PermissionEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._permissionRepository;
+    }
 
-	private _securableRepository: SecurableRepository | undefined;
-	public securableRepository() {
-		if (!this._securableRepository)
-			this._securableRepository = new SecurableRepository(SecurableEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._securableRepository;
-	}
+    private _securableRepository: SecurableRepository | undefined;
+    public securableRepository() {
+        if (!this._securableRepository)
+            this._securableRepository = new SecurableRepository(SecurableEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._securableRepository;
+    }
 
-	private _userRepository: UserRepository | undefined;
-	public userRepository() {
-		if (!this._userRepository)
-			this._userRepository = new UserRepository(UserEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._userRepository;
-	}
+    private _userRepository: UserRepository | undefined;
+    public userRepository() {
+        if (!this._userRepository)
+            this._userRepository = new UserRepository(UserEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._userRepository;
+    }
 
-	private _menuRepository: MenuRepository | undefined;
-	public menuRepository() {
-		if (!this._menuRepository)
-			this._menuRepository = new MenuRepository(MenuEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._menuRepository;
-	}
+    private _menuRepository: MenuRepository | undefined;
+    public menuRepository() {
+        if (!this._menuRepository)
+            this._menuRepository = new MenuRepository(MenuEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._menuRepository;
+    }
 
-	private _listRepository: ListRepository | undefined;
-	public listRepository() {
-		if (!this._listRepository)
-			this._listRepository = new ListRepository(ListEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._listRepository;
-	}
+    private _listRepository: ListRepository | undefined;
+    public listRepository() {
+        if (!this._listRepository)
+            this._listRepository = new ListRepository(ListEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._listRepository;
+    }
 
-	private _listFilterRepository: ListFilterRepository | undefined;
-	public listFilterRepository() {
-		if (!this._listFilterRepository)
-			this._listFilterRepository = new ListFilterRepository(ListFilterEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._listFilterRepository;
-	}
+    private _listFilterRepository: ListFilterRepository | undefined;
+    public listFilterRepository() {
+        if (!this._listFilterRepository)
+            this._listFilterRepository = new ListFilterRepository(ListFilterEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._listFilterRepository;
+    }
 
-	private _settingRepository: SettingRepository | undefined;
-	public settingRepository() {
-		if (!this._settingRepository)
-			this._settingRepository = new SettingRepository(SettingEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._settingRepository;
-	}
-	private _datasetRepository: DatasetRepository | undefined;
-	public datasetRepository() {
-		if (!this._datasetRepository)
-			this._datasetRepository = new DatasetRepository(DatasetEntity, this.createEntityManager(), this.createQueryRunner());
-		return this._datasetRepository;
-	}
+    private _settingRepository: SettingRepository | undefined;
+    public settingRepository() {
+        if (!this._settingRepository)
+            this._settingRepository = new SettingRepository(SettingEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._settingRepository;
+    }
+    private _datasetRepository: DatasetRepository | undefined;
+    public datasetRepository() {
+        if (!this._datasetRepository)
+            this._datasetRepository = new DatasetRepository(DatasetEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._datasetRepository;
+    }
+    private _logRepository: LogRepository | undefined;
+    public logRepository() {
+        if (!this._logRepository)
+            this._logRepository = new LogRepository(LogEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._logRepository;
+    }
 }

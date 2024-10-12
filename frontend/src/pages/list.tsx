@@ -156,7 +156,7 @@ class Page extends BasePage<Props, State> {
                     /></Field>
                     <Field label="SQL"><TextArea
                         monospace={true}
-                        rows={25}
+                        showAll={true}
                         value={this.state.model.sql}
                         onChange={async (value) => {
                             const newModel = JSON.parse(JSON.stringify(this.state.model));

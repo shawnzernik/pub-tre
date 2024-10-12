@@ -3,12 +3,13 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { DatasetDto } from "common/src/models/DatasetDto";
 import { DatasetEntity } from "../data/DatasetEntity";
+import { Logger } from "../Logger";
 
 export class DatasetService extends BaseService {
-    public constructor(app: express.Express) {
+    public constructor(logger: Logger, app: express.Express) {
         super();
 
-        console.log("DatasetService.constructor()");
+        logger.trace();
 
         app.get("/api/v0/dataset/:guid", (req, resp) => { this.methodWrapper(req, resp, this.getGuid) });
         app.get("/api/v0/datasets", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
@@ -16,35 +17,35 @@ export class DatasetService extends BaseService {
         app.delete("/api/v0/dataset/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
     }
 
-    public async getGuid(req: express.Request, ds: EntitiesDataSource): Promise<DatasetDto | null> {
-        console.log("DatasetService.getGuid()");
-        await BaseService.checkSecurity("Dataset:Read", req, ds);
+    public async getGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<DatasetDto | null> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Dataset:Read", req, ds);
 
         const guid = req.params["guid"];
         const ret = await ds.datasetRepository().findOneBy({ guid: guid });
         return ret;
     }
 
-    public async getList(req: express.Request, ds: EntitiesDataSource): Promise<DatasetDto[]> {
-        console.log("DatasetService.getList()");
-        await BaseService.checkSecurity("Dataset:List", req, ds);
+    public async getList(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<DatasetDto[]> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Dataset:List", req, ds);
 
         const ret = await ds.datasetRepository().find();
         return ret;
     }
 
-    public async postSave(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("DatasetService.postSave()");
-        await BaseService.checkSecurity("Dataset:Save", req, ds);
+    public async postSave(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Dataset:Save", req, ds);
 
         const entity = new DatasetEntity();
         entity.copyFrom(req.body as DatasetDto);
         await ds.datasetRepository().save([entity]);
     }
 
-    public async deleteGuid(req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        console.log("DatasetService.deleteGuid()");
-        await BaseService.checkSecurity("Dataset:Delete", req, ds);
+    public async deleteGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Dataset:Delete", req, ds);
 
         const guid = req.params["guid"];
         await ds.datasetRepository().delete({ guid: guid });

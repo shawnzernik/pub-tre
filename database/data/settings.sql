@@ -17,26 +17,36 @@ INSERT INTO "settings" ("guid", "key", "value") VALUES
 ('a8fdf3fb-8726-437a-a8bd-bebd595d1a87', 'Aici:Fine Tune:LR Multiplier', '1.8'),
 ('0277c73c-c228-4fce-ae31-4112a60c6946', 'Aici:Fine Tune:Seed', '0'),
 
-('96de4956-9018-47d2-a50d-fe071ac58338', 'Aici:Upload:Exclude', '
-\\.ts$
-\\.tsx$
-\\.sql$
-\\.json$
-\\.sh$
-\\.css$
-\\.js$
-\\.html$
-\\.md$
-\\.code-workspace$
+('96de4956-9018-47d2-a50d-fe071ac58338', 'Aici:Upload:Include', '
+\.ts$
+\.tsx$
+\.sql$
+\.json$
+\.sh$
+\.css$
+\.js$
+\.html$
+\.md$
+\.xml$
+\.java$
+\.css$
+\.txt$
+\.jsp$
+\.config$
+\.template$
+\.code-workspace$
 '),
-('f7abd78d-d495-4bc2-a753-1d780b789098', 'Aici:Upload:Include', '
+('f7abd78d-d495-4bc2-a753-1d780b789098', 'Aici:Upload:Exclude', '
 frontend/scripts
 node_modules
 bin
 obj
 dist
 coverage
+nbproject
+jquery-ui-
+__MACOSX
 package-lock
-\\.ds\\.json$
-'),
+\.ds\.json$
+')
 ;

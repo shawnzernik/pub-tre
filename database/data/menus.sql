@@ -14,9 +14,10 @@ BEGIN
     ('4fa7b2ae-953d-45ed-bc83-2194176b0c59', 'b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3', 5, 'Help', 'question-circle-fill', '/static/pages/help.html'),
 
     ('a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', NULL, 2, 'OpenAI Aici', 'fire', ''),
-    ('1a5073f4-5be7-4b01-af23-11aff07485f3', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 1, 'Fine Tune', 'easel-fill', '/static/pages/finetune.html'),
-    ('b3d886a8-dd3d-426a-9ddf-1e18cbb7e224', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 2, 'Chat', 'chat-fill', '/static/pages/chat.html'),
-    ('6b8c801f-c6f9-42d6-8502-c2ea75287f26', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 3, 'Datasets', 'backpack-fill', '/static/pages/lists.html?url_key=datasets'),
+    ('720fa4c9-20d0-407d-aff6-3dad45d155cc', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 1, 'Upload', 'cloud-arrow-up-fill', '/static/pages/upload.html'),
+    ('1a5073f4-5be7-4b01-af23-11aff07485f3', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 2, 'Fine Tune', 'easel-fill', '/static/pages/finetune.html'),
+    ('b3d886a8-dd3d-426a-9ddf-1e18cbb7e224', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 3, 'Chat', 'chat-fill', '/static/pages/chat.html'),
+    ('6b8c801f-c6f9-42d6-8502-c2ea75287f26', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 4, 'Datasets', 'backpack-fill', '/static/pages/lists.html?url_key=datasets'),
 
     ('b1e3c680-0f62-4931-8a68-4be9b4b070f7', NULL, 3, 'System', 'gear-fill', ''),
     ('67fa4231-5b8e-4639-89cb-5f15a9207a83', 'b1e3c680-0f62-4931-8a68-4be9b4b070f7', 1, 'Users', 'people-fill', '/static/pages/lists.html?url_key=users'),

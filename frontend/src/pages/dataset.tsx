@@ -199,7 +199,7 @@ class Page extends BasePage<Props, State> {
                             value={this.state.model.guid}
                         />
                     </Field>
-                    <Field label="Train On" size={3}>
+                    <Field label="Train On" size={1}>
                         <Checkbox
                             checked={this.state.model.includeInTraining}
                             onChange={async (value) => {
