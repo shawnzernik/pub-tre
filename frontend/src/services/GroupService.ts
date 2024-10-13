@@ -28,7 +28,7 @@ export class GroupService {
         });
     }
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<GroupDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/group/" + guid,
             corelation: UUIDv4.generate(),
             token: token

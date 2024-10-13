@@ -35,7 +35,13 @@ export class AiciService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Aici:Embedding", req, ds);
 
-        const ret = AiciLogic.search(logger, ds, req.body, 10);
+        const obj = req.body;
+        if(!obj.input)
+            throw new Error("No input provided!  Expected TypeScript interface: `{ input: string, limit: number }`.");
+        if(!obj.limit)
+            throw new Error("No input provided!  Expected TypeScript interface: `{ input: string, limit: number }`.");
+
+        const ret = AiciLogic.search(logger, ds, obj.input, obj.limit);
         return ret;
     }
     public async getUpload(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<LogDto[]> {

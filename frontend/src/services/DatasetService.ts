@@ -31,7 +31,7 @@ export class DatasetService {
     }
 
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<DatasetDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/dataset/" + guid,
             corelation: UUIDv4.generate(),
             token: token

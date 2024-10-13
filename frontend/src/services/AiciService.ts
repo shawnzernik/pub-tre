@@ -15,10 +15,13 @@ export class AiciService {
         return ret;
     }
 
-    public static async search(token: string, similarTo: string): Promise<any> {
+    public static async search(token: string, similarTo: string, limit: number): Promise<any> {
         const ret = await FetchWrapper.post<any>({
             url: "/api/v0/aici/search",
-            body: similarTo,
+            body: { 
+                input: similarTo,
+                limit: limit
+            },
             corelation: UUIDv4.generate(),
             token: token
         });

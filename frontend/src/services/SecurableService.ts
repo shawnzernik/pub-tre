@@ -28,7 +28,7 @@ export class SecurableService {
         });
     }
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<SecurableDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/securable/" + guid,
             corelation: UUIDv4.generate(),
             token: token

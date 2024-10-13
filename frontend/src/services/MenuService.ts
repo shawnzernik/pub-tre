@@ -27,7 +27,7 @@ export class MenuService {
         });
     }
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<MenuDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/menu/" + guid,
             corelation: UUIDv4.generate(),
             token: token

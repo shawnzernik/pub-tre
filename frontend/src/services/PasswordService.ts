@@ -31,7 +31,7 @@ export class PasswordService {
     }
 
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<PasswordDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/password/" + guid,
             corelation: UUIDv4.generate(),
             token: token
