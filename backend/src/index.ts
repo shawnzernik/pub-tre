@@ -33,17 +33,17 @@ export class WebApp {
 
         this.app.use(async (req, res, next) => {
             let corelation = "";
-            if (req.headers["corelation"] && req.headers["corelation"].length === 36) {
-                corelation = req.headers["corelation"] as string;
-            } else if (req.headers["corelation"] && req.headers["corelation"][0] && req.headers["corelation"][0].length === 36) {
-                corelation = req.headers["corelation"]![0] as string;
+            if (req.headers["Corelation"] && req.headers["Corelation"].length === 36) {
+                corelation = req.headers["Corelation"] as string;
+            } else if (req.headers["Corelation"] && req.headers["Corelation"][0] && req.headers["Corelation"][0].length === 36) {
+                corelation = req.headers["Corelation"]![0] as string;
             } else {
                 corelation = UUIDv4.generate();
                 await logger.always(`Injecting Corelation ${corelation}`);
             }
-            req.headers["corelation"] = [corelation];
+            req.headers["Corelation"] = [corelation];
 
-            const newLogger = new Logger(req.headers["corelation"][0]);
+            const newLogger = new Logger(req.headers["Corelation"][0]);
             await newLogger.always(`${req.method} ${req.originalUrl}`);
 
             next();

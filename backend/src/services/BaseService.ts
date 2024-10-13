@@ -31,13 +31,13 @@ export class BaseService {
     }
 
     protected async methodWrapper<T>(req: express.Request, resp: express.Response, method: Method<T>): Promise<void> {
-        if (!req.headers["corelation"])
+        if (!req.headers["Corelation"])
             throw new Error("Corelation header missing!");
 
-        if (req.headers["corelation"].length > 1)
+        if (req.headers["Corelation"].length > 1)
             throw new Error("Multiple corelation!");
 
-        const logger = new Logger(req.headers["corelation"][0]);
+        const logger = new Logger(req.headers["Corelation"][0]);
         if (!resp.status) {
             logger.warn("no resp.status");
             return;

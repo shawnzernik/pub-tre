@@ -8,10 +8,8 @@ import { Form } from "../components/Form";
 import { Field } from "../components/Field";
 import { FlexRow } from "../components/FlexRow";
 import { Button } from "../components/Button";
-import { Input } from "../components/Input";
 import { AuthService } from "../services/AuthService";
 import { AiciService } from "../services/AiciService";
-import { LoginDto } from "common/src/models/LoginDto";
 
 interface Props { }
 interface State extends BasePageState {
@@ -41,7 +39,7 @@ class Page extends BasePage<Props, State> {
         logContent += "|---|---|---|\n"
         logs.forEach((log) => {
             if (log.message)
-                logContent += `|${log.level}|${log.epoch.replace(/"/g, "")}|${log.message}|\n`;
+                logContent += `|${log.level}|${log.epoch.replace(/"/g, "")}|${log.message.replace(/\n/g, " ")}|\n`;
         });
 
         if (logContent.includes("ALL DONE!"))

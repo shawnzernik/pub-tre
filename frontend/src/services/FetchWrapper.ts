@@ -13,7 +13,7 @@ export class FetchWrapper {
 
         const response = await fetch(params.url, {
             method: "DELETE",
-            headers: { ...headers, "corelation": params.corelation }
+            headers: { ...headers, "Corelation": params.corelation }
         });
 
         await FetchWrapper.handleResponse<T>(response);
@@ -23,7 +23,7 @@ export class FetchWrapper {
 
         const response = await fetch(params.url, {
             method: "GET",
-            headers: { ...headers, "corelation": params.corelation }
+            headers: { ...headers, "Corelation": params.corelation }
         });
 
         const ret = await FetchWrapper.handleResponse<T>(response);
@@ -35,7 +35,7 @@ export class FetchWrapper {
         const response = await fetch(params.url, {
             method: "POST",
             body: JSON.stringify(params.body),
-            headers: { ...headers, "corelation": params.corelation }
+            headers: { ...headers, "Corelation": params.corelation }
         });
 
         const ret = await FetchWrapper.handleResponse<T>(response);

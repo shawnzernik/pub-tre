@@ -15,6 +15,7 @@ export class AiciService extends BaseService {
         app.post("/api/v0/aici/chat", (req, resp) => { this.methodWrapper(req, resp, this.postChat) });
         app.post("/api/v0/aici/upload", (req, resp) => { this.methodWrapper(req, resp, this.postUpload) });
         app.get("/api/v0/aici/upload/:corelation", (req, resp) => { this.methodWrapper(req, resp, this.getUpload) });
+        app.post("/api/v0/aici/search", (req, resp) => { this.methodWrapper(req, resp, this.postSearch) });
     }
 
     public async postChat(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<AiciResponse> {
@@ -29,6 +30,13 @@ export class AiciService extends BaseService {
         await BaseService.checkSecurity(logger, "Aici:Upload", req, ds);
 
         AiciLogic.upload(logger, ds, req.body);
+    }
+    public async postSearch(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<any> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Aici:Embedding", req, ds);
+
+        const ret = AiciLogic.search(logger, ds, req.body, 10);
+        return ret;
     }
     public async getUpload(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<LogDto[]> {
         await logger.trace();

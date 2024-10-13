@@ -7,7 +7,9 @@ import { Field } from "../components/Field";
 import { FlexRow } from "../components/FlexRow";
 import { Button } from "../components/Button";
 import { TextArea } from "../components/TextArea";
-import { Navigation } from "../components/Navigation";
+import { ErrorMessage, Navigation } from "../components/Navigation";
+import { AiciService } from "../services/AiciService";
+import { AuthService } from "../services/AuthService";
 
 interface Props { }
 interface State extends BasePageState {
@@ -23,7 +25,20 @@ class Page extends BasePage<Props, State> {
             similarTo: "",
         };
     }
-    private searchClicked() {}
+    private async searchClicked() {
+        try {
+            await this.events.setLoading(true);
+
+            const token = await AuthService.getToken();
+            const ret = await AiciService.search(token, this.state.similarTo);
+
+            await this.events.setLoading(false);            
+        } 
+        catch(err) {
+            await this.events.setLoading(false);                        
+            await ErrorMessage(this, err);
+        }
+    }
     public render(): React.ReactNode {
         return (
             <Navigation
