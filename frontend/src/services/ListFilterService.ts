@@ -28,7 +28,7 @@ export class ListFilterService {
         });
     }
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<ListFilterDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/list_filter/" + guid,
             corelation: UUIDv4.generate(),
             token: token

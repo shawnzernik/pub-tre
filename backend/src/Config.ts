@@ -21,6 +21,12 @@ export class Config {
     public static jestTimeoutSeconds = Number.parseInt(process.env.JEST_TIMEOUT_SECONDS || "300");
     public static httpsLimit: string = process.env.HTTPS_LIMIT || "1024mb";
     public static tempDirectory: string = process.env.TEMP_DIRECTORY || "../temp";
-    static logLevel: LogLevels = process.env.LOG_LEVEL as LogLevels || "trace";
-    static logIndent: number = Number.parseInt(process.env.DB_PORT || "0");
+
+    public static logLevel: LogLevels = process.env.LOG_LEVEL as LogLevels || "trace";
+    public static logIndent: number = Number.parseInt(process.env.DB_PORT || "0");
+
+    public static embeddingModel: string = process.env.EMBEDDING_MODEL || "text-embedding-3-small";
+    public static qdrantUrl: string = process.env.QDRANT_URL || "http://localhost:6333";
+    public static qdrantCollection: string = process.env.QDRANT_COLLECTION || "aici";
+    public static qdrantVectorSize: number = Number.parseInt(process.env.QDRANT_VECTOR_SIZE || "1536");
 }

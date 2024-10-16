@@ -46,7 +46,7 @@ export class MembershipService {
     }
 
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<MembershipDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/membership/" + guid,
             corelation: UUIDv4.generate(),
             token: token

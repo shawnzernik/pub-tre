@@ -55,7 +55,9 @@ module.exports = {
         upload: "./src/pages/upload.tsx",
         finetune: "./src/pages/finetune.tsx",
         chat: "./src/pages/chat.tsx",
+        search: "./src/pages/search.tsx",
         dataset: "./src/pages/dataset.tsx",
+        prompt: "./src/pages/prompt.tsx",
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -146,7 +148,7 @@ module.exports = {
             template: "./src/template.html",
             filename: "../static/pages/upload.html",
             chunks: ["common", "upload"],
-            title: "Fine Tune"
+            title: "Upload Source Code"
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
@@ -162,9 +164,21 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
+            filename: "../static/pages/search.html",
+            chunks: ["common", "search"],
+            title: "Search"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
             filename: "../static/pages/dataset.html",
             chunks: ["common", "dataset"],
             title: "Data Set"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/template.html",
+            filename: "../static/pages/prompt.html",
+            chunks: ["common", "prompt"],
+            title: "Prompt"
         })
     ]
 };

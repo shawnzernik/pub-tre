@@ -15,7 +15,7 @@ export class AiciService extends BaseService {
         app.post("/api/v0/aici/chat", (req, resp) => { this.methodWrapper(req, resp, this.postChat) });
         app.post("/api/v0/aici/upload", (req, resp) => { this.methodWrapper(req, resp, this.postUpload) });
         app.get("/api/v0/aici/upload/:corelation", (req, resp) => { this.methodWrapper(req, resp, this.getUpload) });
-        app.post("/api/v0/aici/embedding", (req, resp) => { this.methodWrapper(req, resp, this.postEmbedding) });
+        app.post("/api/v0/aici/search", (req, resp) => { this.methodWrapper(req, resp, this.postSearch) });
     }
 
     public async postChat(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<AiciResponse> {
@@ -31,6 +31,19 @@ export class AiciService extends BaseService {
 
         AiciLogic.upload(logger, ds, req.body);
     }
+    public async postSearch(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<any> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Aici:Embedding", req, ds);
+
+        const obj = req.body;
+        if(!obj.input)
+            throw new Error("No input provided!  Expected TypeScript interface: `{ input: string, limit: number }`.");
+        if(!obj.limit)
+            throw new Error("No input provided!  Expected TypeScript interface: `{ input: string, limit: number }`.");
+
+        const ret = AiciLogic.search(logger, ds, obj.input, obj.limit);
+        return ret;
+    }
     public async getUpload(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<LogDto[]> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Aici:Upload", req, ds);
@@ -38,11 +51,5 @@ export class AiciService extends BaseService {
         const corelation = req.params["corelation"];
         const ret = await AiciLogic.getUploadLogs(logger, ds, corelation);
         return ret;
-    }
-    public async postEmbedding(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
-        await logger.trace();
-        await BaseService.checkSecurity(logger, "Aici:Embedding", req, ds);
-
-        await AiciLogic.upload(logger, ds, req.body);
     }
 }

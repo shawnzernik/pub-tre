@@ -17,6 +17,7 @@ import { ListFilterService } from "./services/ListFilterService";
 import { SettingService } from "./services/SettingService";
 import { AiciService } from "./services/AiciService";
 import { DatasetService } from "./services/DatasetService";
+import { PromptService } from "./services/PromptService";
 import { Logger } from "./Logger";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 
@@ -75,6 +76,7 @@ export class WebApp {
         new ListService(logger, this.app);
         new ListFilterService(logger, this.app);
         new SettingService(logger, this.app);
+        new PromptService(logger, this.app);
 
         new AiciService(logger, this.app);
         new DatasetService(logger, this.app);

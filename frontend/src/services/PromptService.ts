@@ -1,29 +1,29 @@
-import { PasswordDto } from "common/src/models/PasswordDto";
+import { PromptDto } from "common/src/models/PromptDto";
 import { FetchWrapper } from "./FetchWrapper";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 
-export class PasswordService {
-    public static async get(token: string, guid: string): Promise<PasswordDto> {
-        const ret = await FetchWrapper.get<PasswordDto>({
-            url: "/api/v0/password/" + guid,
+export class PromptService {
+    public static async get(token: string, guid: string): Promise<PromptDto> {
+        const ret = await FetchWrapper.get<PromptDto>({
+            url: "/api/v0/prompt/" + guid,
             corelation: UUIDv4.generate(),
             token: token
         });
         return ret;
     }
 
-    public static async list(token: string): Promise<PasswordDto[]> {
-        const ret = await FetchWrapper.get<PasswordDto[]>({
-            url: "/api/v0/passwords",
+    public static async list(token: string): Promise<PromptDto[]> {
+        const ret = await FetchWrapper.get<PromptDto[]>({
+            url: "/api/v0/prompts",
             corelation: UUIDv4.generate(),
             token: token
         });
         return ret;
     }
 
-    public static async save(token: string, dto: PasswordDto): Promise<void> {
+    public static async save(token: string, dto: PromptDto): Promise<void> {
         await FetchWrapper.post({
-            url: "/api/v0/password",
+            url: "/api/v0/prompt",
             body: dto,
             corelation: UUIDv4.generate(),
             token: token
@@ -32,7 +32,7 @@ export class PasswordService {
 
     public static async delete(token: string, guid: string): Promise<void> {
         await FetchWrapper.delete({
-            url: "/api/v0/password/" + guid,
+            url: "/api/v0/prompt/" + guid,
             corelation: UUIDv4.generate(),
             token: token
         });

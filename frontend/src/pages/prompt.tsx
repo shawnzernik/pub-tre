@@ -6,19 +6,18 @@ import { Heading } from "../components/Heading";
 import { Form } from "../components/Form";
 import { Field } from "../components/Field";
 import { Message as AiciMessage, MessageRole } from "common/src/models/aici/Message";
-import { DatasetDto } from "common/src/models/DatasetDto";
+import { PromptDto } from "common/src/models/PromptDto";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { Input } from "../components/Input";
-import { Checkbox } from "../components/Checkbox";
 import { TextArea } from "../components/TextArea";
-import { DatasetService } from "../services/DatasetService";
+import { PromptService } from "../services/PromptService";
 import { AuthService } from "../services/AuthService";
 import { Button } from "../components/Button";
 import { AiciService } from "../services/AiciService";
 
 interface Props { }
 interface State extends BasePageState {
-    model: DatasetDto;
+    model: PromptDto;
     messages: AiciMessage[];
 }
 
@@ -30,30 +29,27 @@ class Page extends BasePage<Props, State> {
             ...BasePage.defaultState,
             model: {
                 guid: UUIDv4.generate(),
-                includeInTraining: false,
-                isUploaded: false,
                 title: "",
                 json: ""
             },
             messages: []
         }
     }
-
     public async componentDidMount(): Promise<void> {
         try {
             await this.events.setLoading(true);
 
             const guid = this.queryString("guid");
             if (!guid)
-                throw new Error("You must save a chat history to create a new dataset.");
+                throw new Error("You must save a chat history to create a new prompt.");
 
             const token = await AuthService.getToken();
-            const dataset = await DatasetService.get(token, guid);
-            const messages = JSON.parse(dataset.json) as AiciMessage[];
+            const prompt = await PromptService.get(token, guid);
+            const messages = JSON.parse(prompt.json) as AiciMessage[];
 
             await this.updateState({
                 messages: messages,
-                model: dataset
+                model: prompt
             });
 
             await this.events.setLoading(false);
@@ -61,19 +57,6 @@ class Page extends BasePage<Props, State> {
         catch (err) {
             await ErrorMessage(this, err);
         }
-    }
-
-    private async resendClicked(index: number) {
-        await this.events.setLoading(true);
-
-        let newMessages: AiciMessage[] = [];
-
-        for (let cnt = 0; cnt < index + 1; cnt++) {
-            newMessages.push(this.state.messages[cnt]);
-        }
-
-        window.localStorage.setItem("Page.resendClicked", JSON.stringify(newMessages));
-        window.location.assign("chat.html");
     }
     private async removeClicked(target: number) {
         await this.events.setLoading(true);
@@ -85,11 +68,11 @@ class Page extends BasePage<Props, State> {
                 newMessages.push(msg);
         });
 
-        const newDataset = this.jsonCopy(this.state.model);
-        newDataset.json = JSON.stringify(newMessages);
+        const newPrompt = this.jsonCopy(this.state.model);
+        newPrompt.json = JSON.stringify(newMessages);
 
         await this.updateState({
-            model: newDataset,
+            model: newPrompt,
             messages: newMessages
         });
 
@@ -100,11 +83,11 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(true);
 
             const token = await AuthService.getToken();
-            await DatasetService.save(token, this.state.model);
+            await PromptService.save(token, this.state.model);
 
             await this.events.setLoading(false);
             await Dialogue(this, "Saved", "Your changes have been saved.");
-            window.location.replace("dataset.html?guid=" + this.state.model.guid);
+            window.location.replace("prompt.html?guid=" + this.state.model.guid);
         }
         catch (err) {
             await ErrorMessage(this, err);
@@ -116,7 +99,7 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(true);
 
             const token = await AuthService.getToken();
-            await DatasetService.delete(token, this.state.model.guid);
+            await PromptService.delete(token, this.state.model.guid);
 
             await this.events.setLoading(false);
             window.history.back();
@@ -136,10 +119,10 @@ class Page extends BasePage<Props, State> {
                 content: `Please provide a simple string title for the following JSON OpenAI message history.  Do not use markdown nor emojis.\n\n${JSON.stringify(this.state.messages)}`
             }]);
 
-            const newDataset = this.jsonCopy(this.state.model);
-            newDataset.title = chatResponse.choices[0].message.content;
+            const newPrompt = this.jsonCopy(this.state.model);
+            newPrompt.title = chatResponse.choices[0].message.content;
 
-            await this.updateState({ model: newDataset });
+            await this.updateState({ model: newPrompt });
             await this.events.setLoading(false);
         }
         catch (err) {
@@ -147,22 +130,35 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
-    async appendClicked(role: string) {
+    async appendClicked(role: string, index: number) {
         try {
             await this.events.setLoading(true);
+            
+            const newMessages: AiciMessage[] = [];
+            for(let cnt = 0; cnt < this.state.messages.length; cnt++) {
+                newMessages.push(this.state.messages[cnt]);
+                if(cnt == index){
+                    newMessages.push({
+                        role: role == "user"
+                            ? "user"
+                            : "assistant",
+                        content: ""
+                    });
+                    newMessages.push({
+                        role: role == "user"
+                            ? "assistant"
+                            : "user",
+                        content: ""
+                    });        
+                }
+            }
 
-            const newMessages = this.jsonCopy(this.state.messages);
-            newMessages.push({
-                role: role as MessageRole,
-                content: ""
-            });
-
-            const newDataset = this.jsonCopy(this.state.model);
-            newDataset.json = JSON.stringify(newMessages);    
+            const newPrompt = this.jsonCopy(this.state.model);
+            newPrompt.json = JSON.stringify(newMessages);
 
             await this.updateState({
                 messages: newMessages,
-                model: newDataset
+                model: newPrompt
             });
 
             await this.events.setLoading(false);
@@ -170,7 +166,7 @@ class Page extends BasePage<Props, State> {
         catch (err) {
             await ErrorMessage(this, err);
             await this.events.setLoading(false);
-        }        
+        }
     }
 
     private countLines(text: string) {
@@ -194,11 +190,11 @@ class Page extends BasePage<Props, State> {
                                 const newMessages = this.jsonCopy(this.state.messages);
                                 newMessages[index].content = value;
 
-                                const newDataset = this.jsonCopy(this.state.model);
-                                newDataset.json = JSON.stringify(newMessages);
+                                const newPrompt = this.jsonCopy(this.state.model);
+                                newPrompt.json = JSON.stringify(newMessages);
 
                                 await this.updateState({
-                                    model: newDataset,
+                                    model: newPrompt,
                                     messages: newMessages
                                 });
                             }}
@@ -207,15 +203,8 @@ class Page extends BasePage<Props, State> {
                     <Field>
                         {
                             msg.role == "user"
-                                ? <Button label="Resend" onClick={this.resendClicked.bind(this, index)} />
-                                : null
-                        }
-                        {
-                            msg.role == "user" && index + 1 == this.state.messages.length
-                                ? <Button label="Append" onClick={() => { this.appendClicked("assistant"); }} />
-                                : msg.role == "assistant" && index + 1 == this.state.messages.length
-                                    ? <Button label="Append" onClick={() => { this.appendClicked("user"); }} />
-                                    : null
+                                ? <Button label="Add A+U" onClick={() => { this.appendClicked("assistant", index); }} />
+                                : <Button label="Add U+A" onClick={() => { this.appendClicked("user", index); }} />
                         }
                         <Button label="Remove" onClick={this.removeClicked.bind(this, index)} />
                     </Field>
@@ -227,50 +216,24 @@ class Page extends BasePage<Props, State> {
             <Navigation
                 state={this.state} events={this.events}
                 topMenuGuid="a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4"
-                leftMenuGuid="6b8c801f-c6f9-42d6-8502-c2ea75287f26"
+                leftMenuGuid="2d926f48-3007-4912-b6e7-a55a2af65d62"
             >
-                <Heading level={1}>Dataset Edit</Heading>
+                <Heading level={1}>Prompt Edit</Heading>
                 <Form>
                     <Field label="GUID" size={3}>
                         <Input
                             value={this.state.model.guid}
                         />
                     </Field>
-                    <Field label="Uploaded" size={1}>
-                        <Checkbox
-                            checked={this.state.model.isUploaded}
-                            onChange={async (value) => {
-                                const newDataset = this.jsonCopy(this.state.model);
-                                newDataset.isUploaded = value;
-
-                                await this.updateState({
-                                    model: newDataset
-                                });
-                            }}
-                        />
-                    </Field>
-                    <Field label="Train On" size={1}>
-                        <Checkbox
-                            checked={this.state.model.includeInTraining}
-                            onChange={async (value) => {
-                                const newDataset = this.jsonCopy(this.state.model);
-                                newDataset.includeInTraining = value;
-
-                                await this.updateState({
-                                    model: newDataset
-                                });
-                            }}
-                        />
-                    </Field>
                     <Field label="Title">
                         <Input
                             value={this.state.model.title}
                             onChange={async (value) => {
-                                const newDataset = this.jsonCopy(this.state.model);
-                                newDataset.title = value;
+                                const newPrompt = this.jsonCopy(this.state.model);
+                                newPrompt.title = value;
 
                                 await this.updateState({
-                                    model: newDataset
+                                    model: newPrompt
                                 });
                             }}
                         />

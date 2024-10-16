@@ -24,6 +24,8 @@ import { DatasetEntity } from "./DatasetEntity";
 import { DatasetRepository } from "./DatasetRepository";
 import { LogRepository } from "./LogRepository";
 import { LogEntity } from "./LogEntity";
+import { PromptEntity } from "./PromptEntity";
+import { PromptRepository } from "./PromptRepository";
 
 export class EntitiesDataSource extends DataSource {
     public constructor() {
@@ -46,7 +48,8 @@ export class EntitiesDataSource extends DataSource {
                 ListFilterEntity,
                 SettingEntity,
                 DatasetEntity,
-                LogEntity
+                LogEntity,
+                PromptEntity,
             ],
         });
     }
@@ -147,5 +150,11 @@ export class EntitiesDataSource extends DataSource {
         if (!this._logRepository)
             this._logRepository = new LogRepository(LogEntity, this.createEntityManager(), this.createQueryRunner());
         return this._logRepository;
+    }
+    private _promptRepository: PromptRepository | undefined;
+    public promptRepository() {
+        if (!this._promptRepository)
+            this._promptRepository = new PromptRepository(PromptEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._promptRepository;
     }
 }

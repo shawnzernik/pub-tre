@@ -15,6 +15,18 @@ export class AiciService {
         return ret;
     }
 
+    public static async search(token: string, similarTo: string, limit: number): Promise<any> {
+        const ret = await FetchWrapper.post<any>({
+            url: "/api/v0/aici/search",
+            body: { 
+                input: similarTo,
+                limit: limit
+            },
+            corelation: UUIDv4.generate(),
+            token: token
+        });
+        return ret;
+    }
     private static async readFile(f: File): Promise<ArrayBuffer> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { ErrorMessage, Navigation } from "../components/Navigation";
+import { Dialogue, ErrorMessage, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Markdown } from "../components/Markdown";
 import { Heading } from "../components/Heading";
@@ -8,20 +8,18 @@ import { Form } from "../components/Form";
 import { Field } from "../components/Field";
 import { FlexRow } from "../components/FlexRow";
 import { Button } from "../components/Button";
-import { Input } from "../components/Input";
 import { AuthService } from "../services/AuthService";
 import { AiciService } from "../services/AiciService";
-import { LoginDto } from "common/src/models/LoginDto";
 
 interface Props { }
 interface State extends BasePageState {
     file: File | null;
     corelation: string | null;
     logs: string | null;
-    interval: NodeJS.Timeout | null;
 }
 
 class Page extends BasePage<Props, State> {
+    private interval: NodeJS.Timeout | null;
     public constructor(props: Props) {
         super(props);
 
@@ -30,7 +28,6 @@ class Page extends BasePage<Props, State> {
             file: null,
             corelation: null,
             logs: null,
-            interval: null
         };
     }
     private async uploadLogInterval() {
@@ -41,13 +38,16 @@ class Page extends BasePage<Props, State> {
         logContent += "|---|---|---|\n"
         logs.forEach((log) => {
             if (log.message)
-                logContent += `|${log.level}|${log.epoch.replace(/"/g, "")}|${log.message}|\n`;
+                logContent += `|${log.level}|${log.epoch.replace(/"/g, "")}|${log.message.replace(/\n/g, " ")}|\n`;
         });
 
-        if (logContent.includes("ALL DONE!"))
-            clearInterval(this.state.interval);
+        if (logContent.includes("ALL DONE!")) {
+            clearInterval(this.interval);
+            await Dialogue(this, "Done", "The dataset and vector DB have been updated.");
+        }
 
-        this.updateState({ logs: logContent })
+        await this.updateState({ logs: logContent })
+        await this.events.setLoading(false);
     }
     private async uploadClicked() {
         try {
@@ -60,9 +60,7 @@ class Page extends BasePage<Props, State> {
             const corelation = await AiciService.upload(token, this.state.file);
             await this.updateState({ corelation: corelation });
 
-            setInterval(this.uploadLogInterval.bind(this), 5 * 1000);
-
-            await this.events.setLoading(false);
+            this.interval = setInterval(this.uploadLogInterval.bind(this), 5 * 1000);
         }
         catch (err) {
             ErrorMessage(this, err);
@@ -76,9 +74,10 @@ class Page extends BasePage<Props, State> {
                 topMenuGuid="a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4"
                 leftMenuGuid="720fa4c9-20d0-407d-aff6-3dad45d155cc"
             >
-                <Heading level={1}>Upload ZIP File</Heading>
+                <Heading level={1}>Upload Source Code</Heading>
+                <p>Please upload a ZIP file - preferably from a GIT repo.  We will process the code by first asking the AI model to explain the code - this will be used for fine tuning.  Secondly, we'll generate embeddings for the file.</p>
                 <Form>
-                    <Field label="Upload File"><input
+                    <Field label="ZIP File"><input
                         type="file"
                         onChange={(e) => {
                             this.setState({

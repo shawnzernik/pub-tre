@@ -48,7 +48,7 @@ export class ListService {
     }
 
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<ListDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/list/" + guid,
             corelation: UUIDv4.generate(),
             token: token

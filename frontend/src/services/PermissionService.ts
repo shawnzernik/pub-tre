@@ -47,7 +47,7 @@ export class PermissionService {
     }
 
     public static async delete(token: string, guid: string): Promise<void> {
-        await FetchWrapper.delete<PermissionDto>({
+        await FetchWrapper.delete({
             url: "/api/v0/permission/" + guid,
             corelation: UUIDv4.generate(),
             token: token
