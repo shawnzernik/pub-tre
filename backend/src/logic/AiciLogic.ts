@@ -9,7 +9,6 @@ import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { DatasetEntity } from "../data/DatasetEntity";
 import { Logger } from "../Logger";
 import { LogEntity } from "../data/LogEntity";
-import { EmbeddingEntity } from "../data/EmbeddingEntity";
 import { QdrantClient } from "@qdrant/js-client-rest";
 
 /**
@@ -114,6 +113,33 @@ export class AiciLogic {
         const ds = new EntitiesDataSource();
         await ds.initialize();
         try {
+            // prepare database
+            await ds.datasetRepository().createQueryBuilder().delete()
+                .from("datasets")
+                .where("is_uploaded = TRUE")
+                .execute();
+
+            // prepare vector db
+            const qdrantClient = new QdrantClient({
+                url: Config.qdrantUrl
+            });
+
+            const collections = await qdrantClient.getCollections();
+            let collectionExists = collections.collections.some((pred) => { return pred.name === Config.qdrantCollection });
+            if (collectionExists)
+                await qdrantClient.deleteCollection(Config.qdrantCollection);
+
+            await qdrantClient.createCollection(
+                Config.qdrantCollection,
+                {
+                    vectors: {
+                        size: Config.qdrantVectorSize,
+                        distance: "Cosine"
+                    }
+                }
+            );
+
+            // extract file
             const uploadedFile = this.saveUpload(body, "zip");
             const extractedZipFolder = await this.extractZip(uploadedFile);
 
@@ -126,7 +152,7 @@ export class AiciLogic {
             const files = this.getFiles(logger, extractedZipFolder, includeRexExes, excludeRegExes);
             let logFile = "file,input,new,total,seconds,t/s\n";
 
-            // store explain for finetune
+            // update dataset
             let promises: Promise<void>[] = [];
             files.forEach((file, cnt) => {
                 promises.push(new Promise(async (resolve) => {
@@ -184,25 +210,7 @@ export class AiciLogic {
             });
             await Promise.all(promises);
 
-            // create embeddings
-            const qdrantClient = new QdrantClient({
-                url: Config.qdrantUrl
-            });
-
-            const collections = await qdrantClient.getCollections();
-            let collectionExists = collections.collections.some((pred) => { return pred.name === Config.qdrantCollection });
-            if (!collectionExists) {
-                await qdrantClient.createCollection(
-                    Config.qdrantCollection,
-                    {
-                        vectors: {
-                            size: Config.qdrantVectorSize,
-                            distance: "Cosine"
-                        }
-                    }
-                );
-            }
-
+            // update vector db
             promises = [];
             files.forEach((file, cnt) => {
                 promises.push(new Promise(async (resolve) => {
@@ -210,17 +218,11 @@ export class AiciLogic {
                         await logger.log(`Embedding ${cnt + 1} of ${files.length}`);
                         await logger.log(`Embedding ${cnt + 1} of ${files.length} - ${file}`);
 
-                        let userMarkdown = "File '%FILE%':\n\n```\n%CONTENT%\n```";
-
                         const mdFileName = path.join("~", file);
-                        userMarkdown = userMarkdown.replace("%FILE%", mdFileName);
-
-                        const fileContents = fs.readFileSync(path.join(extractedZipFolder, file), { encoding: "utf8" });
-                        userMarkdown = userMarkdown.replace("%CONTENT%", fileContents.replace(/`/, "\\`"));
 
                         const request: EmbeddingRequest = {
                             model: Config.embeddingModel,
-                            input: userMarkdown
+                            input: mdFileName
                         };
 
                         await logger.log(`Embedding ${cnt + 1} of ${files.length} - AI to Embed`);
@@ -231,22 +233,6 @@ export class AiciLogic {
                         await logger.log(`Embedding ${cnt + 1} of ${files.length} - Input: ${response.usage.prompt_tokens}; Total: ${response.usage.total_tokens}`);
                         await logger.log(`Embedding ${cnt + 1} of ${files.length} - Seconds: ${(ended - started) / 1000}; T/S: ${response.usage.total_tokens / ((ended - started) / 1000)}`);
 
-                        await logger.log(`Embedding ${cnt + 1} of ${files.length} - Load/Create Dataset`);
-
-                        let embedding = await ds.embeddingRepository().findOneBy({ title: mdFileName });
-                        if (!embedding) {
-                            embedding = new EmbeddingEntity();
-                            embedding.guid = UUIDv4.generate();
-                            embedding.title = mdFileName;
-                        }
-                        embedding.input = request.input as string;
-                        embedding.promptTokens = response.usage.prompt_tokens;
-                        embedding.totalTokens = response.usage.total_tokens;
-                        embedding.embeddingJson = JSON.stringify(response.data[0].embedding);
-
-                        await logger.log(`Embedding ${cnt + 1} of ${files.length} - Saving to Database`);
-                        await ds.embeddingRepository().save(embedding);
-
                         await logger.log(`Embedding ${cnt + 1} of ${files.length} - Saving to Qdrant`);
                         await qdrantClient.upsert(
                             Config.qdrantCollection,
@@ -254,13 +240,13 @@ export class AiciLogic {
                                 wait: true,
                                 points: [
                                     {
-                                        id: embedding.guid,
+                                        id: UUIDv4.generate(),
                                         vector: response.data[0].embedding,
                                         payload: {
-                                            title: embedding.title,
-                                            content: embedding.input,
-                                            promptTokens: embedding.promptTokens,
-                                            totalTokens: embedding.totalTokens
+                                            title: mdFileName,
+                                            content: mdFileName,
+                                            promptTokens: response.usage.prompt_tokens,
+                                            totalTokens: response.usage.total_tokens
                                         }
                                     }
                                 ]
@@ -434,12 +420,14 @@ export class AiciLogic {
      * @returns A promise that resolves to the path of the extracted folder.
      */
     private static async extractZip(zipFileName: string): Promise<string> {
-        const uploadFolder = path.join(Config.tempDirectory, zipFileName.replace(path.extname(zipFileName), ""));
-
+        let uploadFolder = path.join(Config.tempDirectory, zipFileName.replace(path.extname(zipFileName), ""));
         if (fs.existsSync(uploadFolder))
             fs.rmSync(uploadFolder, { recursive: true, force: true });
         fs.mkdirSync(uploadFolder, { recursive: true });
 
+        const ret = uploadFolder;
+
+        uploadFolder = Config.tempDirectory;
         return new Promise((resolve, reject) => {
             const zip = new AdmZip(zipFileName);
             zip.extractAllToAsync(uploadFolder, true, false, () => {

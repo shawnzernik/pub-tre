@@ -1,11 +1,22 @@
 import fs from "fs";
 
 class Program {
-    private document = "docs/DataAccess.md";
-    private regex = /<!!\s([^\s]+\/[^\s]+\.[^\s]+)\s!!\/>/g;
+    private document = "docs/BackendService.md";
+    private name = "Prompt";
+    private tableName = "prompt";
+    private regex = /<!!\sFILE\s([^\s]+\/[^\s]+\.[^\s]+)\s!!\/>/g;
+
+    private values: Dictionary<string> = {
+        NAME: "Prompt",
+        TABLENAME: "prompt"
+    };
 
     public execute() {
         let markdown = fs.readFileSync(this.document, { encoding: "utf8" });
+
+        markdown = markdown.replace(/\%NAME\%/g, this.name);
+        markdown = markdown.replace(/\%TABLENAME\%/g, this.tableName);
+        
         const matches = [...markdown.matchAll(this.regex)];
 
         matches.forEach((match) => {

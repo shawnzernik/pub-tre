@@ -17,6 +17,7 @@ import { ListFilterService } from "./services/ListFilterService";
 import { SettingService } from "./services/SettingService";
 import { AiciService } from "./services/AiciService";
 import { DatasetService } from "./services/DatasetService";
+import { PromptService } from "./services/PromptService";
 import { Logger } from "./Logger";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 
@@ -33,17 +34,17 @@ export class WebApp {
 
         this.app.use(async (req, res, next) => {
             let corelation = "";
-            if (req.headers["Corelation"] && req.headers["Corelation"].length === 36) {
-                corelation = req.headers["Corelation"] as string;
-            } else if (req.headers["Corelation"] && req.headers["Corelation"][0] && req.headers["Corelation"][0].length === 36) {
-                corelation = req.headers["Corelation"]![0] as string;
+            if (req.headers["corelation"] && req.headers["corelation"].length === 36) {
+                corelation = req.headers["corelation"] as string;
+            } else if (req.headers["corelation"] && req.headers["corelation"][0] && req.headers["corelation"][0].length === 36) {
+                corelation = req.headers["corelation"]![0] as string;
             } else {
                 corelation = UUIDv4.generate();
                 await logger.always(`Injecting Corelation ${corelation}`);
             }
-            req.headers["Corelation"] = [corelation];
+            req.headers["corelation"] = [corelation];
 
-            const newLogger = new Logger(req.headers["Corelation"][0]);
+            const newLogger = new Logger(req.headers["corelation"][0]);
             await newLogger.always(`${req.method} ${req.originalUrl}`);
 
             next();
@@ -75,6 +76,7 @@ export class WebApp {
         new ListService(logger, this.app);
         new ListFilterService(logger, this.app);
         new SettingService(logger, this.app);
+        new PromptService(logger, this.app);
 
         new AiciService(logger, this.app);
         new DatasetService(logger, this.app);

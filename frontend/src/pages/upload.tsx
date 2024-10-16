@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { ErrorMessage, Navigation } from "../components/Navigation";
+import { Dialogue, ErrorMessage, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Markdown } from "../components/Markdown";
 import { Heading } from "../components/Heading";
@@ -16,10 +16,10 @@ interface State extends BasePageState {
     file: File | null;
     corelation: string | null;
     logs: string | null;
-    interval: NodeJS.Timeout | null;
 }
 
 class Page extends BasePage<Props, State> {
+    private interval: NodeJS.Timeout | null;
     public constructor(props: Props) {
         super(props);
 
@@ -28,7 +28,6 @@ class Page extends BasePage<Props, State> {
             file: null,
             corelation: null,
             logs: null,
-            interval: null
         };
     }
     private async uploadLogInterval() {
@@ -42,10 +41,13 @@ class Page extends BasePage<Props, State> {
                 logContent += `|${log.level}|${log.epoch.replace(/"/g, "")}|${log.message.replace(/\n/g, " ")}|\n`;
         });
 
-        if (logContent.includes("ALL DONE!"))
-            clearInterval(this.state.interval);
+        if (logContent.includes("ALL DONE!")) {
+            clearInterval(this.interval);
+            await Dialogue(this, "Done", "The dataset and vector DB have been updated.");
+        }
 
-        this.updateState({ logs: logContent })
+        await this.updateState({ logs: logContent })
+        await this.events.setLoading(false);
     }
     private async uploadClicked() {
         try {
@@ -58,9 +60,7 @@ class Page extends BasePage<Props, State> {
             const corelation = await AiciService.upload(token, this.state.file);
             await this.updateState({ corelation: corelation });
 
-            setInterval(this.uploadLogInterval.bind(this), 5 * 1000);
-
-            await this.events.setLoading(false);
+            this.interval = setInterval(this.uploadLogInterval.bind(this), 5 * 1000);
         }
         catch (err) {
             ErrorMessage(this, err);

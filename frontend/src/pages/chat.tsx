@@ -13,6 +13,8 @@ import { Theme } from "../components/Theme";
 import { DatasetDto } from "common/src/models/DatasetDto";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { DatasetService } from "../services/DatasetService";
+import { PromptDto } from "common/src/models/PromptDto";
+import { PromptService } from "../services/PromptService";
 
 interface Props { }
 interface State extends BasePageState {
@@ -115,13 +117,14 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
-    private async saveClicked() {
+    private async saveDatasetClicked() {
         try {
             await this.events.setLoading(true);
 
             const dto: DatasetDto = {
                 guid: UUIDv4.generate(),
                 includeInTraining: false,
+                isUploaded: false,
                 title: Date.now().toString(),
                 json: JSON.stringify(this.state.messages)
             };
@@ -131,6 +134,28 @@ class Page extends BasePage<Props, State> {
 
             await this.events.setLoading(false);
             await Dialogue(this, "Saved", "The conversation has been saved to datasets!");
+        }
+        catch (err) {
+            await ErrorMessage(this, err);
+            await this.events.setLoading(false);
+        }
+    }
+
+    private async savePromptClicked() {
+        try {
+            await this.events.setLoading(true);
+
+            const dto: PromptDto = {
+                guid: UUIDv4.generate(),
+                title: Date.now().toString(),
+                json: JSON.stringify(this.state.messages)
+            };
+
+            const token = await AuthService.getToken();
+            await PromptService.save(token, dto);
+
+            await this.events.setLoading(false);
+            await Dialogue(this, "Saved", "The conversation has been saved to prompts!");
         }
         catch (err) {
             await ErrorMessage(this, err);
@@ -187,7 +212,8 @@ class Page extends BasePage<Props, State> {
                 <FlexRow gap="1em">
                     <Button label="Submit" onClick={this.submitClicked.bind(this)} />
                     <Button label="Reset" onClick={this.resetClicked.bind(this)} />
-                    <Button label="Save" onClick={this.saveClicked.bind(this)} />
+                    <Button label="Save Dataset" onClick={this.saveDatasetClicked.bind(this)} />
+                    <Button label="Save Prompt" onClick={this.savePromptClicked.bind(this)} />
                 </FlexRow>
             </Navigation>
         );

@@ -30,7 +30,7 @@ SQL_FILES=(
     "tables/list_filters.sql"
     "tables/datasets.sql"
     "tables/logs.sql"
-    "tables/embeddings.sql"
+    "tables/prompts.sql"
     "foreignkeys/memberships.sql"
     "foreignkeys/passwords.sql"
     "foreignkeys/permissions.sql"
@@ -43,6 +43,7 @@ SQL_FILES=(
     "data/lists.sql"
     "data/settings.sql"
     "data/datasets.sql"
+    "data/prompts.sql"
 )
 
 for SQL_FILE in "${SQL_FILES[@]}"; do

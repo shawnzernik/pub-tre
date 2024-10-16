@@ -18,7 +18,8 @@ BEGIN
     ('1a5073f4-5be7-4b01-af23-11aff07485f3', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 2, 'Fine Tune', 'easel-fill', '/static/pages/finetune.html'),
     ('f8d6fabe-c73a-4dac-bb4b-c85c776c45c1', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 3, 'Search', 'search', '/static/pages/search.html'),
     ('b3d886a8-dd3d-426a-9ddf-1e18cbb7e224', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 4, 'Chat', 'chat-fill', '/static/pages/chat.html'),
-    ('6b8c801f-c6f9-42d6-8502-c2ea75287f26', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 5, 'Datasets', 'backpack-fill', '/static/pages/lists.html?url_key=datasets'),
+    ('2d926f48-3007-4912-b6e7-a55a2af65d62', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 5, 'Prompts', 'chat-dots-fill', '/static/pages/lists.html?url_key=prompts'),
+    ('6b8c801f-c6f9-42d6-8502-c2ea75287f26', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 6, 'Datasets', 'backpack-fill', '/static/pages/lists.html?url_key=datasets'),
 
     ('b1e3c680-0f62-4931-8a68-4be9b4b070f7', NULL, 3, 'System', 'gear-fill', ''),
     ('67fa4231-5b8e-4639-89cb-5f15a9207a83', 'b1e3c680-0f62-4931-8a68-4be9b4b070f7', 1, 'Users', 'people-fill', '/static/pages/lists.html?url_key=users'),

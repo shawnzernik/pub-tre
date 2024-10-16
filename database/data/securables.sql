@@ -53,5 +53,9 @@ INSERT INTO "securables" ("guid", "display_name") VALUES
 ('ef6fcf59-5015-47fb-9059-6ab8714d6e29', 'Dataset:List'),
 ('0d2b41bb-3552-4bcf-8612-34bf2a842929', 'Dataset:Read'),
 ('7d511755-ab19-4f30-bdb4-5a4e05adb0d6', 'Dataset:Save'),
-('d8a01e3b-d76e-4763-9c68-de36d51ea965', 'Dataset:Delete')
+('d8a01e3b-d76e-4763-9c68-de36d51ea965', 'Dataset:Delete'),
+('15cfe365-45ff-4d5a-b581-bc1ea3875416', 'Prompt:List'),
+('70dde75e-1ffb-47a8-b837-1f726aae3bd4', 'Prompt:Read'),
+('cb7811c6-f091-4467-b57f-7ec269c00e24', 'Prompt:Save'),
+('25ebaceb-f6e6-41db-84e8-8b721ba753e7', 'Prompt:Delete')
 ;

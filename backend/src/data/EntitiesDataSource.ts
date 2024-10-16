@@ -24,8 +24,8 @@ import { DatasetEntity } from "./DatasetEntity";
 import { DatasetRepository } from "./DatasetRepository";
 import { LogRepository } from "./LogRepository";
 import { LogEntity } from "./LogEntity";
-import { EmbeddingEntity } from "./EmbeddingEntity";
-import { EmbeddingRepository } from "./EmbeddingRepository";
+import { PromptEntity } from "./PromptEntity";
+import { PromptRepository } from "./PromptRepository";
 
 export class EntitiesDataSource extends DataSource {
     public constructor() {
@@ -49,7 +49,7 @@ export class EntitiesDataSource extends DataSource {
                 SettingEntity,
                 DatasetEntity,
                 LogEntity,
-                EmbeddingEntity
+                PromptEntity,
             ],
         });
     }
@@ -151,10 +151,10 @@ export class EntitiesDataSource extends DataSource {
             this._logRepository = new LogRepository(LogEntity, this.createEntityManager(), this.createQueryRunner());
         return this._logRepository;
     }
-    private _embeddingRepository: EmbeddingRepository | undefined;
-    public embeddingRepository() {
-        if (!this._embeddingRepository)
-            this._embeddingRepository = new EmbeddingRepository(EmbeddingEntity, this.createEntityManager(), this.createQueryRunner());
-        return this._embeddingRepository;
+    private _promptRepository: PromptRepository | undefined;
+    public promptRepository() {
+        if (!this._promptRepository)
+            this._promptRepository = new PromptRepository(PromptEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._promptRepository;
     }
 }
