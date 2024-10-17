@@ -9,7 +9,15 @@ import { UserEntity } from "../data/UserEntity";
 import { PasswordLogic } from "../logic/PasswordLogic";
 import { Logger } from "../Logger";
 
+/**
+ * Service for handling authentication related operations.
+ */
 export class AuthService extends BaseService {
+    /**
+     * Creates an instance of AuthService.
+     * @param logger - Logger instance for logging purposes.
+     * @param app - Express application instance.
+     */
     public constructor(logger: Logger, app: express.Express) {
         super();
 
@@ -24,6 +32,13 @@ export class AuthService extends BaseService {
         app.post("/api/v0/auth/password", (req, resp) => { this.methodWrapper(req, resp, this.postPassword) });
     }
 
+    /**
+     * Retrieves user information.
+     * @param logger - Logger instance for logging purposes.
+     * @param req - Express request object.
+     * @param ds - Data source for accessing entities.
+     * @returns Promise resolving to the UserDto object.
+     */
     public async getUser(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<UserDto> {
         await logger.trace();
         const logic = await BaseService.checkSecurity(logger, "Auth:Get:User", req, ds);
@@ -34,6 +49,14 @@ export class AuthService extends BaseService {
 
         return ret;
     }
+
+    /**
+     * Updates user information.
+     * @param logger - Logger instance for logging purposes.
+     * @param req - Express request object containing user data.
+     * @param ds - Data source for accessing entities.
+     * @returns Promise resolving to void.
+     */
     public async postUser(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Auth:Post:User", req, ds);
@@ -48,6 +71,14 @@ export class AuthService extends BaseService {
 
         await ds.userRepository().save([entity]);
     }
+
+    /**
+     * Updates the password for the user.
+     * @param logger - Logger instance for logging purposes.
+     * @param req - Express request object containing password data.
+     * @param ds - Data source for accessing entities.
+     * @returns Promise resolving to void.
+     */
     public async postPassword(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Auth:Post:Password", req, ds);
@@ -59,6 +90,14 @@ export class AuthService extends BaseService {
 
         await ds.passwordRepository().save([passEntity]);
     }
+
+    /**
+     * Authenticates a user and generates a login token.
+     * @param logger - Logger instance for logging purposes.
+     * @param req - Express request object containing login credentials.
+     * @param ds - Data source for accessing entities.
+     * @returns Promise resolving to the generated token.
+     */
     public async postLogin(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<string> {
         await logger.trace();
 
@@ -66,18 +105,42 @@ export class AuthService extends BaseService {
         const auth = await AuthLogic.passwordLogin(ds, bodyJson["emailAddress"], bodyJson["password"]);
         return auth.tokenize();
     }
+
+    /**
+     * Retrieves the public key for JWT verification.
+     * @param logger - Logger instance for logging purposes.
+     * @param req - Express request object.
+     * @param ds - Data source for accessing entities.
+     * @returns Promise resolving to the public key string.
+     */
     public async getPublicKey(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<string> {
         await logger.trace();
 
         const content = fs.readFileSync(Config.jwtPublicKeyFile, { encoding: "utf8" });
         return content;
     }
+
+    /**
+     * Authenticates an anonymous user and generates a token.
+     * @param logger - Logger instance for logging purposes.
+     * @param req - Express request object.
+     * @param ds - Data source for accessing entities.
+     * @returns Promise resolving to the generated token.
+     */
     public async getAnonymous(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<string> {
         await logger.trace();
 
         const auth = await AuthLogic.anonymousLogin(ds);
         return auth.tokenize();
     }
+
+    /**
+     * Renews the user's token based on the provided authorization header.
+     * @param logger - Logger instance for logging purposes.
+     * @param req - Express request object containing the authorization header.
+     * @param ds - Data source for accessing entities.
+     * @returns Promise resolving to the new token.
+     */
     public async postRenew(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<string> {
         await logger.trace();
 

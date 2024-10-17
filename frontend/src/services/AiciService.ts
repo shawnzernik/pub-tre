@@ -15,9 +15,9 @@ export class AiciService {
         return ret;
     }
 
-    public static async search(token: string, similarTo: string, limit: number): Promise<any> {
+    public static async search(token: string, collection: string, similarTo: string, limit: number): Promise<any> {
         const ret = await FetchWrapper.post<any>({
-            url: "/api/v0/aici/search",
+            url: "/api/v0/aici/search/" + collection,
             body: { 
                 input: similarTo,
                 limit: limit

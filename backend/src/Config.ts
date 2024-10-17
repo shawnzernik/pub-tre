@@ -26,7 +26,12 @@ export class Config {
     public static logIndent: number = Number.parseInt(process.env.DB_PORT || "0");
 
     public static embeddingModel: string = process.env.EMBEDDING_MODEL || "text-embedding-3-small";
+    public static embeddingBytesPerToken: number = Number.parseInt(process.env.EMBEDDING_BYTES_PER_TOKEN || "3");
+    public static embeddingMaxTokens: number = Number.parseInt(process.env.EMBEDDING_MAX_TOKENS || "8192");
+
     public static qdrantUrl: string = process.env.QDRANT_URL || "http://localhost:6333";
-    public static qdrantCollection: string = process.env.QDRANT_COLLECTION || "aici";
+    public static qdrantNameCollection: string = process.env.QDRANT_FILE_CONTENT_COLLECTION || "name";
+    public static qdrantContentCollection: string = process.env.QDRANT_FILE_CONTENT_COLLECTION || "content";
+    public static qdrantExplanationCollection: string = process.env.QDRANT_FILE_EXPLANATION_COLLECTION || "explanation";
     public static qdrantVectorSize: number = Number.parseInt(process.env.QDRANT_VECTOR_SIZE || "1536");
 }
