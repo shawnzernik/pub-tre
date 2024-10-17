@@ -2,9 +2,11 @@ import express from "express";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { Response as AiciResponse } from "common/src/models/aici/Response";
-import { AiciLogic } from "../logic/AiciLogic";
 import { Logger } from "../Logger";
 import { LogDto } from "common/src/models/LogDto";
+import { ApiLogic } from "../logic/aici/ApiLogic";
+import { UploadLogic } from "../logic/aici/UploadLogic";
+import { VectorLogic } from "../logic/aici/VectorLogic";
 
 /**
  * AiciService class that implements various APIs related to chat, upload, and search functionalities.
@@ -40,7 +42,7 @@ export class AiciService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Aici:Chat", req, ds);
 
-        const aiResponse: AiciResponse = await AiciLogic.chat(ds, req.body);
+        const aiResponse: AiciResponse = await ApiLogic.chat(ds, req.body);
         return aiResponse;
     }
 
@@ -56,7 +58,7 @@ export class AiciService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Aici:Upload", req, ds);
 
-        AiciLogic.upload(logger, ds, req.body);
+        UploadLogic.upload(logger, req.body);
     }
 
     /**
@@ -78,7 +80,7 @@ export class AiciService extends BaseService {
         if (!obj.limit)
             throw new Error("No input provided!  Expected TypeScript interface: `{ input: string, limit: number }`.");
 
-        const ret = AiciLogic.search(logger, ds, collection, obj.input, obj.limit);
+        const ret = VectorLogic.search(ds, collection, obj.input, obj.limit);
         return ret;
     }
 
@@ -95,7 +97,7 @@ export class AiciService extends BaseService {
         await BaseService.checkSecurity(logger, "Aici:Upload", req, ds);
 
         const corelation = req.params["corelation"];
-        const ret = await AiciLogic.getUploadLogs(logger, ds, corelation);
+        const ret = await UploadLogic.getUploadLogs(ds, corelation);
         return ret;
     }
 }
