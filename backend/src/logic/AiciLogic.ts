@@ -10,57 +10,9 @@ import { DatasetEntity } from "../data/DatasetEntity";
 import { Logger } from "../Logger";
 import { LogEntity } from "../data/LogEntity";
 import { QdrantClient } from "@qdrant/js-client-rest";
-
-/**
- * Represents an upload to the Aici system.
- */
-export interface AiciUpload {
-    /** The name of the file being uploaded. */
-    file: string;
-    /** The base64-encoded contents of the file. */
-    contents: string;
-}
-
-/**
- * Represents a request for generating embeddings.
- */
-interface EmbeddingRequest {
-    /** The model to use for generating embeddings. */
-    model: string;
-    /** The input data for which embeddings are to be generated. */
-    input: string | string[] | number[] | number[][];
-}
-
-/**
- * Represents a list of embeddings returned from the API.
- */
-interface EmbeddingList {
-    /** The type of the object returned. */
-    object: string;
-    /** The array of embeddings. */
-    data: Embedding[];
-    /** The model used to generate the embeddings. */
-    model: string;
-    /** Usage statistics for the embedding request. */
-    usage: {
-        /** Number of prompt tokens used. */
-        prompt_tokens: number;
-        /** Total number of tokens used. */
-        total_tokens: number;
-    }
-}
-
-/**
- * Represents a single embedding.
- */
-interface Embedding {
-    /** The type of the object returned. */
-    object: string;
-    /** The embedding vector. */
-    embedding: number[];
-    /** The index of the embedding in the list. */
-    index: number;
-}
+import { UploadDto } from "../models/UploadDto";
+import { EmbeddingListDto } from "../models/EmbeddingListDto";
+import { EmbeddingRequestDto } from "../models/EmbeddingRequestDto";
 
 /**
  * Contains logic for interacting with the Aici API, including chat and embedding functionalities.
@@ -110,7 +62,7 @@ export class AiciLogic {
      * @returns A promise that resolves when the entire upload process is complete.
      * @throws Will throw an error if file processing fails or database operations encounter issues.
      */
-    public static async upload(logger: Logger, do_not_use: EntitiesDataSource, body: AiciUpload): Promise<void> {
+    public static async upload(logger: Logger, do_not_use: EntitiesDataSource, body: UploadDto): Promise<void> {
         const ds = new EntitiesDataSource();
         await ds.initialize();
         try {
@@ -151,48 +103,46 @@ export class AiciLogic {
 
                         const fileContents = fs.readFileSync(path.join(extractedZipFolder, file), { encoding: "utf8" });
 
-                        await logger.log(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - Explain`);
                         const messages: Message[] = await this.getExplanation(cnt + 1, files.length, logger, ds, fileName, fileContents);
                         await this.saveMessagesToDataset(cnt + 1, files.length, logger, ds, fileName, messages);
 
                         let embeddingResponse;
-                        try {
-                            await logger.log(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - Embed name`);
-                            embeddingResponse = await this.getEmbedding(cnt + 1, files.length, logger, ds, fileName);
-                            await this.saveToVectorDb(cnt + 1, files.length, logger, qdrantClient, Config.qdrantNameCollection, embeddingResponse, fileName, fileContents);
-                        }
-                        catch (err) {
-                            errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - name ERROR: ${(err as Error).message}`);
-                        }
+                        if (fileContents.length / Config.embeddingBytesPerToken > Config.embeddingMaxTokens)
+                            errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - content.tokens > ${Config.embeddingMaxTokens}`);
+                        if (fileContents.length / Config.embeddingBytesPerToken > Config.embeddingMaxTokens)
+                            errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - explanation.tokens > ${Config.embeddingMaxTokens}`);
 
-                        try {
-                            if (fileContents.length / Config.embeddingBytesPerToken > Config.embeddingMaxTokens) {
-                                errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - content.tokens > ${Config.embeddingMaxTokens}`);
-                            } else {
-                                await logger.log(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - Embed content`);
+                        if (!(
+                            fileContents.length / Config.embeddingBytesPerToken > Config.embeddingMaxTokens
+                            || fileContents.length / Config.embeddingBytesPerToken > Config.embeddingMaxTokens
+                        )) {
+                            try {
+                                embeddingResponse = await this.getEmbedding(cnt + 1, files.length, logger, ds, fileName);
+                                await this.saveToVectorDb(cnt + 1, files.length, logger, qdrantClient, Config.qdrantNameCollection, embeddingResponse, fileName, fileContents);
+                            }
+                            catch (err) {
+                                errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - name ERROR: ${(err as Error).message}`);
+                            }
+
+                            try {
                                 embeddingResponse = await this.getEmbedding(cnt + 1, files.length, logger, ds, fileContents);
                                 await this.saveToVectorDb(cnt + 1, files.length, logger, qdrantClient, Config.qdrantContentCollection, embeddingResponse, fileName, fileContents);
                             }
-                        }
-                        catch (err) {
-                            errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - content ERROR: ${(err as Error).message}`);
-                        }
+                            catch (err) {
+                                errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - content ERROR: ${(err as Error).message}`);
+                            }
 
-                        try {
-                            if (fileContents.length / Config.embeddingBytesPerToken > Config.embeddingMaxTokens) {
-                                errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - explanation.tokens > ${Config.embeddingMaxTokens}`);
-                            } else {
-                                await logger.log(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - Embed explanation`);
+                            try {
                                 const explanation = messages[messages.length - 1].content;
                                 embeddingResponse = await this.getEmbedding(cnt + 1, files.length, logger, ds, explanation);
                                 await this.saveToVectorDb(cnt + 1, files.length, logger, qdrantClient, Config.qdrantExplanationCollection, embeddingResponse, fileName, explanation);
                             }
-                        }
-                        catch (err) {
-                            errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - explanation ERROR: ${(err as Error).message}`);
+                            catch (err) {
+                                errors.push(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - explanation ERROR: ${(err as Error).message}`);
+                            }
                         }
 
-                        await logger.log(`Aici.upload() - ${cnt + 1} of ${files.length} - ${fileName} - COMPLETED ${resolved + 1} of ${files.length}`);
+                        await logger.log(`Aici.upload() - COMPLETED ${resolved + 1} of ${files.length}`);
                         resolved += 1;
                         resolve();
                     }
@@ -205,7 +155,7 @@ export class AiciLogic {
             await Promise.all(promises);
 
             for (let cnt = 0; cnt < errors.length; cnt++)
-                await logger.log(errors[cnt]);
+                await logger.error(errors[cnt]);
 
             await logger.log("ALL DONE!");
         }
@@ -225,8 +175,7 @@ export class AiciLogic {
      * @param fileName The name of the processed file.
      * @param fileContents The contents of the processed file.
      */
-    private static async saveToVectorDb(current: number, max: number, logger: Logger, qdrantClient: QdrantClient, collection: string, embeddingResponse: EmbeddingList, fileName: string, fileContents: string) {
-        await logger.log(`AiciLogic.saveToVectorDb() - ${current} of ${max} - Saving`);
+    private static async saveToVectorDb(current: number, max: number, logger: Logger, qdrantClient: QdrantClient, collection: string, embeddingResponse: EmbeddingListDto, fileName: string, fileContents: string) {
         await qdrantClient.upsert(
             collection,
             {
@@ -257,14 +206,14 @@ export class AiciLogic {
      * @returns A promise that resolves to the embedding list for the specified content.
      * @throws Will throw an error if the embedding generation fails.
      */
-    private static async getEmbedding(current: number, max: number, logger: Logger, ds: EntitiesDataSource, fileName: string): Promise<EmbeddingList> {
-        const request: EmbeddingRequest = {
+    private static async getEmbedding(current: number, max: number, logger: Logger, ds: EntitiesDataSource, fileName: string): Promise<EmbeddingListDto> {
+        const request: EmbeddingRequestDto = {
             model: Config.embeddingModel,
             input: fileName
         };
 
         const started = Date.now();
-        const response: EmbeddingList = await AiciLogic.embedding(ds, request);
+        const response: EmbeddingListDto = await AiciLogic.embedding(ds, request);
         const ended = Date.now();
 
         await logger.log(`AiciLogic.getEmbedding() - ${current} of ${max} - Input: ${response.usage.prompt_tokens}; Total: ${response.usage.total_tokens}`);
@@ -293,7 +242,6 @@ export class AiciLogic {
         }
         dataset.json = JSON.stringify(messages);
 
-        await logger.log(`AiciLogic.saveMessagesToDataset() - ${current} of ${max} - Saving`);
         await ds.datasetRepository().save(dataset);
     }
 
@@ -370,11 +318,11 @@ export class AiciLogic {
     public static async search(logger: Logger, ds: EntitiesDataSource, collection: string, content: string, limit: number): Promise<any> {
         try {
             // Generate embedding for the search content
-            const embeddingRequest: EmbeddingRequest = {
+            const embeddingRequest: EmbeddingRequestDto = {
                 model: Config.embeddingModel,
                 input: content
             };
-            const embeddingResponse: EmbeddingList = await this.embedding(ds, embeddingRequest);
+            const embeddingResponse: EmbeddingListDto = await this.embedding(ds, embeddingRequest);
             const embeddingVector = embeddingResponse.data[0].embedding;
 
             const qdrantClient = new QdrantClient({
@@ -382,7 +330,6 @@ export class AiciLogic {
             });
 
             // Perform vector search in Qdrant
-            await logger.log(`Performing vector search in Qdrant for content: "${content}"`);
             const searchResponse = await qdrantClient.search(
                 collection,
                 {
@@ -406,7 +353,7 @@ export class AiciLogic {
      * @returns A promise that resolves to the list of embeddings retrieved from the Aici API.
      * @throws Will throw an error if the HTTP request fails or if the response is not ok.
      */
-    private static async embedding(ds: EntitiesDataSource, request: EmbeddingRequest): Promise<EmbeddingList> {
+    private static async embedding(ds: EntitiesDataSource, request: EmbeddingRequestDto): Promise<EmbeddingListDto> {
         const urlSetting = await ds.settingRepository().findByKey("Aici:URL");
         const apiKeySetting = await ds.settingRepository().findByKey("Aici:API Key");
         const fetchResponse = await fetch(`${urlSetting.value}/v1/embeddings`, {
@@ -424,7 +371,7 @@ export class AiciLogic {
         }
 
         const aiResponse = await fetchResponse.json();
-        return aiResponse as EmbeddingList;
+        return aiResponse as EmbeddingListDto;
     }
 
     /**
@@ -464,7 +411,7 @@ export class AiciLogic {
                 include = include || regex.test(name.toLowerCase());
             });
             if (!include) {
-                logger.log("Not Included - " + name);
+                logger.log("(-) " + name);
                 return;
             }
 
@@ -473,11 +420,11 @@ export class AiciLogic {
                 exclude = exclude || regex.test(name.toLowerCase());
             });
             if (exclude) {
-                logger.log("Excluded - " + name);
+                logger.log("(-) " + name);
                 return;
             }
 
-            logger.log("Included - " + name);
+            logger.log("(+) " + name);
             ret.push(name);
         });
 
@@ -531,7 +478,7 @@ export class AiciLogic {
      * @returns The path to the saved file.
      * @throws Will throw an error if the file name or contents are empty, or if the file extension does not match.
      */
-    private static saveUpload(upload: AiciUpload, extension: string | undefined): string {
+    private static saveUpload(upload: UploadDto, extension: string | undefined): string {
         const fileName = upload.file;
         const contents = upload.contents;
         if (!fileName || !contents)
