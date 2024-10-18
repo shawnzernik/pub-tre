@@ -80,7 +80,7 @@ export class AiciService extends BaseService {
         if (!obj.limit)
             throw new Error("No input provided!  Expected TypeScript interface: `{ input: string, limit: number }`.");
 
-        const ret = VectorLogic.search(ds, collection, obj.input, obj.limit);
+        const ret = await VectorLogic.search(ds, collection, obj.input, obj.limit);
         return ret;
     }
 

@@ -1,10 +1,8 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
-import { Logger } from "typeorm";
 import { Config } from "../../Config";
 import { EntitiesDataSource } from "../../data/EntitiesDataSource";
 import { EmbeddingListDto } from "../../models/EmbeddingListDto";
-import { EmbeddingRequestDto } from "../../models/EmbeddingRequestDto";
 import { ApiLogic } from "./ApiLogic";
 
 export class VectorLogic {
@@ -23,6 +21,7 @@ export class VectorLogic {
                 limit: limit
             }
         );
+        return searchResponse;
     }
     public static async deleteAndCreateCollections(qdrantClient: QdrantClient, name: string) {
         let collections = await qdrantClient.getCollections();
