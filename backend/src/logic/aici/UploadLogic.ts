@@ -1,17 +1,17 @@
 import fs from "fs";
 import path from "path";
+import AdmZip from "adm-zip";
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { Config } from "../../Config";
 import { VectorLogic } from "./VectorLogic";
 import { EntitiesDataSource } from "../../data/EntitiesDataSource";
 import { Logger } from "../../Logger";
-import { UploadDto } from "../../models/UploadDto";
-import AdmZip from "adm-zip";
 import { Message } from "common/src/models/aici/Message";
 import { DatasetEntity } from "../../data/DatasetEntity";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { LogEntity } from "../../data/LogEntity";
 import { ApiLogic } from "./ApiLogic";
+import { File as AiciFile } from "common/src/models/aici/File";
 
 export class UploadLogic {
     public static async getUploadLogs(ds: EntitiesDataSource, corelation: string): Promise<LogEntity[]> {
@@ -23,7 +23,50 @@ export class UploadLogic {
 
         return logs;
     }
-    public static async upload(logger: Logger, body: UploadDto): Promise<void> {
+    public static async download(logger: Logger, ds: EntitiesDataSource, body: AiciFile): Promise<AiciFile> {
+        if(!body.file || body.file === "undefined")
+            throw new Error("You must provide a file name!");
+
+        let file: AiciFile | null = null;
+        file = UploadLogic.downloadFile(ds, body.file);
+        if (file)
+            return file;
+
+        file = await UploadLogic.downloadVector(ds, Config.qdrantNameCollection, body.file);
+        if (file)
+            return file;
+
+        throw new Error(`Could not locate file or embedding by name '${body.file}'!`);
+    }
+    private static async downloadVector(ds: EntitiesDataSource, collection: string, file: string): Promise<AiciFile | null> {
+        let vector = await VectorLogic.search(ds, collection, file, 1);
+
+        if(vector[0].score < 0.75)
+            throw new Error(`File '${file}' not found with confidence!`);
+
+        return {
+            file: vector[0].payload.title,
+            contents: vector[0].payload.content
+        };
+    }
+    private static downloadFile(ds: EntitiesDataSource, requested: string): AiciFile | null {
+        let file = requested;
+        if (file.startsWith("~/"))
+            file = path.join(Config.tempDirectory, file.substring(2, file.length));
+
+        file = path.resolve(file);
+        const temp = path.resolve(Config.tempDirectory);
+        if (!file.startsWith(temp))
+            return null;
+        if (!fs.existsSync(file))
+            return null;
+
+        return {
+            file: file,
+            contents: fs.readFileSync(file, { encoding: "utf8" })
+        }
+    }
+    public static async upload(logger: Logger, body: AiciFile): Promise<void> {
         const ds = new EntitiesDataSource();
         await ds.initialize();
         try {
@@ -121,7 +164,7 @@ export class UploadLogic {
             await ds.destroy();
         }
     }
-    private static saveUpload(upload: UploadDto, extension: string | undefined): string {
+    private static saveUpload(upload: AiciFile, extension: string | undefined): string {
         const fileName = upload.file;
         const contents = upload.contents;
         if (!fileName || !contents)
