@@ -3,33 +3,28 @@ import { createRoot } from "react-dom/client";
 import { ErrorMessage, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { Heading } from "../components/Heading";
-import { Field } from "../components/Field";
-import { UUIDv4 } from "common/src/logic/UUIDv4";
-import { AuthService } from "../services/AuthService";
 import { Form } from "../components/Form";
+import { Field } from "../components/Field";
 import { Input } from "../components/Input";
+import { FinetuneDto } from "common/src/models/FinetuneDto";
+import { UUIDv4 } from "common/src/logic/UUIDv4";
+import { FinetuneService } from "../services/FinetuneService";
+import { AuthService } from "../services/AuthService";
 import { Button } from "../components/Button";
 import { FlexRow } from "../components/FlexRow";
-import { GroupDto } from "common/src/models/GroupDto";
-import { GroupService } from "../services/GroupService";
-import { Checkbox } from "../components/Checkbox";
 
 interface Props { }
-
-/**
- * State interface extending BasePageState to include model
- */
 interface State extends BasePageState {
-    model: GroupDto;
+    model: FinetuneDto;
 }
 
 /**
- * Page class for editing a group
+ * Page component for editing a finetune model.
  */
 class Page extends BasePage<Props, State> {
     /**
-     * Constructor initializing state
-     * @param props - Component props
+     * Constructs the Page component.
+     * @param props - Props for the component.
      */
     public constructor(props: Props) {
         super(props);
@@ -37,43 +32,50 @@ class Page extends BasePage<Props, State> {
         this.state = {
             ...BasePage.defaultState,
             model: {
-                displayName: "",
                 guid: UUIDv4.generate(),
-                isAdministrator: false
+                displayName: "",
+                suffix: "",
+                id: "",
+                model: "gpt-4o-mini-2024-07-18",
+                learningRateMultiplier: 1.8,
+                batchSize: 32,
+                epochs: 10,
+                seed: 1,
+                trainingFile: "",
+                trainingData: "",
+                validationFile: "",
+                validationData: ""
             }
         };
     }
 
     /**
-     * Life cycle method called after component mounts
-     * Fetches group data if guid is present in query string
+     * Lifecycle method that is called after the component is mounted.
      */
     public async componentDidMount(): Promise<void> {
-        await this.events.setLoading(true);
+        this.events.setLoading(true);
 
+        const token = await AuthService.getToken();
         const guid = this.queryString("guid");
         if (!guid) {
-            await this.events.setLoading(false);
+            this.events.setLoading(false);
             return;
         }
 
-        const token = await AuthService.getToken();
-
-        const model = await GroupService.get(token, guid);
+        const model = await FinetuneService.get(token, guid);
         await this.updateState({ model: model });
-        await this.events.setLoading(false);
+        this.events.setLoading(false);
     }
 
     /**
-     * Handles save button click
-     * Saves the current group data
+     * Handler for the save button click event.
      */
     public async saveClicked() {
         this.events.setLoading(true);
         try {
             const token = await AuthService.getToken();
-            await GroupService.save(token, this.state.model);
-            window.location.replace("group.html?guid=" + this.state.model.guid);
+            await FinetuneService.save(token, this.state.model);
+            window.location.replace("/static/pages/finetune.html?guid=" + this.state.model.guid);
             return;
         }
         catch (err) {
@@ -83,14 +85,13 @@ class Page extends BasePage<Props, State> {
     }
 
     /**
-     * Handles delete button click
-     * Deletes the current group
+     * Handler for the delete button click event.
      */
     public async deleteClicked() {
         this.events.setLoading(true);
         try {
             const token = await AuthService.getToken();
-            await GroupService.delete(token, this.state.model.guid);
+            await FinetuneService.delete(token, this.state.model.guid);
             window.history.back();
             return;
         }
@@ -101,37 +102,79 @@ class Page extends BasePage<Props, State> {
     }
 
     /**
-     * Renders the component
-     * @returns JSX element
+     * Renders the component.
+     * @returns The rendered component.
      */
     public render(): React.ReactNode {
         return (
             <Navigation
                 state={this.state} events={this.events}
-                topMenuGuid="b1e3c680-0f62-4931-8a68-4be9b4b070f7"
-                leftMenuGuid="d7db605a-ec82-4da6-8fae-df4d5bfb173d"
+                topMenuGuid="a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4"
+                leftMenuGuid="1a5073f4-5be7-4b01-af23-11aff07485f3"
             >
-                <Heading level={1}>Group Edit</Heading>
+                <Heading level={1}>Finetune Edit</Heading>
                 <Form>
                     <Field label="GUID" size={3}><Input
                         readonly={true}
                         value={this.state.model.guid}
                     /></Field>
-                    <Field label="Display" size={2}><Input
+                    <Field label="Display Name" size={2}><Input
                         value={this.state.model.displayName}
                         onChange={async (value) => {
-                            const newModel = this.jsonCopy(this.state.model);;
-                            newModel.displayName = value;
+                            const newModel = { ...this.state.model, displayName: value };
                             await this.updateState({ model: newModel });
                         }}
                     /></Field>
-                    <Field label="Display" size={1}><Checkbox
-                        checked={this.state.model.isAdministrator}
+                    <Field label="Suffix" size={1}><Input
+                        value={this.state.model.suffix}
                         onChange={async (value) => {
-                            const newModel = this.jsonCopy(this.state.model);;
-                            newModel.isAdministrator = value;
+                            const newModel = { ...this.state.model, suffix: value };
                             await this.updateState({ model: newModel });
                         }}
+                    /></Field>
+                    <Field label="Model" size={2}><Input
+                        value={this.state.model.model}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, model: value };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="Epochs" size={1}><Input
+                        value={this.state.model.epochs.toString()}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, epochs: Number.parseInt(value) };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="LRM" size={1}><Input
+                        value={this.state.model.learningRateMultiplier.toString()}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, learningRateMultiplier: Number.parseFloat(value) };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="Batch Size" size={1}><Input
+                        value={this.state.model.batchSize.toString()}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, batchSize: Number.parseInt(value) };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="Seed" size={1}><Input
+                        value={this.state.model.seed.toString()}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, seed: Number.parseInt(value) };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="ID" size={2}><Input
+                        value={this.state.model.id}
+                    /></Field>
+                    <Field label="Training File" size={2}><Input
+                        value={this.state.model.trainingFile}
+                    /></Field>
+                    <Field label="Validation File" size={2}><Input
+                        value={this.state.model.validationFile}
                     /></Field>
                 </Form>
                 <FlexRow gap="1em">
@@ -144,17 +187,17 @@ class Page extends BasePage<Props, State> {
 }
 
 /**
- * Window onload event to render the Page component
+ * Window load event handler that renders the Page component.
  */
 window.onload = () => {
-    const element = document.getElementById('root');
+    const element = document.getElementById("root");
     const root = createRoot(element);
-    root.render(<Page />)
+    root.render(<Page />);
 };
 
 /**
- * Window onpageshow event to reload the page if persisted
- * @param event - Event object
+ * Window page show event handler that reloads the page if it was restored from cache.
+ * @param event - The event object.
  */
 window.onpageshow = (event) => {
     if (event.persisted) {
