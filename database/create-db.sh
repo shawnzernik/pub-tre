@@ -31,6 +31,7 @@ SQL_FILES=(
     "tables/datasets.sql"
     "tables/logs.sql"
     "tables/prompts.sql"
+    "tables/finetunes.sql"
     "foreignkeys/memberships.sql"
     "foreignkeys/passwords.sql"
     "foreignkeys/permissions.sql"
