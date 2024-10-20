@@ -74,7 +74,14 @@ SELECT
     "title" AS "Title"
 FROM "prompts"
 ORDER BY "title"
-', '/static/pages/prompt.html', 'false');
+', '/static/pages/prompt.html', 'false'),
+('8bf5524f-4853-430f-b658-57077937c90e', 'Finetune List', 'finetune', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', '1a5073f4-5be7-4b01-af23-11aff07485f3', '
+SELECT
+    "guid",
+    "display_name" AS "Name"
+FROM "finetunes"
+ORDER BY "display_name"
+', '/static/pages/finetune.html', 'false');
 
 INSERT INTO "securables" ("guid", "display_name")
 SELECT

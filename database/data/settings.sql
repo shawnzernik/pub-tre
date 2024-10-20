@@ -7,6 +7,7 @@ INSERT INTO "settings" ("guid", "key", "value") VALUES
 ('1cbb9527-afab-4d0d-a101-7a53d15359bc', 'Password:Require Symbols', 'y'),
 
 ('1ad66e51-dcbf-4eea-ba53-f420e8627658', 'Aici:Model', 'gpt-4o-mini'),
+('e0f051dc-ee5b-4d84-9f62-8fc687f09663', 'Aici:Finetune:Model', 'gpt-4o-mini'),
 ('c3e92f5a-63eb-4749-aa6b-e110151477a0', 'Aici:URL', 'https://api.openai.com'),
 ('4bcb2ae1-7c9d-4e19-a380-0abddcba8c18', 'Aici:API Key', 'YOU OPEN AI KEY HERE'),
 

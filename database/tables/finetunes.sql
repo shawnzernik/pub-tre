@@ -3,15 +3,15 @@ CREATE TABLE "finetunes" (
 
 	"display_name" VARCHAR(100) NOT NULL,
     "suffix" VARCHAR(50) NOT NULL,
-    "id" VARCHAR(100) NOT NULL,
+    "id" VARCHAR(100),
 
     "model" VARCHAR(100) NOT NULL,
     "epochs" INT,
-    "learning_rate_multiplier" INT,
+    "learning_rate_multiplier" NUMERIC,
     "batch_size" INT,
     "seed" INT,
 
-    "training_file" VARCHAR(250) NOT NULL,
+    "training_file" VARCHAR(250),
     "training_data" TEXT NOT NULL,
 
     "validation_file" VARCHAR(250),

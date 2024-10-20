@@ -5,8 +5,73 @@ import { EmbeddingRequestDto } from "../../models/EmbeddingRequestDto";
 import { Config } from "../../Config";
 import { Response } from "common/src/models/aici/Response";
 import { Logger } from "../../Logger";
+import { FinetuneDto } from "common/src/models/FinetuneDto";
 
 export class ApiLogic {
+    static async finetune(ds: EntitiesDataSource, requestDto: FinetuneDto): Promise<string> {
+        const modelSetting = await ds.settingRepository().findByKey("Aici:Finetune:Model");
+        const urlSetting = await ds.settingRepository().findByKey("Aici:URL");
+        const apiKeySetting = await ds.settingRepository().findByKey("Aici:API Key");
+
+        const fetchResponse = await fetch(`${urlSetting.value}/v1/fine_tuning/jobs`, {
+            method: "POST",
+            body: JSON.stringify({
+                training_file: requestDto.trainingFile,
+                validation_file: requestDto.validationFile ? requestDto.validationFile : null,
+                model: requestDto.model,
+                suffix: requestDto.suffix,
+                hyperparameters: {
+                    batch_size: requestDto.batchSize,
+                    learning_rate_multiplier: requestDto.learningRateMultiplier,
+                    n_epochs: requestDto.epochs,
+                }
+            }),
+            headers: {
+                "Authorization": `Bearer ${apiKeySetting.value}`,
+                "Content-Type": "application/json"
+            }
+        });
+        if (!fetchResponse.ok) {
+            const details = await fetchResponse.text();
+            throw new Error(`HTTP Status ${fetchResponse.status} - ${fetchResponse.statusText} - ${details}`);
+        }
+
+        const data = await fetchResponse.json();
+        return data.id;
+    }
+    public static async finetuneUpload(ds: EntitiesDataSource, dataset: string): Promise<string> {
+        const boundary = '----WebKitFormBoundary7MA4YWxkTrZu0gW';
+        const body = `--${boundary}\r\n` +
+            `Content-Disposition: form-data; name="purpose"\r\n` +
+            `\r\n` +
+            `fine-tune\r\n` +
+            `--${boundary}\r\n` +
+            `Content-Disposition: form-data; name="file"; filename="dataset.jsonl"\r\n` +
+            `Content-Type: application/json\r\n` +
+            `\r\n` +
+            `${dataset}\r\n` +
+            `--${boundary}--\r\n`;
+
+        const urlSetting = await ds.settingRepository().findByKey("Aici:URL");
+        const apiKeySetting = await ds.settingRepository().findByKey("Aici:API Key");
+
+        const fetchResponse = await fetch(`${urlSetting.value}/v1/files`, {
+            method: "POST",
+            body: body,
+            headers: {
+                "Authorization": `Bearer ${apiKeySetting.value}`,
+                "Content-Type": `multipart/form-data; boundary=${boundary}`
+            }
+        });
+
+        if (!fetchResponse.ok) {
+            const details = await fetchResponse.text();
+            throw new Error(`HTTP Status ${fetchResponse.status} - ${fetchResponse.statusText} - ${details}`);
+        }
+
+        const data = await fetchResponse.json();
+        return data.id;
+    }
     public static async chat(ds: EntitiesDataSource, body: Message[]): Promise<Response> {
         const modelSetting = await ds.settingRepository().findByKey("Aici:Model");
         const urlSetting = await ds.settingRepository().findByKey("Aici:URL");
@@ -58,8 +123,8 @@ export class ApiLogic {
         });
 
         return messages;
-    }    
-    
+    }
+
     public static async getEmbedding(ds: EntitiesDataSource, content: string): Promise<EmbeddingListDto> {
         const response: EmbeddingListDto = await ApiLogic.embedding(ds, {
             model: Config.embeddingModel,
@@ -87,5 +152,5 @@ export class ApiLogic {
         const aiResponse = await fetchResponse.json();
         return aiResponse as EmbeddingListDto;
     }
-    
+
 }

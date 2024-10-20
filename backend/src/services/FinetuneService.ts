@@ -4,6 +4,8 @@ import { BaseService } from "./BaseService";
 import { FinetuneDto } from "common/src/models/FinetuneDto";
 import { FinetuneEntity } from "../data/FinetuneEntity";
 import { Logger } from "../Logger";
+import { ApiLogic } from "../logic/aici/ApiLogic";
+import { DatasetLogic } from "../logic/aici/DatasetLogic";
 
 export class FinetuneService extends BaseService {
     public constructor(logger: Logger, app: express.Express) {
@@ -38,8 +40,16 @@ export class FinetuneService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Finetune:Save", req, ds);
 
+        const requestDto = req.body as FinetuneDto;
+
         const entity = new FinetuneEntity();
-        entity.copyFrom(req.body as FinetuneDto);
+        entity.copyFrom(requestDto);
+        entity.trainingData = await DatasetLogic.createDataset(ds);
+        await ds.finetuneRepository().save([entity]);
+
+        entity.trainingFile = await ApiLogic.finetuneUpload(ds, entity.trainingData);
+        entity.id = await ApiLogic.finetune(ds, entity);
+
         await ds.finetuneRepository().save([entity]);
     }
 

@@ -15,7 +15,7 @@ BEGIN
 
     ('a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', NULL, 2, 'OpenAI Aici', 'fire', ''),
     ('720fa4c9-20d0-407d-aff6-3dad45d155cc', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 1, 'Upload', 'cloud-arrow-up-fill', '/static/pages/upload.html'),
-    ('1a5073f4-5be7-4b01-af23-11aff07485f3', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 2, 'Fine Tune', 'easel-fill', '/static/pages/finetune.html'),
+    ('1a5073f4-5be7-4b01-af23-11aff07485f3', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 2, 'Fine Tune', 'easel-fill', '/static/pages/lists.html?url_key=finetune'),
     ('f8d6fabe-c73a-4dac-bb4b-c85c776c45c1', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 3, 'Search', 'search', '/static/pages/search.html'),
     ('b3d886a8-dd3d-426a-9ddf-1e18cbb7e224', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 4, 'Chat', 'chat-fill', '/static/pages/chat.html'),
     ('2d926f48-3007-4912-b6e7-a55a2af65d62', 'a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4', 5, 'Prompts', 'chat-dots-fill', '/static/pages/lists.html?url_key=prompts'),

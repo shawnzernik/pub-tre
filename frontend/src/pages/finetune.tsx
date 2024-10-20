@@ -29,7 +29,11 @@ class Page extends BasePage<Props, State> {
                 displayName: "",
                 suffix: "",
                 id: "",
-                model: "",
+                model: "gpt-4o-mini-2024-07-18",
+                learningRateMultiplier: 1.8,
+                batchSize: 32,
+                epochs: 10,
+                seed: 1,
                 trainingFile: "",
                 trainingData: "",
                 validationFile: "",
@@ -85,6 +89,8 @@ class Page extends BasePage<Props, State> {
         return (
             <Navigation
                 state={this.state} events={this.events}
+                topMenuGuid="a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4"
+                leftMenuGuid="1a5073f4-5be7-4b01-af23-11aff07485f3"
             >
                 <Heading level={1}>Finetune Edit</Heading>
                 <Form>
@@ -92,61 +98,63 @@ class Page extends BasePage<Props, State> {
                         readonly={true}
                         value={this.state.model.guid}
                     /></Field>
-                    <Field label="Display Name"><Input
+                    <Field label="Display Name" size={2}><Input
                         value={this.state.model.displayName}
                         onChange={async (value) => {
                             const newModel = { ...this.state.model, displayName: value };
                             await this.updateState({ model: newModel });
                         }}
                     /></Field>
-                    <Field label="Suffix"><Input
+                    <Field label="Suffix" size={1}><Input
                         value={this.state.model.suffix}
                         onChange={async (value) => {
                             const newModel = { ...this.state.model, suffix: value };
                             await this.updateState({ model: newModel });
                         }}
                     /></Field>
-                    <Field label="ID"><Input
-                        value={this.state.model.id}
-                        onChange={async (value) => {
-                            const newModel = { ...this.state.model, id: value };
-                            await this.updateState({ model: newModel });
-                        }}
-                    /></Field>
-                    <Field label="Model"><Input
+                    <Field label="Model" size={2}><Input
                         value={this.state.model.model}
                         onChange={async (value) => {
                             const newModel = { ...this.state.model, model: value };
                             await this.updateState({ model: newModel });
                         }}
                     /></Field>
-                    <Field label="Training File"><Input
+                    <Field label="Epochs" size={1}><Input
+                        value={this.state.model.epochs.toString()}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, epochs: Number.parseInt(value) };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="LRM" size={1}><Input
+                        value={this.state.model.learningRateMultiplier.toString()}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, learningRateMultiplier: Number.parseFloat(value) };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="Batch Size" size={1}><Input
+                        value={this.state.model.batchSize.toString()}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, batchSize: Number.parseInt(value) };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="Seed" size={1}><Input
+                        value={this.state.model.seed.toString()}
+                        onChange={async (value) => {
+                            const newModel = { ...this.state.model, seed: Number.parseInt(value) };
+                            await this.updateState({ model: newModel });
+                        }}
+                    /></Field>
+                    <Field label="ID" size={2}><Input
+                        value={this.state.model.id}
+                    /></Field>
+                    <Field label="Training File" size={2}><Input
                         value={this.state.model.trainingFile}
-                        onChange={async (value) => {
-                            const newModel = { ...this.state.model, trainingFile: value };
-                            await this.updateState({ model: newModel });
-                        }}
                     /></Field>
-                    <Field label="Training Data"><Input
-                        value={this.state.model.trainingData}
-                        onChange={async (value) => {
-                            const newModel = { ...this.state.model, trainingData: value };
-                            await this.updateState({ model: newModel });
-                        }}
-                    /></Field>
-                    <Field label="Validation File"><Input
+                    <Field label="Validation File" size={2}><Input
                         value={this.state.model.validationFile}
-                        onChange={async (value) => {
-                            const newModel = { ...this.state.model, validationFile: value };
-                            await this.updateState({ model: newModel });
-                        }}
-                    /></Field>
-                    <Field label="Validation Data"><Input
-                        value={this.state.model.validationData}
-                        onChange={async (value) => {
-                            const newModel = { ...this.state.model, validationData: value };
-                            await this.updateState({ model: newModel });
-                        }}
                     /></Field>
                 </Form>
                 <FlexRow gap="1em">
