@@ -27,13 +27,13 @@ interface Props { }
  * Interface for component state.
  */
 interface State extends BasePageState {
-    model: PromptDto;
-    messages: AiciMessage[];
-    output: string;
-    files: string;
-    values: string;
-    status: string;
-    embeddingLogic: EmbeddingLogic | null;
+    model: PromptDto;            // The current prompt model being edited.
+    messages: AiciMessage[];     // Array of messages in the conversation.
+    output: string;              // Output generated from processing.
+    files: string;               // Files associated with the prompt.
+    values: string;              // Values related to the prompt.
+    status: string;              // Current status of the operation.
+    embeddingLogic: EmbeddingLogic | null; // Instance of EmbeddingLogic for processing.
 }
 
 /**
@@ -272,6 +272,9 @@ class Page extends BasePage<Props, State> {
         }
     }
 
+    /**
+     * Saves the current processed messages as a dataset.
+     */
     public async saveDatasetClicked() {
         try {
             await this.events.setLoading(true);
@@ -296,7 +299,6 @@ class Page extends BasePage<Props, State> {
             await ErrorMessage(this, err);
         }
     }
-
 
     /**
      * Counts the number of lines in a given text.

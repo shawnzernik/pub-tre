@@ -18,7 +18,14 @@ interface State extends BasePageState {
     model: SecurableDto;
 }
 
+/**  
+ * Page component for managing a Securable entity.
+ */
 class Page extends BasePage<Props, State> {
+    /**  
+     * Constructor for the Page component.
+     * @param props - Component properties.
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -31,6 +38,10 @@ class Page extends BasePage<Props, State> {
         };
     }
 
+    /**  
+     * Lifecycle method called after the component is mounted.
+     * Retrieves the Securable model if a GUID is provided in the query string.
+     */
     public async componentDidMount(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -47,6 +58,10 @@ class Page extends BasePage<Props, State> {
         await this.events.setLoading(false);
     }
 
+    /**  
+     * Handler for the save button click event.
+     * Saves the current model state to the server.
+     */
     public async saveClicked() {
         this.events.setLoading(true);
         try {
@@ -60,6 +75,11 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**  
+     * Handler for the delete button click event.
+     * Deletes the current model from the server.
+     */
     public async deleteClicked() {
         this.events.setLoading(true);
         try {
@@ -73,6 +93,11 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**  
+     * Renders the component.
+     * @returns The rendered component.
+     */
     public render(): React.ReactNode {
         return (
             <Navigation
@@ -104,11 +129,19 @@ class Page extends BasePage<Props, State> {
     }
 }
 
+/**  
+ * Initializes the application when the window loads.
+ */
 window.onload = () => {
     const element = document.getElementById('root');
     const root = createRoot(element);
     root.render(<Page />)
 };
+
+/**  
+ * Reloads the page if it was restored from the back/forward cache.
+ * @param event - The event object.
+ */
 window.onpageshow = (event) => {
     if (event.persisted) {
         window.location.reload();

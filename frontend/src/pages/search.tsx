@@ -28,7 +28,7 @@ interface State extends BasePageState {
     collection: string;       // The type of content to search (e.g., name, content).
     limit: string;            // The maximum number of results to return.
     results: any;             // The search results returned from the AiciService.
-    showContent: boolean;
+    showContent: boolean;     // Flag to determine whether to show content in results.
 }
 
 /**

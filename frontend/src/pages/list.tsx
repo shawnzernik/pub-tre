@@ -21,14 +21,28 @@ import { AuthService } from "../services/AuthService";
 import { MenuService } from "../services/MenuService";
 
 interface Props { }
+
+/**
+ * Page component for managing lists.
+ */
 interface State extends BasePageState {
     model: ListDto;
 }
 
+/**
+ * Page class for managing the list creation and editing.
+ */
 class Page extends BasePage<Props, State> {
+    /** Top menu options for the select component */
     private topMenuOptions: React.ReactElement[] = [];
+
+    /** Left menu options for the select component */
     private leftMenuOptions: React.ReactElement[] = [];
 
+    /**
+     * Creates an instance of Page.
+     * @param props - Component props
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -46,6 +60,10 @@ class Page extends BasePage<Props, State> {
             }
         };
     }
+
+    /**
+     * Lifecycle method that is called after the component is mounted.
+     */
     public async componentDidMount(): Promise<void> {
         this.events.setLoading(true);
 
@@ -106,6 +124,9 @@ class Page extends BasePage<Props, State> {
         this.events.setLoading(false);
     }
 
+    /**
+     * Handles the save button click event.
+     */
     public async saveClicked() {
         this.events.setLoading(true);
         try {
@@ -119,6 +140,10 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Handles the delete button click event.
+     */
     public async deleteClicked() {
         this.events.setLoading(true);
         try {
@@ -133,6 +158,10 @@ class Page extends BasePage<Props, State> {
         }
     }
 
+    /**
+     * Renders the component.
+     * @returns The rendered component.
+     */
     public render(): React.ReactNode {
         return (
             <Navigation
@@ -218,11 +247,18 @@ class Page extends BasePage<Props, State> {
     }
 }
 
+/** 
+ * Window onload event to render the Page component.
+ */
 window.onload = () => {
     const element = document.getElementById('root');
     const root = createRoot(element);
     root.render(<Page />)
 };
+
+/** 
+ * Window onpageshow event to reload the page if it was restored from the back-forward cache.
+ */
 window.onpageshow = (event) => {
     if (event.persisted) {
         window.location.reload();

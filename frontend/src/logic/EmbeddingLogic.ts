@@ -3,23 +3,55 @@ import { AiciService } from "../services/AiciService";
 import { Dictionary } from "common/src/Dictionary";
 import { AuthService } from "../services/AuthService";
 
+/**
+ * Handles the logic for processing embeddings and messages.
+ */
 export class EmbeddingLogic {
     private static fileRegexp = /<!!\s*FILE\s*([~\w-/\.]*)\s*([~\w-/\.]*)\s*(?:NOFILENAME)?\s*!!\/>/g;
-    private static mdFileNameRegExp = /File(?:\s*name)\s*[\`\']([\S]*)[\`\']:/g
+    private static mdFileNameRegExp = /File(?:\s*name)\s*[\`\']([\S]*)[\`\']:/g;
     private static mdFileContentRegExp = /\`\`\`(?:\S*)\n([\s\S]*)\n\`\`\`/g;
     private static equalsRegExp = /[Ee]quals:\s*(.*)/g;
     private static saveRegExp = /[Ss]ave:\s*([^\s%]*)/g;
     private static setRegExp = /[Ss]et:\s*([^\s%]*)/g;
 
+    /**
+     * Original messages received.
+     */
     public originals: AiciMessage[];
+    /**
+     * Completed messages processed.
+     */
     public completed: AiciMessage[] = [];
+    /**
+     * Values stored for processing.
+     */
     public values: Dictionary<string> = {};
-    fileNameToContents: Dictionary<string> = {}
+    /**
+     * Mapping of file names to their contents.
+     */
+    public fileNameToContents: Dictionary<string> = {};
+    /**
+     * Total tokens used.
+     */
     public tokens: number = 0;
+    /**
+     * Total milliseconds taken for processing.
+     */
     public milliseconds: number = 0;
+    /**
+     * Maximum tokens used in a single prompt.
+     */
     public maxPromptTokens: number = 0;
+    /**
+     * Status message for processing.
+     */
     public status: string = "";
 
+    /**
+     * Constructor for EmbeddingLogic.
+     * @param originals Original messages received.
+     * @param input Input string for processing.
+     */
     public constructor(originals: AiciMessage[], input?: string) {
         this.originals = originals;
         this.values["INPUT"] = input;
@@ -39,6 +71,10 @@ export class EmbeddingLogic {
         this.values["SAVE_PROMPT"] = savePrompt;
     }
 
+    /**
+     * Processes the messages and interacts with the Aici service.
+     * @throws Error if processing order is incorrect or no choices are returned.
+     */
     public async process(): Promise<void> {
         if (this.completed.length + 1 >= this.originals.length)
             throw new Error("Process called after all messages are completed!");
@@ -82,21 +118,34 @@ export class EmbeddingLogic {
         this.status = `Completed ${this.completed.length / 2} of ${this.originals.length / 2} pairs - Max Prompt Tokens: ${this.maxPromptTokens} - Total Tokens: ${this.tokens} - Seconds: ${this.milliseconds / 1000}`;
     }
 
+    /**
+     * Processes the response from the assistant.
+     * @param original Original assistant message.
+     * @param response Response message from the assistant.
+     * @returns Promise<void>
+     */
     private async processResponse(original: AiciMessage, response: AiciMessage): Promise<void> {
         let matches;
 
-        matches = Array.from(original.content.matchAll(EmbeddingLogic.equalsRegExp))
+        matches = Array.from(original.content.matchAll(EmbeddingLogic.equalsRegExp));
         if (matches.length > 0)
             return await this.processEqualsResponse(original, response);
 
-        matches = Array.from(original.content.matchAll(EmbeddingLogic.setRegExp))
+        matches = Array.from(original.content.matchAll(EmbeddingLogic.setRegExp));
         if (matches.length > 0)
             return await this.processSetResponse(original, response);
 
-        matches = Array.from(original.content.matchAll(EmbeddingLogic.saveRegExp))
+        matches = Array.from(original.content.matchAll(EmbeddingLogic.saveRegExp));
         if (matches.length > 0)
             return await this.processSaveResponse(original, response);
     }
+
+    /**
+     * Processes the equals response from the assistant.
+     * @param original Original assistant message.
+     * @param response Response message from the assistant.
+     * @returns Promise<void>
+     */
     private async processEqualsResponse(original: AiciMessage, response: AiciMessage): Promise<void> {
         const matches = Array.from(original.content.matchAll(EmbeddingLogic.equalsRegExp));
         if (matches.length != 1)
@@ -107,6 +156,13 @@ export class EmbeddingLogic {
         if (value.trim() !== response.content.trim())
             throw new Error(`The expected value '${value.trim()}' does not match '${response.content.trim()}'!`);
     }
+
+    /**
+     * Processes the save response from the assistant.
+     * @param original Original assistant message.
+     * @param response Response message from the assistant.
+     * @returns Promise<void>
+     */
     private async processSaveResponse(original: AiciMessage, response: AiciMessage): Promise<void> {
         const fileNameMatches = Array.from(response.content.matchAll(EmbeddingLogic.mdFileNameRegExp));
         if (fileNameMatches.length != 1)
@@ -126,6 +182,13 @@ export class EmbeddingLogic {
         this.values[valuesKey] = fileName;
         this.fileNameToContents[fileName] = fileContents;
     }
+
+    /**
+     * Processes the set response from the assistant.
+     * @param original Original assistant message.
+     * @param response Response message from the assistant.
+     * @returns Promise<void>
+     */
     private async processSetResponse(original: AiciMessage, response: AiciMessage): Promise<void> {
         const matches = Array.from(original.content.matchAll(EmbeddingLogic.setRegExp));
         if (matches.length != 1)
@@ -136,6 +199,11 @@ export class EmbeddingLogic {
         this.values[key] = response.content.trim();
     }
 
+    /**
+     * Processes variable replacements in the message content.
+     * @param original Original message content.
+     * @returns Processed message content.
+     */
     private processValues(original: string): string {
         let ret = original;
 
@@ -147,6 +215,12 @@ export class EmbeddingLogic {
 
         return ret;
     }
+
+    /**
+     * Processes file references in the message content.
+     * @param original Original message content.
+     * @returns Promise<string> Processed message content.
+     */
     private async processFiles(original: string): Promise<string> {
         let ret = original;
 
@@ -182,11 +256,21 @@ export class EmbeddingLogic {
 
         return ret;
     }
+
+    /**
+     * Creates a regular expression for literal text, escaping special characters.
+     * @param literal The literal text to escape.
+     * @returns A regular expression that matches the literal text.
+     */
     private createRegExpForLiteral(literal: string): RegExp {
         const target = literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return new RegExp(target, "g");
     }
 
+    /**
+     * Generates the markdown completions from completed messages.
+     * @returns A string containing markdown formatted completions.
+     */
     public markdownCompletions(): string {
         let ret = "";
 
@@ -224,17 +308,22 @@ export class EmbeddingLogic {
 
         return ret;
     }
+
+    /**
+     * Generates the markdown saves from file information.
+     * @returns A string containing markdown formatted file information.
+     */
     public markdownSaves(): string {
         let ret = "";
 
         const fileNames = Object.keys(this.fileNameToContents);
 
         if (fileNames.length > 0)
-            ret += "## Files\n"
+            ret += "## Files\n";
 
         for (let fileName of fileNames) {
             ret += "\n";
-            ret += "**File name `" + fileName + "`**:\n"
+            ret += "**File name `" + fileName + "`**:\n";
             ret += "\n";
             ret += "```\n";
             ret += this.fileNameToContents[fileName];
@@ -244,18 +333,23 @@ export class EmbeddingLogic {
 
         return ret;
     }
+
+    /**
+     * Generates the markdown values from stored values.
+     * @returns A string containing markdown formatted values.
+     */
     public markdownValues(): string {
         let ret = "";
 
         const keys = Object.keys(this.values);
 
         if (keys.length > 0) {
-            ret += "## Values\n"
+            ret += "## Values\n";
             ret += "\n";
         }
         for (let key of keys) {
             ret += "\n";
-            ret += "**" + key + "**:\n"
+            ret += "**" + key + "**:\n";
             ret += "\n";
             ret += "```\n";
             ret += this.values[key].replace(/`/g, "\\`");

@@ -1,15 +1,32 @@
 import * as React from "react";
-import { InputTheme } from "./InputTheme";
 import { Dictionary } from "common/src/Dictionary";
+import { TabsTheme } from "./TabsTheme";
 
+// Interface for component props
 interface Props {
+    /** 
+     * A dictionary where keys are tab labels and values are React elements. 
+     * Each entry represents a tab.
+     */
     components: Dictionary<React.ReactElement>;
 }
+
+// Interface for component state
 interface State {
+    /** 
+     * The label of the currently active tab. 
+     * Determines which component is visible.
+     */
     activeLabel: string;
 }
 
 export class Tabs extends React.Component<Props, State> {
+    /** 
+     * Creates an instance of Tabs. 
+     * Initializes the state with the first tab label.
+     * @param props - The props object containing component data.
+     * @throws Error if no tab components are provided.
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -21,98 +38,39 @@ export class Tabs extends React.Component<Props, State> {
         this.state = { activeLabel: labels[0] };
     }
 
+    /** 
+     * Renders the component. 
+     * Creates tab labels and sets the active tab style.
+     * @returns The JSX representation of the Tabs component.
+     */
     public render(): React.ReactNode {
         const labelDivs: React.ReactElement[] = [];
         const labels = Object.keys(this.props.components);
         for (let label of labels) {
-            if (this.state.activeLabel == label)
-                labelDivs.push(<>
+            const isActive = this.state.activeLabel === label;
+            labelDivs.push(
+                <>
                     <span
                         onClick={() => {
                             this.setState({ activeLabel: label });
                         }}
-                        style={{
-                            flexGrow: "0",
-                            flexShrink: "0",
-                            padding: "0.5em",
-                            color: "#08f",
-                            border: "1pt solid black",
-                            borderBottom: "none",
-                            borderTopLeftRadius: "0.25em",
-                            borderTopRightRadius: "0.25em",
-                            cursor: "pointer"
-                        }}
+                        style={isActive ? TabsTheme.tabActive : TabsTheme.tabInactive}
                     >
                         {label}
                     </span>
-                    <span
-                        style={{
-                            borderBottom: "1pt solid black",
-                            flexGrow: "0",
-                            flexShrink: "0",
-                            padding: "0.5em",
-                        }}
-                    >&nbsp;</span>
-                </>);
-            else
-                labelDivs.push(<>
-                    <span
-                        onClick={() => {
-                            this.setState({ activeLabel: label });
-                        }}
-                        style={{
-                            borderBottom: "1pt solid black",
-                            flexGrow: "0",
-                            flexShrink: "0",
-                            padding: "0.5em",
-                            cursor: "pointer",
-                        }}
-                    >
-                        {label}
-                    </span>
-                    <span
-                        style={{
-                            borderBottom: "1pt solid black",
-                            flexGrow: "0",
-                            flexShrink: "0",
-                            padding: "0.5em"
-                        }}
-                    >&nbsp;</span>
-                </>);
+                    <span style={TabsTheme.space}>&nbsp;</span>
+                </>
+            );
         }
 
-        const visibleComponent = this.props.components[this.state.activeLabel]
+        const visibleComponent = this.props.components[this.state.activeLabel];
 
         return (
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column"
-                }}
-            >
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "row"
-                    }}
-                >
-                    <span
-                        style={{
-                            borderBottom: "1pt solid black",
-                            flexGrow: "0",
-                            flexShrink: "0",
-                            padding: "0.5em"
-                        }}
-                    >&nbsp;</span>
+            <div style={TabsTheme.tabContainer}>
+                <div style={TabsTheme.tabRowContainer}>
+                    <span style={TabsTheme.space}>&nbsp;</span>
                     {labelDivs}
-                    <span
-                        style={{
-                            flexGrow: "1",
-                            flexShrink: "1",
-                            borderBottom: "1pt solid black",
-                            padding: "0.5em"
-                        }}
-                    >&nbsp;</span>
+                    <span style={TabsTheme.spaceGrow}>&nbsp;</span>
                 </div>
                 <div>
                     {visibleComponent}

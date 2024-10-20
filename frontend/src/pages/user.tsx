@@ -20,7 +20,14 @@ interface State extends BasePageState {
     confirmPassword: string;
 }
 
+/**
+ * Page class for User Edit
+ */
 class Page extends BasePage<Props, State> {
+    /**
+     * Constructor for the Page class
+     * @param props - Component props
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -37,6 +44,9 @@ class Page extends BasePage<Props, State> {
         };
     }
 
+    /**
+     * Life cycle method that is called after the component is mounted
+     */
     public async componentDidMount(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -53,6 +63,9 @@ class Page extends BasePage<Props, State> {
         await this.events.setLoading(false);
     }
 
+    /**
+     * Method called when the save button is clicked
+     */
     public async saveClicked() {
         this.events.setLoading(true);
         try {
@@ -66,6 +79,10 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Method called when the delete button is clicked
+     */
     public async deleteClicked() {
         this.events.setLoading(true);
         try {
@@ -79,6 +96,10 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Method called when the change password button is clicked
+     */
     public async changeClicked() {
         this.events.setLoading(true);
         try {
@@ -99,6 +120,10 @@ class Page extends BasePage<Props, State> {
         }
     }
 
+    /**
+     * Render method for the Page class
+     * @returns JSX to render
+     */
     public render(): React.ReactNode {
         return (
             <Navigation
@@ -175,4 +200,3 @@ window.onpageshow = (event) => {
         window.location.reload();
     }
 };
-

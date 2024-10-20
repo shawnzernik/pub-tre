@@ -22,7 +22,14 @@ interface State extends BasePageState {
     menuOptions: React.ReactElement[];
 }
 
+/**
+ * Represents the menu edit page.
+ */
 class Page extends BasePage<Props, State> {
+    /**
+     * Initializes a new instance of the Page class.
+     * @param props - The component's props.
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -39,6 +46,10 @@ class Page extends BasePage<Props, State> {
             menuOptions: []
         }
     }
+
+    /**
+     * Called after the component is mounted.
+     */
     public async componentDidMount(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -73,11 +84,14 @@ class Page extends BasePage<Props, State> {
         await this.events.setLoading(false);
     }
 
+    /**
+     * Handles the save button click event.
+     */
     public async saveClicked() {
         this.events.setLoading(true);
         try {
             const tempModel = this.jsonCopy(this.state.model);
-            if(tempModel.parentsGuid === "")
+            if (tempModel.parentsGuid === "")
                 tempModel.parentsGuid = null;
 
             const token = await AuthService.getToken();
@@ -90,6 +104,10 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Handles the delete button click event.
+     */
     public async deleteClicked() {
         this.events.setLoading(true);
         try {
@@ -101,9 +119,13 @@ class Page extends BasePage<Props, State> {
         catch (err) {
             await ErrorMessage(this, err);
             await this.events.setLoading(false);
-        }        
+        }
     }
 
+    /**
+     * Renders the component.
+     * @returns The rendered component.
+     */
     public render(): React.ReactNode {
         return (
             <Navigation

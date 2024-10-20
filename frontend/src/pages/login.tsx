@@ -12,11 +12,22 @@ import { AuthService } from "../services/AuthService";
 import { FlexRow } from "../components/FlexRow";
 
 interface Props { }
+
 interface State extends BasePageState {
-    model: LoginDto;
+    model: LoginDto; // Holds the login form data
 }
 
+/**
+ * Represents the login page.
+ * Inherits from BasePage to utilize shared page functionality.
+ */
 class Page extends BasePage<Props, State> {
+
+    /**
+     * Constructs a new instance of the Page class.
+     * Initializes the state with default values and sets the AuthService token to an empty string.
+     * @param props The properties passed to the component.
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -31,6 +42,11 @@ class Page extends BasePage<Props, State> {
         AuthService.setToken("");
     }
 
+    /**
+     * Handles the login process.
+     * Sets the loading state, retrieves the token from AuthService, and redirects to the copyright page.
+     * @returns A promise that resolves when the login process is complete.
+     */
     public async login(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -45,6 +61,11 @@ class Page extends BasePage<Props, State> {
         await this.events.setLoading(false);
     }
 
+    /**
+     * Renders the login page.
+     * Constructs the UI components and binds the necessary event handlers.
+     * @returns The rendered React nodes.
+     */
     public render(): React.ReactNode {
         return (
             <Navigation
@@ -86,6 +107,7 @@ window.onload = () => {
     const root = createRoot(element);
     root.render(<Page />)
 };
+
 window.onpageshow = (event) => {
     if (event.persisted) {
         window.location.reload();

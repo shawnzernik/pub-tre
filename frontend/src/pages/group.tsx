@@ -15,11 +15,22 @@ import { GroupService } from "../services/GroupService";
 import { Checkbox } from "../components/Checkbox";
 
 interface Props { }
+
+/**
+ * State interface extending BasePageState to include model
+ */
 interface State extends BasePageState {
-    model: GroupDto;
+    model: GroupDto; // Model representing the group data
 }
 
+/**
+ * Page class responsible for the Group Edit functionality
+ */
 class Page extends BasePage<Props, State> {
+    /**
+     * Constructor initializing the state
+     * @param props - Component props
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -33,6 +44,10 @@ class Page extends BasePage<Props, State> {
         };
     }
 
+    /**
+     * Lifecycle method called after component mounted
+     * Fetches the group data if a guid is provided in the query string
+     */
     public async componentDidMount(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -49,6 +64,10 @@ class Page extends BasePage<Props, State> {
         await this.events.setLoading(false);
     }
 
+    /**
+     * Handler for save button click
+     * Saves the current group data
+     */
     public async saveClicked() {
         this.events.setLoading(true);
         try {
@@ -62,6 +81,11 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Handler for delete button click
+     * Deletes the current group
+     */
     public async deleteClicked() {
         this.events.setLoading(true);
         try {
@@ -75,6 +99,11 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Renders the component
+     * @returns React.ReactNode
+     */
     public render(): React.ReactNode {
         return (
             <Navigation
@@ -114,14 +143,21 @@ class Page extends BasePage<Props, State> {
     }
 }
 
+/**
+ * Window onload event to render the Page component
+ */
 window.onload = () => {
     const element = document.getElementById('root');
     const root = createRoot(element);
     root.render(<Page />)
 };
+
+/**
+ * Window onpageshow event to handle page navigation
+ * @param event - The event object
+ */
 window.onpageshow = (event) => {
     if (event.persisted) {
         window.location.reload();
     }
 };
-

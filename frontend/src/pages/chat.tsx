@@ -17,6 +17,7 @@ import { PromptDto } from "common/src/models/PromptDto";
 import { PromptService } from "../services/PromptService";
 
 interface Props { }
+
 interface State extends BasePageState {
     messages: AiciMessage[];
     user: string;
@@ -25,7 +26,11 @@ interface State extends BasePageState {
     seconds: number;
 }
 
+/**
+ * Chat Page Component
+ */
 class Page extends BasePage<Props, State> {
+    /** Default messages to display in the chat */
     private static defaultMessages: AiciMessage[] = [
         // {
         //     "role": "user",
@@ -37,6 +42,10 @@ class Page extends BasePage<Props, State> {
         // }
     ];
 
+    /**
+     * Constructs the Page component.
+     * @param props - Component props
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -50,6 +59,10 @@ class Page extends BasePage<Props, State> {
         }
     }
 
+    /**
+     * Lifecycle method called after component mounts.
+     * Resends messages if applicable.
+     */
     public async componentDidMount(): Promise<void> {
         const resend = window.localStorage.getItem("Page.resendClicked");
         if (!resend)
@@ -70,6 +83,9 @@ class Page extends BasePage<Props, State> {
         });
     }
 
+    /**
+     * Resets the chat state when the reset button is clicked.
+     */
     private async resetClicked() {
         await this.updateState({
             messages: Page.defaultMessages,
@@ -77,6 +93,9 @@ class Page extends BasePage<Props, State> {
         })
     }
 
+    /**
+     * Submits the user's message when the submit button is clicked.
+     */
     private async submitClicked() {
         try {
             await this.events.setLoading(true);
@@ -117,6 +136,10 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Saves the current conversation as a dataset.
+     */
     private async saveDatasetClicked() {
         try {
             await this.events.setLoading(true);
@@ -141,6 +164,9 @@ class Page extends BasePage<Props, State> {
         }
     }
 
+    /**
+     * Saves the current conversation as a prompt.
+     */
     private async savePromptClicked() {
         try {
             await this.events.setLoading(true);
@@ -164,6 +190,10 @@ class Page extends BasePage<Props, State> {
         }
     }
 
+    /**
+     * Renders the chat page.
+     * @returns The rendered chat page component
+     */
     public render(): React.ReactNode {
         let markdown = "# Conversation\n\n";
         if (this.state.messages && this.state.messages.length > 0) {
@@ -231,4 +261,3 @@ window.onpageshow = (event) => {
         window.location.reload();
     }
 };
-

@@ -1,15 +1,24 @@
 import * as React from "react";
 import { MarkdownTheme } from "./MarkdownTheme";
 import { marked } from "marked";
-import { BasePage, BasePageState } from "./BasePage";
 
 interface Props {
     children: string;
     page: any;
 }
 
+/**
+ * A React component that renders markdown content with code blocks
+ * that can be copied to the clipboard.
+ */
 export class Markdown extends React.Component<Props> {
 
+    /**
+     * Copies the provided text to the clipboard and displays a message
+     * using the page event system.
+     * 
+     * @param text - The text to be copied to the clipboard.
+     */
     private copyToClipboard(text: string): void {
         navigator.clipboard.writeText(text)
             .then(() => {
@@ -26,6 +35,9 @@ export class Markdown extends React.Component<Props> {
             });
     }
 
+    /**
+     * Binds the click event to all code blocks for copying functionality.
+     */
     private bindCopyToCodeBlocks(): void {
         const codeBlocks = document.querySelectorAll('pre code');
         codeBlocks.forEach((codeBlock) => {
@@ -36,6 +48,9 @@ export class Markdown extends React.Component<Props> {
         });
     }
 
+    /**
+     * Unbinds the click event from all code blocks.
+     */
     private unbindCopyFromCodeBlocks(): void {
         const codeBlocks = document.querySelectorAll('pre code');
         codeBlocks.forEach((codeBlock) => {
@@ -43,19 +58,33 @@ export class Markdown extends React.Component<Props> {
         });
     }
 
-    componentDidMount(): void {
+    /**
+     * Binds the copy event to code blocks when the component is mounted.
+     */
+    public componentDidMount(): void {
         this.bindCopyToCodeBlocks();
     }
 
-    componentDidUpdate(): void {
+    /**
+     * Binds and unbinds the copy event to code blocks when the component updates.
+     */
+    public componentDidUpdate(): void {
         this.unbindCopyFromCodeBlocks();
         this.bindCopyToCodeBlocks();
     }
 
-    componentWillUnmount(): void {
+    /**
+     * Unbinds the copy event from code blocks when the component is unmounted.
+     */
+    public componentWillUnmount(): void {
         this.unbindCopyFromCodeBlocks();
     }
 
+    /**
+     * Renders the component by converting markdown content to HTML.
+     * 
+     * @returns The rendered component.
+     */
     public render(): React.ReactNode {
         marked.setOptions({
             gfm: true

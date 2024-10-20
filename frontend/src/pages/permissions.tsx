@@ -33,6 +33,10 @@ interface State extends BasePageState {
 }
 
 class Page extends BasePage<Props, State> {
+    /**
+     * Constructor for the Page class.
+     * @param props - Component props.
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -48,6 +52,10 @@ class Page extends BasePage<Props, State> {
         };
     }
 
+    /**
+     * Lifecycle method that is called after the component is mounted.
+     * Fetches the securables and groups and updates the component state.
+     */
     public async componentDidMount(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -83,6 +91,9 @@ class Page extends BasePage<Props, State> {
         await this.events.setLoading(false);
     }
 
+    /**
+     * Loads permissions based on the selected group or securable.
+     */
     private async loadClicked() {
         if (!this.state.selectedGroup && !this.state.selectedSecurable) {
             await Dialogue(this, "Notice", "No selections for securable or group were made!", ["OK"]);
@@ -103,6 +114,10 @@ class Page extends BasePage<Props, State> {
 
         await this.events.setLoading(false);
     }
+
+    /**
+     * Saves the permissions that have been modified.
+     */
     private async saveClicked() {
         await this.events.setLoading(true);
 
@@ -119,13 +134,17 @@ class Page extends BasePage<Props, State> {
         await this.events.setLoading(false);
     }
 
+    /**
+     * Renders the component.
+     * @returns The JSX to render.
+     */
     public render(): React.ReactNode {
         const rows: React.ReactElement[] = [];
         this.state.models.forEach((model) => {
             if (!this.state.groupMap[model.groupsGuid] || !this.state.securableMap[model.securablesGuid])
                 return;
 
-            rows.push(<tr>
+            rows.push(<tr key={model.guid}>
                 <td>{this.state.groupMap[model.groupsGuid].displayName}</td>
                 <td>{this.state.securableMap[model.securablesGuid].displayName}</td>
                 <td><Checkbox

@@ -11,7 +11,13 @@ import { FlexRow } from "../components/FlexRow";
 import { UserDto } from "common/src/models/UserDto";
 import { AuthService } from "../services/AuthService";
 
+/**
+ * Properties required by Account page.
+ */
 interface Props { }
+/**
+ * State used by Account properties.
+ */
 interface State extends BasePageState {
     model: UserDto,
     currentPassword: string,
@@ -19,7 +25,11 @@ interface State extends BasePageState {
     confirmPassword: string
 }
 
+/** 
+ * Account page component class
+ */
 class Page extends BasePage<Props, State> {
+    /** Constructor initializes state properties */
     public constructor(props: Props) {
         super(props);
 
@@ -36,6 +46,10 @@ class Page extends BasePage<Props, State> {
             confirmPassword: ""
         };
     }
+
+    /** 
+     * Lifecycle method called after component mounts 
+     */
     public async componentDidMount(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -44,10 +58,14 @@ class Page extends BasePage<Props, State> {
             await this.updateState({ model: user });
             await this.events.setLoading(false);
         }
-        catch(err) {
+        catch (err) {
             await ErrorMessage(this, err);
         }
     }
+
+    /** 
+     * Saves the user information 
+     */
     public async saveClicked(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -57,10 +75,14 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
             await Dialogue(this, "Success", "Changes have been saved!  You should log out and log back in for your changes to take effect.", ["OK"]);
         }
-        catch(err) {
+        catch (err) {
             await ErrorMessage(this, err);
         }
     }
+
+    /** 
+     * Changes the user's password 
+     */
     public async changeClicked(): Promise<void> {
         await this.events.setLoading(true);
 
@@ -69,10 +91,14 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
             await Dialogue(this, "Success", "Your password has been changed.", ["OK"]);
         }
-        catch(err) {
+        catch (err) {
             await ErrorMessage(this, err);
         }
     }
+
+    /** 
+     * Renders the account page 
+     */
     public render(): React.ReactNode {
         return (
             <Navigation
@@ -141,6 +167,13 @@ class Page extends BasePage<Props, State> {
                 </FlexRow>
             </Navigation>
         );
+    }
+
+    /** 
+     * Sets up the component for rendering 
+     */
+    public async setUpComponent(): Promise<void> {
+        await this.componentDidMount();
     }
 }
 

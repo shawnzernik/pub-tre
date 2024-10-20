@@ -1,18 +1,28 @@
 import { Dictionary } from "common/src/Dictionary";
 
+/**
+ * Interface representing the parameters required for Fetch requests.
+ */
 export interface FetchParameters {
+    /** The URL to which the request is sent. */
     url: string;
+    /** Optional bearer token for authorization. */
     token?: string;
+    /** Optional body for requests that require it (e.g., POST, PUT). */
     body?: any;
+    /** Correlation ID for tracking requests. */
     corelation: string;
 }
 
+/**
+ * A wrapper class for the Fetch API to handle HTTP requests with default headers and error handling.
+ */
 export class FetchWrapper {
     /**
      * Sends a DELETE request to the specified URL with optional authorization and correlation headers.
      * @param params - The parameters required to make the DELETE request.
      */
-    static async delete(params: FetchParameters): Promise<void> {
+    public static async delete(params: FetchParameters): Promise<void> {
         const headers = FetchWrapper.defaultHeaders(params.token);
 
         const response = await fetch(params.url, {
@@ -28,7 +38,7 @@ export class FetchWrapper {
      * @param params - The parameters required to make the GET request.
      * @returns The response data of type T.
      */
-    static async get<T>(params: FetchParameters): Promise<T> {
+    public static async get<T>(params: FetchParameters): Promise<T> {
         const headers = FetchWrapper.defaultHeaders(params.token);
 
         const response = await fetch(params.url, {

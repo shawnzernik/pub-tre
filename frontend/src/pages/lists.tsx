@@ -14,7 +14,14 @@ interface State extends BasePageState {
     list?: ListDto;
 }
 
+/**
+ * Represents the Page component that displays a list of items.
+ */
 class Page extends BasePage<Props, State> {
+    /**
+     * Creates an instance of the Page component.
+     * @param props - The props for the component.
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -24,6 +31,10 @@ class Page extends BasePage<Props, State> {
         };
     }
 
+    /**
+     * Lifecycle method that is called after the component is mounted.
+     * Fetches the list and its items from the server.
+     */
     public async componentDidMount(): Promise<void> {
         this.events.setLoading(true);
 
@@ -37,6 +48,10 @@ class Page extends BasePage<Props, State> {
         this.events.setLoading(false);
     }
 
+    /**
+     * Renders the component.
+     * @returns The rendered component.
+     */
     public render(): React.ReactNode {
         if (!this.state.list || !this.state.items)
             return;
@@ -80,6 +95,9 @@ class Page extends BasePage<Props, State> {
     }
 }
 
+/**
+ * Initializes the Page component and renders it.
+ */
 window.onload = () => {
     const element = document.getElementById('root');
     const root = createRoot(element);
