@@ -1,7 +1,6 @@
 import { ListDto } from "common/src/models/ListDto";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { ListFilterDto } from "common/src/models/ListFilterDto";
-import { Dictionary } from "common/src/Dictionary";
 
 /**
  * Handles logic related to retrieving and filtering list items from the database.

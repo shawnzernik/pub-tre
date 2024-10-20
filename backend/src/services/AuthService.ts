@@ -42,7 +42,7 @@ export class AuthService extends BaseService {
     public async getUser(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<UserDto> {
         await logger.trace();
         const logic = await BaseService.checkSecurity(logger, "Auth:Get:User", req, ds);
-        
+
         const ret = await ds.userRepository().findOneBy({ guid: logic.user!.guid });
         if (!ret)
             throw new Error("Could not locate user for token!");
@@ -66,7 +66,7 @@ export class AuthService extends BaseService {
         const entity = new UserEntity();
         entity.copyFrom(req.body as UserDto);
 
-        if(entity.guid != logic.user!.guid)
+        if (entity.guid != logic.user!.guid)
             throw new Error("User being saved is not the active user!");
 
         await ds.userRepository().save([entity]);

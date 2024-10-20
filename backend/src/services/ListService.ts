@@ -7,7 +7,15 @@ import { ListLogic } from "../logic/ListLogic";
 import { ListFilterDto } from "common/src/models/ListFilterDto";
 import { Logger } from "../Logger";
 
+/**
+ * Service for managing lists.
+ */
 export class ListService extends BaseService {
+    /**
+     * Creates an instance of ListService.
+     * @param logger - Logger instance for logging.
+     * @param app - Express application instance to register routes.
+     */
     public constructor(logger: Logger, app: express.Express) {
         super();
 
@@ -21,6 +29,13 @@ export class ListService extends BaseService {
         app.delete("/api/v0/list/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
     }
 
+    /**
+     * Posts items to a specific list.
+     * @param logger - Logger instance for logging.
+     * @param req - Express request object.
+     * @param ds - Data source context.
+     * @returns A promise that resolves to an array of ListDto.
+     */
     public async postItems(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListDto[]> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "List:Items", req, ds);
@@ -37,6 +52,14 @@ export class ListService extends BaseService {
 
         return ret;
     }
+
+    /**
+     * Gets a specific list by GUID.
+     * @param logger - Logger instance for logging.
+     * @param req - Express request object.
+     * @param ds - Data source context.
+     * @returns A promise that resolves to a ListDto or null.
+     */
     public async getGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "List:Read", req, ds);
@@ -45,6 +68,14 @@ export class ListService extends BaseService {
         const ret = await ds.listRepository().findOneBy({ guid: guid });
         return ret;
     }
+
+    /**
+     * Gets a specific list by URL key.
+     * @param logger - Logger instance for logging.
+     * @param req - Express request object.
+     * @param ds - Data source context.
+     * @returns A promise that resolves to a ListDto or null.
+     */
     public async getUrlKey(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListDto | null> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "List:Read", req, ds);
@@ -53,6 +84,14 @@ export class ListService extends BaseService {
         const ret = await ds.listRepository().findOneBy({ urlKey: urlKey });
         return ret;
     }
+
+    /**
+     * Gets all lists.
+     * @param logger - Logger instance for logging.
+     * @param req - Express request object.
+     * @param ds - Data source context.
+     * @returns A promise that resolves to an array of ListDto.
+     */
     public async getList(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListDto[]> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "List:List", req, ds);
@@ -60,6 +99,14 @@ export class ListService extends BaseService {
         const ret = await ds.listRepository().find();
         return ret;
     }
+
+    /**
+     * Saves a new list.
+     * @param logger - Logger instance for logging.
+     * @param req - Express request object.
+     * @param ds - Data source context.
+     * @returns A promise that resolves to void.
+     */
     public async postSave(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "List:Save", req, ds);
@@ -68,6 +115,14 @@ export class ListService extends BaseService {
         entity.copyFrom(req.body as ListDto);
         await ds.listRepository().save([entity]);
     }
+
+    /**
+     * Deletes a specific list by GUID.
+     * @param logger - Logger instance for logging.
+     * @param req - Express request object.
+     * @param ds - Data source context.
+     * @returns A promise that resolves to void.
+     */
     public async deleteGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "List:Delete", req, ds);

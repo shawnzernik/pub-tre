@@ -8,22 +8,22 @@ export class JwtToken implements jwt.JwtPayload {
     /**
      * The duration before the token expires.
      */
-    public static expiresIn = "1h";
+    public static expiresIn: string = "1h";
 
     /**
      * The intended audience of the token.
      */
-    public static audience = "lagovistatech.com";
+    public static audience: string = "lagovistatech.com";
 
     /**
      * The issuer of the token.
      */
-    public static issuer = "lagovistatech.com";
+    public static issuer: string = "lagovistatech.com";
 
     /**
      * The subject of the token.
      */
-    public static subject = "jwt_token";
+    public static subject: string = "jwt_token";
 
     /**
      * The algorithm used to sign the token.
@@ -37,7 +37,7 @@ export class JwtToken implements jwt.JwtPayload {
 
     /**
      * Creates a new instance of JwtToken.
-     * @param data The payload data to include in the token.
+     * @param data The payload data to include in the token. Defaults to undefined.
      */
     public constructor(data: any = undefined) {
         this.data = data;
@@ -66,7 +66,7 @@ export class JwtToken implements jwt.JwtPayload {
      * @returns An instance of JwtToken if verification is successful.
      * @throws Will throw an error if the token is invalid or verification fails.
      */
-    public static verify(token: string, publicKey: string) {
+    public static verify(token: string, publicKey: string): JwtToken {
         const obj = jwt.verify(token, publicKey);
 
         const ret = new JwtToken();

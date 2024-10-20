@@ -15,6 +15,7 @@ export type Method<T> = (logger: Logger, req: express.Request, ds: EntitiesDataS
  * Base service class that provides common functionality for derived services.
  */
 export class BaseService {
+
     /**
      * Checks the security for a given securable name in the request.
      * @param logger - Logger instance for logging purposes.

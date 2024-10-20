@@ -9,8 +9,8 @@ import { Logger } from "../Logger";
  * Service for handling dataset-related operations.
  */
 export class DatasetService extends BaseService {
-    /**
-     * Creates an instance of DatasetService.
+    /** 
+     * Creates an instance of DatasetService. 
      * @param logger - Logger instance for logging purposes.
      * @param app - Express application instance.
      */
@@ -25,8 +25,8 @@ export class DatasetService extends BaseService {
         app.delete("/api/v0/dataset/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
     }
 
-    /**
-     * Retrieves a dataset by its GUID.
+    /** 
+     * Retrieves a dataset by its GUID. 
      * @param logger - Logger instance for logging purposes.
      * @param req - Express request object containing the dataset GUID in the parameters.
      * @param ds - Data source for accessing entities.
@@ -41,8 +41,8 @@ export class DatasetService extends BaseService {
         return ret;
     }
 
-    /**
-     * Retrieves the list of all datasets.
+    /** 
+     * Retrieves the list of all datasets. 
      * @param logger - Logger instance for logging purposes.
      * @param req - Express request object.
      * @param ds - Data source for accessing entities.
@@ -56,8 +56,8 @@ export class DatasetService extends BaseService {
         return ret;
     }
 
-    /**
-     * Saves a new dataset entity.
+    /** 
+     * Saves a new dataset entity. 
      * @param logger - Logger instance for logging purposes.
      * @param req - Express request object containing the dataset data in the body.
      * @param ds - Data source for accessing entities.
@@ -72,8 +72,8 @@ export class DatasetService extends BaseService {
         await ds.datasetRepository().save([entity]);
     }
 
-    /**
-     * Deletes a dataset by its GUID.
+    /** 
+     * Deletes a dataset by its GUID. 
      * @param logger - Logger instance for logging purposes.
      * @param req - Express request object containing the dataset GUID in the parameters.
      * @param ds - Data source for accessing entities.

@@ -63,6 +63,14 @@ export class AiciService extends BaseService {
         UploadLogic.upload(logger, req.body);
     }
 
+    /**
+     * Handles file download requests.
+     * 
+     * @param logger - The logger instance for logging.
+     * @param req - The request object for the download.
+     * @param ds - The data source object for accessing the necessary entities.
+     * @returns A promise that resolves to an AiciFile containing the downloaded file data.
+     */
     public async postDownload(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<AiciFile> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Aici:Download", req, ds);

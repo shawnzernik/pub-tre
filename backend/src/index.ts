@@ -22,10 +22,20 @@ import { PromptService } from "./services/PromptService";
 import { Logger } from "./Logger";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 
+/**
+ * WebApp class is responsible for initializing and configuring the Express application,
+ * setting up middleware, serving static files, and starting the HTTPS server.
+ */
 export class WebApp {
+    /** Express application instance */
     private app: express.Express = express();
+    /** HTTPS server instance */
     public server: https.Server | undefined;
 
+    /**
+     * Execute method initializes the WebApp, configures middleware, sets up routes,
+     * and starts the HTTPS server.
+     */
     public async execute() {
         const logger = new Logger(UUIDv4.generate());
 
@@ -97,11 +107,23 @@ export class WebApp {
         });
     }
 
+    /**
+     * Health check endpoint
+     * @param logger Logger instance for logging
+     * @param req Express request object
+     * @param res Express response object
+     */
     public async getHealth(logger: Logger, req: express.Request, res: express.Response) {
         await logger.trace();
         res.status(200).send({ data: "OK" } as ResponseDto<string>)
     }
 
+    /**
+     * Liveness check endpoint
+     * @param logger Logger instance for logging
+     * @param req Express request object
+     * @param res Express response object
+     */
     public async getLiveliness(logger: Logger, req: express.Request, res: express.Response) {
         await logger.trace();
         res.status(200).send({ data: "OK" } as ResponseDto<string>)

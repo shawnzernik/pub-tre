@@ -15,12 +15,12 @@ export class AuthLogic {
     /**
      * Message displayed when a login attempt is invalid.
      */
-    private static invalidLoginMsg = "Invalid login!";
+    private static invalidLoginMsg: string = "Invalid login!";
 
     /**
      * Message displayed when a token is invalid.
      */
-    private static invalidTokenMsg = "Invalid token!";
+    private static invalidTokenMsg: string = "Invalid token!";
 
     /**
      * The authenticated user's data transfer object.

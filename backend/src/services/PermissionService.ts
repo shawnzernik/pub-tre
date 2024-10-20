@@ -6,7 +6,15 @@ import { PermissionEntity } from "../data/PermissionEntity";
 import { PermissionLogic } from "../logic/PermissionLogic";
 import { Logger } from "../Logger";
 
+/**
+ * Service class for handling permission-related operations.
+ */
 export class PermissionService extends BaseService {
+    /**
+     * Initializes a new instance of the PermissionService class.
+     * @param logger - The logger to be used for logging.
+     * @param app - The Express application to which the routes will be added.
+     */
     public constructor(logger: Logger, app: express.Express) {
         super();
 
@@ -21,6 +29,13 @@ export class PermissionService extends BaseService {
         app.get("/api/v0/securable/:guid/permissions", (req, resp) => { this.methodWrapper(req, resp, this.getSecurablePermissions) });
     }
 
+    /**
+     * Retrieves the permissions associated with a specific group.
+     * @param logger - The logger for tracing.
+     * @param req - The HTTP request object.
+     * @param ds - The data source used for accessing the database.
+     * @returns A promise that resolves to an array of PermissionDto objects.
+     */
     public async getGroupPermissions(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Permission:Read", req, ds);
@@ -29,6 +44,14 @@ export class PermissionService extends BaseService {
         const ret = await PermissionLogic.getGroupPermissions(ds, guid);
         return ret;
     }
+
+    /**
+     * Retrieves the permissions associated with a specific securable entity.
+     * @param logger - The logger for tracing.
+     * @param req - The HTTP request object.
+     * @param ds - The data source used for accessing the database.
+     * @returns A promise that resolves to an array of PermissionDto objects.
+     */
     public async getSecurablePermissions(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Permission:Read", req, ds);
@@ -37,6 +60,14 @@ export class PermissionService extends BaseService {
         const ret = await PermissionLogic.getSecurablePermissions(ds, guid);
         return ret;
     }
+
+    /**
+     * Retrieves a permission entity by its GUID.
+     * @param logger - The logger for tracing.
+     * @param req - The HTTP request object.
+     * @param ds - The data source used for accessing the database.
+     * @returns A promise that resolves to a PermissionDto object or null if not found.
+     */
     public async getGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto | null> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Permission:Read", req, ds);
@@ -45,6 +76,14 @@ export class PermissionService extends BaseService {
         const ret = await ds.permissionRepository().findOneBy({ guid: guid });
         return ret;
     }
+
+    /**
+     * Retrieves a list of all permission entities.
+     * @param logger - The logger for tracing.
+     * @param req - The HTTP request object.
+     * @param ds - The data source used for accessing the database.
+     * @returns A promise that resolves to an array of PermissionDto objects.
+     */
     public async getList(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PermissionDto[]> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Permission:List", req, ds);
@@ -52,6 +91,14 @@ export class PermissionService extends BaseService {
         const ret = await ds.permissionRepository().find();
         return ret;
     }
+
+    /**
+     * Saves a new permission entity.
+     * @param logger - The logger for tracing.
+     * @param req - The HTTP request object.
+     * @param ds - The data source used for accessing the database.
+     * @returns A promise that resolves when the save operation is complete.
+     */
     public async postSave(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Permission:Save", req, ds);
@@ -60,6 +107,14 @@ export class PermissionService extends BaseService {
         entity.copyFrom(req.body as PermissionDto);
         await ds.permissionRepository().save([entity]);
     }
+
+    /**
+     * Deletes a permission entity by its GUID.
+     * @param logger - The logger for tracing.
+     * @param req - The HTTP request object.
+     * @param ds - The data source used for accessing the database.
+     * @returns A promise that resolves when the delete operation is complete.
+     */
     public async deleteGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Permission:Delete", req, ds);

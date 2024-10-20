@@ -5,7 +5,15 @@ import { PromptDto } from "common/src/models/PromptDto";
 import { PromptEntity } from "../data/PromptEntity";
 import { Logger } from "../Logger";
 
+/**
+ * Service class for handling prompts.
+ */
 export class PromptService extends BaseService {
+    /**
+     * Creates an instance of PromptService.
+     * @param logger - The logger instance for logging.
+     * @param app - The express application instance to register routes.
+     */
     public constructor(logger: Logger, app: express.Express) {
         super();
 
@@ -17,6 +25,13 @@ export class PromptService extends BaseService {
         app.delete("/api/v0/prompt/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
     }
 
+    /**
+     * Retrieves a prompt by its GUID.
+     * @param logger - The logger instance for logging.
+     * @param req - The express request object.
+     * @param ds - The data source instance to access the database.
+     * @returns The prompt DTO or null if not found.
+     */
     public async getGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PromptDto | null> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Prompt:Read", req, ds);
@@ -26,6 +41,13 @@ export class PromptService extends BaseService {
         return ret;
     }
 
+    /**
+     * Retrieves a list of prompts.
+     * @param logger - The logger instance for logging.
+     * @param req - The express request object.
+     * @param ds - The data source instance to access the database.
+     * @returns A list of prompt DTOs.
+     */
     public async getList(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<PromptDto[]> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Prompt:List", req, ds);
@@ -34,6 +56,12 @@ export class PromptService extends BaseService {
         return ret;
     }
 
+    /**
+     * Saves a new prompt.
+     * @param logger - The logger instance for logging.
+     * @param req - The express request object.
+     * @param ds - The data source instance to access the database.
+     */
     public async postSave(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Prompt:Save", req, ds);
@@ -43,6 +71,12 @@ export class PromptService extends BaseService {
         await ds.promptRepository().save([entity]);
     }
 
+    /**
+     * Deletes a prompt by its GUID.
+     * @param logger - The logger instance for logging.
+     * @param req - The express request object.
+     * @param ds - The data source instance to access the database.
+     */
     public async deleteGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Prompt:Delete", req, ds);

@@ -14,7 +14,16 @@ import { ApiLogic } from "./ApiLogic";
 import { File as AiciFile } from "common/src/models/aici/File";
 import { SettingLogic } from "../SettingLogic";
 
+/**
+ * Handles the upload and download of files for the AICI module.
+ */
 export class UploadLogic {
+    /**
+     * Retrieves upload logs based on the provided correlation string.
+     * @param ds - The EntitiesDataSource instance for database access.
+     * @param corelation - The correlation string to filter logs.
+     * @returns An array of LogEntity objects.
+     */
     public static async getUploadLogs(ds: EntitiesDataSource, corelation: string): Promise<LogEntity[]> {
         const logs = await ds.logRepository().find({ where: { corelation: corelation }, order: { epoch: "DESC", order: "DESC" } });
 
@@ -24,6 +33,14 @@ export class UploadLogic {
 
         return logs;
     }
+
+    /**
+     * Downloads a file, first checking for it in local storage, then in the vector database.
+     * @param logger - The logger instance for logging messages.
+     * @param ds - The EntitiesDataSource instance for database access.
+     * @param body - The AiciFile object containing file download information.
+     * @returns The downloaded AiciFile object.
+     */
     public static async download(logger: Logger, ds: EntitiesDataSource, body: AiciFile): Promise<AiciFile> {
         if (!body.file || body.file === "undefined")
             throw new Error("You must provide a file name!");
@@ -39,6 +56,14 @@ export class UploadLogic {
 
         throw new Error(`Could not locate file or embedding by name '${body.file}'!`);
     }
+
+    /**
+     * Downloads vector data for a specified file from the vector database.
+     * @param ds - The EntitiesDataSource instance for database access.
+     * @param collection - The name of the collection to search.
+     * @param file - The name of the file to search for.
+     * @returns An AiciFile object containing the file download information, or null if not found.
+     */
     private static async downloadVector(ds: EntitiesDataSource, collection: string, file: string): Promise<AiciFile | null> {
         const setting = await ds.settingRepository().findByKey("Aici:Download:Confidence");
         const settingLogic = new SettingLogic(setting);
@@ -53,6 +78,13 @@ export class UploadLogic {
             contents: vector[0].payload.content
         };
     }
+
+    /**
+     * Attempts to download a file from the local filesystem.
+     * @param ds - The EntitiesDataSource instance for database access.
+     * @param requested - The name of the requested file.
+     * @returns An AiciFile object if the file exists and is accessible, or null if not found.
+     */
     private static downloadFile(ds: EntitiesDataSource, requested: string): AiciFile | null {
         let file = requested;
         if (file.startsWith("~/"))
@@ -70,6 +102,13 @@ export class UploadLogic {
             contents: fs.readFileSync(file, { encoding: "utf8" })
         }
     }
+
+    /**
+     * Uploads a file, processing it for vector embeddings and saving metadata to the database.
+     * @param logger - The logger instance for logging messages.
+     * @param body - The AiciFile object containing file upload information.
+     * @returns void
+     */
     public static async upload(logger: Logger, body: AiciFile): Promise<void> {
         const ds = new EntitiesDataSource();
         await ds.initialize();
@@ -168,6 +207,13 @@ export class UploadLogic {
             await ds.destroy();
         }
     }
+
+    /**
+     * Saves an uploaded file to the local filesystem.
+     * @param upload - The AiciFile object containing file upload information.
+     * @param extension - The expected file extension.
+     * @returns The path to the saved file.
+     */
     private static saveUpload(upload: AiciFile, extension: string | undefined): string {
         if (!fs.existsSync(Config.tempDirectory))
             fs.mkdirSync(Config.tempDirectory, { recursive: true });
@@ -189,6 +235,12 @@ export class UploadLogic {
 
         return targetFile;
     }
+
+    /**
+     * Extracts a ZIP file into a specified directory.
+     * @param zipFileName - The name of the ZIP file to extract.
+     * @returns The path to the extracted folder.
+     */
     private static async extractZip(zipFileName: string): Promise<string> {
         let uploadFolder = path.join(Config.tempDirectory, zipFileName.replace(path.extname(zipFileName), ""));
         if (fs.existsSync(uploadFolder))
@@ -205,6 +257,15 @@ export class UploadLogic {
             });
         });
     }
+
+    /**
+     * Gets a list of files in a directory that match include/exclude patterns.
+     * @param logger - The logger instance for logging messages.
+     * @param base - The base directory to search for files.
+     * @param includeRexExes - An array of regexes for including files.
+     * @param excludeRexExes - An array of regexes for excluding files.
+     * @returns An array of file names that match the include/exclude criteria.
+     */
     private static getFiles(logger: Logger, base: string, includeRexExes: RegExp[], excludeRexExes: RegExp[]): string[] {
         const ret: string[] = [];
 
@@ -236,6 +297,14 @@ export class UploadLogic {
 
         return ret;
     }
+
+    /**
+     * Saves messages to a dataset in the database.
+     * @param ds - The EntitiesDataSource instance for database access.
+     * @param fileName - The name of the file associated with the messages.
+     * @param messages - An array of messages to save.
+     * @returns void
+     */
     private static async saveMessagesToDataset(ds: EntitiesDataSource, fileName: string, messages: Message[]) {
         let dataset = await ds.datasetRepository().findOneBy({ title: fileName });
         if (!dataset) {
@@ -248,6 +317,12 @@ export class UploadLogic {
 
         await ds.datasetRepository().save(dataset);
     }
+
+    /**
+     * Creates an array of regexes from a newline-separated list.
+     * @param newlineSepList - A string of regex patterns separated by newlines.
+     * @returns An array of regexes.
+     */
     private static createRegExes(newlineSepList: string): RegExp[] {
         let strs = newlineSepList.trim().split("\n");
 
