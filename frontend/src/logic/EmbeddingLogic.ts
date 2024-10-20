@@ -4,8 +4,6 @@ import { Dictionary } from "common/src/Dictionary";
 import { AuthService } from "../services/AuthService";
 
 export class EmbeddingLogic {
-    // <!! FILE ~/ts-react-express-openai-aici/backend/src/data/UserEntity.ts NOFILENAME !!/>
-    // <!! FILE ~/ts-react-express-openai-aici/backend/src/data/UserEntity.ts !!/>
     private static fileRegexp = /<!!\s*FILE\s*([~\w-/\.]*)\s*(?:NOFILENAME)?\s*!!\/>/g;
     private static mdFileNameRegExp = /File(?:\s*name)\s*[\`\']([\S]*)[\`\']:/g
     private static mdFileContentRegExp = /\`\`\`(?:\S*)\n([\s\S]*)\n\`\`\`/g;
@@ -16,6 +14,7 @@ export class EmbeddingLogic {
     public originals: AiciMessage[];
     public completed: AiciMessage[] = [];
     public values: Dictionary<string> = {};
+    fileNameToContents: Dictionary<string> = {}
     public tokens: number = 0;
     public milliseconds: number = 0;
 
@@ -74,6 +73,7 @@ export class EmbeddingLogic {
 
         await this.processResponse(originalAssistant, responseMessage);
     }
+
     private async processResponse(original: AiciMessage, response: AiciMessage): Promise<void> {
         let matches;
 
@@ -110,15 +110,13 @@ export class EmbeddingLogic {
         const saveMatches = Array.from(original.content.matchAll(EmbeddingLogic.saveRegExp));
         if (saveMatches.length != 1)
             throw new Error("Multiple save matches found!");
-
-        const key = saveMatches[0][1];
-
-        if (fileNameMatches.length != 1)
-            throw new Error("Multiple file name matches found!");
+        const valuesKey = saveMatches[0][1];
 
         const fileName = fileNameMatches[0][1];
+        const fileContents = fileContentMatches[0][1];
 
-        this.values[key] = fileName;
+        this.values[valuesKey] = fileName;
+        this.fileNameToContents[fileName] = fileContents;
     }
     private async processSetResponse(original: AiciMessage, response: AiciMessage): Promise<void> {
         const matches = Array.from(original.content.matchAll(EmbeddingLogic.setRegExp));
@@ -129,10 +127,7 @@ export class EmbeddingLogic {
 
         this.values[key] = response.content.trim();
     }
-    private createRegExpForLiteral(literal: string): RegExp {
-        const target = literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return new RegExp(target, "g");
-    }
+
     private processValues(original: string): string {
         let ret = original;
 
@@ -172,7 +167,12 @@ export class EmbeddingLogic {
 
         return ret;
     }
-    public markdown(): string {
+    private createRegExpForLiteral(literal: string): RegExp {
+        const target = literal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return new RegExp(target, "g");
+    }
+
+    public markdownCompletions(): string {
         let ret = "";
 
         if (this.completed.length > 0)
@@ -205,6 +205,50 @@ export class EmbeddingLogic {
                 ret += msg.content + "\n";
                 ret += "\n";
             }
+        }
+
+        return ret;
+    }
+    public markdownSaves(): string {
+        let ret = "";
+
+        const fileNames = Object.keys(this.fileNameToContents);
+
+        if (fileNames.length > 0)
+            ret += "## Files\n"
+
+        for (let fileName of fileNames) {
+            ret += "\n";
+            ret += "**File name `" + fileName + "`**:\n"
+            ret += "\n";
+            ret += "```\n";
+            ret += this.fileNameToContents[fileName];
+            ret += "\n```\n";
+            ret += "\n";
+        }
+
+        return ret;
+    }
+    public markdownValues(): string {
+        let ret = "";
+
+        const keys = Object.keys(this.values);
+
+        if (keys.length > 0) {
+            ret += "## Values\n"
+            ret += "\n";
+        }
+        for (let key of keys) {
+            ret += "\n";
+            ret += "**" + key + "**:\n"
+            ret += "\n";
+            ret += "```\n";
+            ret += this.values[key].replace(/`/g, "\\`");
+            ret += "\n```\n";
+            ret += "\n";
+        }
+        if (keys.length > 0) {
+            ret += "\n";
         }
 
         return ret;

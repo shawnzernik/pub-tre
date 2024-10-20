@@ -7,7 +7,7 @@ import { SecurableEntity } from '../../data/SecurableEntity';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
-describe("SecurablesService", () => {
+describe("SecurableService", () => {
     let agent = new https.Agent({ rejectUnauthorized: false });
     let entityGuid = "faf76b3d-ed66-4182-a7c2-7ea6562785fe";
     let token: string | undefined;

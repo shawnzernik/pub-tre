@@ -16,6 +16,7 @@ import { Button } from "../components/Button";
 import { AiciService } from "../services/AiciService";
 import { EmbeddingLogic } from "../logic/EmbeddingLogic";
 import { Markdown } from "../components/Markdown";
+import { Tabs } from "../components/Tabs";
 
 interface Props { }
 
@@ -27,6 +28,8 @@ interface State extends BasePageState {
     input: string;
     messages: AiciMessage[];
     output: string;
+    files: string;
+    values: string;
 }
 
 /**
@@ -49,7 +52,9 @@ class Page extends BasePage<Props, State> {
             },
             input: "",
             messages: [],
-            output: ""
+            output: "",
+            files: "",
+            values: ""
         }
     }
 
@@ -225,7 +230,11 @@ class Page extends BasePage<Props, State> {
 
             while (embeddingLogic.completed.length < embeddingLogic.originals.length) {
                 await embeddingLogic.process();
-                await this.updateState({ output: embeddingLogic.markdown() });
+                await this.updateState({
+                    output: embeddingLogic.markdownCompletions(),
+                    files: embeddingLogic.markdownSaves(),
+                    values: embeddingLogic.markdownValues()
+                });
                 await this.events.setLoading(false);
             }
 
@@ -233,7 +242,11 @@ class Page extends BasePage<Props, State> {
         }
         catch (err) {
             await this.events.setLoading(false);
-            await this.updateState({ output: embeddingLogic.markdown() });
+            await this.updateState({
+                output: embeddingLogic.markdownCompletions(),
+                files: embeddingLogic.markdownSaves(),
+                values: embeddingLogic.markdownValues()
+            });
             await ErrorMessage(this, err);
         }
         finally {
@@ -353,11 +366,19 @@ class Page extends BasePage<Props, State> {
                             }}
                         />
                     </Field>
-
-                    <Heading level={2}>Messages</Heading>
-                    {messages}
                 </Form>
-                <Markdown>{this.state.output}</Markdown>
+                <Tabs
+                    components={{
+                        "Messages": <>
+                            <Heading level={2}>Messages</Heading>
+                            {messages}
+                        </>,
+                        "Files": <Markdown>{this.state.files}</Markdown>,
+                        "Values": <Markdown>{this.state.values}</Markdown>,
+                        "Output": <Markdown>{this.state.output}</Markdown>
+                    }}
+                />
+
             </Navigation>
         );
     }

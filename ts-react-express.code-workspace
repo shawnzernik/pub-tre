@@ -14,6 +14,8 @@
         "emmet.showAbbreviationSuggestions": false,
         "emmet.showExpandedAbbreviation": "never",
         "emmet.showSuggestionsAsSnippets": false,
-        "editor.hover.delay": 1000
+        "editor.hover.delay": 1000,
+        "editor.trimAutoWhitespace": true,
+        "editor.formatOnSave": true
     }
 }
