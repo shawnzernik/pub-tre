@@ -11,6 +11,7 @@ import { PasswordService } from "./services/PasswordService";
 import { PermissionService } from "./services/PermissionService";
 import { SecurableService } from "./services/SecurableService";
 import { UserService } from "./services/UserService";
+import { FinetuneService } from "./services/FinetuneService";
 import { MenuService } from "./services/MenusService";
 import { ListService } from "./services/ListService";
 import { ListFilterService } from "./services/ListFilterService";
@@ -72,6 +73,7 @@ export class WebApp {
         new PermissionService(logger, this.app);
         new SecurableService(logger, this.app);
         new UserService(logger, this.app);
+        new FinetuneService(logger, this.app);
         new MenuService(logger, this.app);
         new ListService(logger, this.app);
         new ListFilterService(logger, this.app);

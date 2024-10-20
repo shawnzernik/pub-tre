@@ -12,6 +12,7 @@ import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { LogEntity } from "../../data/LogEntity";
 import { ApiLogic } from "./ApiLogic";
 import { File as AiciFile } from "common/src/models/aici/File";
+import { SettingLogic } from "../SettingLogic";
 
 export class UploadLogic {
     public static async getUploadLogs(ds: EntitiesDataSource, corelation: string): Promise<LogEntity[]> {
@@ -39,10 +40,13 @@ export class UploadLogic {
         throw new Error(`Could not locate file or embedding by name '${body.file}'!`);
     }
     private static async downloadVector(ds: EntitiesDataSource, collection: string, file: string): Promise<AiciFile | null> {
+        const setting = await ds.settingRepository().findByKey("Aici:Download:Confidence");
+        const settingLogic = new SettingLogic(setting);
+
         let vector = await VectorLogic.search(ds, collection, file, 1);
 
-        if (vector[0].score < 0.75)
-            throw new Error(`File '${file}' not found with confidence!`);
+        if (vector[0].score < settingLogic.integerValue())
+            throw new Error(`File '${file}' not found with confidence (minimum ${settingLogic.integerValue()}; actual ${vector[0].score})!`);
 
         return {
             file: vector[0].payload.title,

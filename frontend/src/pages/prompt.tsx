@@ -56,7 +56,7 @@ class Page extends BasePage<Props, State> {
             output: "",
             files: "",
             values: "",
-            status: "Not started.",
+            status: "Not started",
         }
     }
 
@@ -238,13 +238,13 @@ class Page extends BasePage<Props, State> {
                     output: embeddingLogic.markdownCompletions(),
                     files: embeddingLogic.markdownSaves(),
                     values: embeddingLogic.markdownValues(),
-                    status: `${embeddingLogic.completed.length} of ${embeddingLogic.originals.length} prompts done; ${embeddingLogic.tokens} tokens; ${embeddingLogic.milliseconds / 1000} seconds`
+                    status: embeddingLogic.status
                 });
                 await this.events.setLoading(false);
             }
 
             await this.updateState({
-                status: `Done - ${embeddingLogic.completed.length} of ${embeddingLogic.originals.length} prompts done; ${embeddingLogic.tokens} tokens; ${embeddingLogic.milliseconds / 1000} seconds`
+                status: `Done - ${embeddingLogic.status}`
             });
             await Dialogue(this, "Done", "We have completed processing the messages!")
         }

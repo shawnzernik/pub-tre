@@ -106,46 +106,6 @@
             "windows": {
                 "program": "${workspaceFolder}/frontend/node_modules/jest/bin/jest.cmd"
             }
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "chat-maker",
-            "runtimeArgs": [
-                "-r",
-                "ts-node/register",
-                "${workspaceFolder}/chat-maker/src/index.ts"
-            ],
-            "sourceMaps": true,
-            "cwd": "${workspaceFolder}/chat-maker",
-            "protocol": "inspector",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ],
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "console": "integratedTerminal"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "backend make-dataset",
-            "runtimeArgs": [
-                "-r",
-                "ts-node/register",
-                "${workspaceFolder}/backend/src/make-dataset.ts"
-            ],
-            "sourceMaps": true,
-            "cwd": "${workspaceFolder}/backend",
-            "protocol": "inspector",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ],
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "console": "integratedTerminal"
         }
     ]
 }

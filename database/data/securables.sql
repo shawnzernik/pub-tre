@@ -58,5 +58,10 @@ INSERT INTO "securables" ("guid", "display_name") VALUES
 ('15cfe365-45ff-4d5a-b581-bc1ea3875416', 'Prompt:List'),
 ('70dde75e-1ffb-47a8-b837-1f726aae3bd4', 'Prompt:Read'),
 ('cb7811c6-f091-4467-b57f-7ec269c00e24', 'Prompt:Save'),
-('25ebaceb-f6e6-41db-84e8-8b721ba753e7', 'Prompt:Delete')
+('25ebaceb-f6e6-41db-84e8-8b721ba753e7', 'Prompt:Delete'),
+
+('89e7b4d3-19b2-4a85-b200-a03a7c7815e1', 'Finetune:List'),
+('fd2cc9f0-1947-4a42-bb4a-f4ae9fcd8783', 'Finetune:Read'),
+('b834cb89-c855-4cf1-8b86-91bb3aee2004', 'Finetune:Save'),
+('e1165754-227d-4be5-aa52-07aaa75a8e06', 'Finetune:Delete')
 ;

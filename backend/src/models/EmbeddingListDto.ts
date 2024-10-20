@@ -1,3 +1,5 @@
+import { EmbeddingDto } from "./EmbeddingDto";
+
 export interface EmbeddingListDto {
     object: string;
     data: EmbeddingDto[];

@@ -5,6 +5,7 @@ import { PasswordEntity } from "./PasswordEntity";
 import { PermissionEntity } from "./PermissionEntity";
 import { SecurableEntity } from "./SecurableEntity";
 import { UserEntity } from "./UserEntity";
+import { FinetuneEntity } from "./FinetuneEntity";
 import { Config } from "../Config";
 import { UserRepository } from "./UserRepository";
 import { GroupRepository } from "./GroupRepository";
@@ -26,6 +27,7 @@ import { LogRepository } from "./LogRepository";
 import { LogEntity } from "./LogEntity";
 import { PromptEntity } from "./PromptEntity";
 import { PromptRepository } from "./PromptRepository";
+import { FinetuneRepository } from "./FinetuneRepository";
 
 export class EntitiesDataSource extends DataSource {
     public constructor() {
@@ -43,6 +45,7 @@ export class EntitiesDataSource extends DataSource {
                 PermissionEntity,
                 SecurableEntity,
                 UserEntity,
+                FinetuneEntity,
                 MenuEntity,
                 ListEntity,
                 ListFilterEntity,
@@ -112,6 +115,13 @@ export class EntitiesDataSource extends DataSource {
         return this._userRepository;
     }
 
+    private _finetuneRepository: FinetuneRepository | undefined;
+    public finetuneRepository() {
+        if (!this._finetuneRepository)
+            this._finetuneRepository = new FinetuneRepository(FinetuneEntity, this.createEntityManager(), this.createQueryRunner());
+        return this._finetuneRepository;
+    }
+
     private _menuRepository: MenuRepository | undefined;
     public menuRepository() {
         if (!this._menuRepository)
@@ -139,18 +149,21 @@ export class EntitiesDataSource extends DataSource {
             this._settingRepository = new SettingRepository(SettingEntity, this.createEntityManager(), this.createQueryRunner());
         return this._settingRepository;
     }
+
     private _datasetRepository: DatasetRepository | undefined;
     public datasetRepository() {
         if (!this._datasetRepository)
             this._datasetRepository = new DatasetRepository(DatasetEntity, this.createEntityManager(), this.createQueryRunner());
         return this._datasetRepository;
     }
+
     private _logRepository: LogRepository | undefined;
     public logRepository() {
         if (!this._logRepository)
             this._logRepository = new LogRepository(LogEntity, this.createEntityManager(), this.createQueryRunner());
         return this._logRepository;
     }
+
     private _promptRepository: PromptRepository | undefined;
     public promptRepository() {
         if (!this._promptRepository)

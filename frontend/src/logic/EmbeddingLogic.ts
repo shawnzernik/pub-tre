@@ -17,6 +17,8 @@ export class EmbeddingLogic {
     fileNameToContents: Dictionary<string> = {}
     public tokens: number = 0;
     public milliseconds: number = 0;
+    public maxPromptTokens: number = 0;
+    public status: string = "";
 
     public constructor(originals: AiciMessage[], input?: string) {
         this.originals = originals;
@@ -52,6 +54,7 @@ export class EmbeddingLogic {
 
         let message = this.processValues(originalUser.content);
         message = await this.processFiles(message);
+        message = this.processValues(message);
 
         this.completed.push({
             role: "user",
@@ -71,7 +74,12 @@ export class EmbeddingLogic {
         this.completed.push(response.choices[0].message);
         this.tokens += response.usage.total_tokens;
 
+        if (this.maxPromptTokens < response.usage.total_tokens)
+            this.maxPromptTokens = response.usage.total_tokens;
+
         await this.processResponse(originalAssistant, responseMessage);
+
+        this.status = `Completed ${this.completed.length / 2} of ${this.originals.length / 2} pairs - Max Prompt Tokens: ${this.maxPromptTokens} - Total Tokens: ${this.tokens} - Seconds: ${this.milliseconds / 1000}`;
     }
 
     private async processResponse(original: AiciMessage, response: AiciMessage): Promise<void> {

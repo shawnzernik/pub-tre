@@ -10,6 +10,7 @@ INSERT INTO "settings" ("guid", "key", "value") VALUES
 ('c3e92f5a-63eb-4749-aa6b-e110151477a0', 'Aici:URL', 'https://api.openai.com'),
 ('4bcb2ae1-7c9d-4e19-a380-0abddcba8c18', 'Aici:API Key', 'YOU OPEN AI KEY HERE'),
 
+('5f0c748e-c86d-43a2-aefa-1ea7b96563b6', 'Aici:Download:Confidence', '0.74'),
 ('96de4956-9018-47d2-a50d-fe071ac58338', 'Aici:Upload:Include', '
 \.ts$
 \.tsx$
