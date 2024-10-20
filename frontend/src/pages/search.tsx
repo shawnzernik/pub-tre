@@ -13,6 +13,7 @@ import { AuthService } from "../services/AuthService";
 import { Markdown } from "../components/Markdown";
 import { Input } from "../components/Input";
 import { Select } from "../components/Select";
+import { Checkbox } from "../components/Checkbox";
 
 /**
  * Props for the Page component.
@@ -27,6 +28,7 @@ interface State extends BasePageState {
     collection: string;       // The type of content to search (e.g., name, content).
     limit: string;            // The maximum number of results to return.
     results: any;             // The search results returned from the AiciService.
+    showContent: boolean;
 }
 
 /**
@@ -46,7 +48,8 @@ class Page extends BasePage<Props, State> {
             similarTo: "",
             collection: "name",
             limit: "10",
-            results: null
+            results: null,
+            showContent: false
         };
     }
 
@@ -83,16 +86,17 @@ class Page extends BasePage<Props, State> {
         if (this.state.results) {
             md += "## Results\n\n";
             this.state.results.forEach((result: any) => {
-                md += `###### ${result.payload.title}\n\n`;
-                md += `**Score:** ${result.score}\n`;
-                md += `**Tokens:** ${result.payload.totalTokens}\n`;
-                md += `\`\`\`\n${result.payload.content}\n\`\`\`\n\n`;
+                md += `- ${result.payload.title}\n\n`;
+                md += `   - **Score:** ${result.score}\n`;
+                md += `   - **Tokens:** ${result.payload.totalTokens}\n`;
+                if (this.state.showContent)
+                    md += `\`\`\`\n${result.payload.content}\n\`\`\`\n\n`;
             });
         }
 
         return (
             <Navigation
-                state={this.state} 
+                state={this.state}
                 events={this.events}
                 topMenuGuid="a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4"
                 leftMenuGuid="f8d6fabe-c73a-4dac-bb4b-c85c776c45c1"
@@ -127,6 +131,16 @@ class Page extends BasePage<Props, State> {
                             onChange={(value) => {
                                 this.setState({
                                     limit: value
+                                });
+                            }}
+                        />
+                    </Field>
+                    <Field label="Content" size={1}>
+                        <Checkbox
+                            checked={this.state.showContent}
+                            onChange={(value) => {
+                                this.setState({
+                                    showContent: value
                                 });
                             }}
                         />

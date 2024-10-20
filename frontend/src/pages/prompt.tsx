@@ -5,7 +5,7 @@ import { BasePage, BasePageState } from "../components/BasePage";
 import { Heading } from "../components/Heading";
 import { Form } from "../components/Form";
 import { Field } from "../components/Field";
-import { Message as AiciMessage, MessageRole } from "common/src/models/aici/Message";
+import { Message as AiciMessage } from "common/src/models/aici/Message";
 import { PromptDto } from "common/src/models/PromptDto";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { Input } from "../components/Input";
@@ -14,14 +14,29 @@ import { PromptService } from "../services/PromptService";
 import { AuthService } from "../services/AuthService";
 import { Button } from "../components/Button";
 import { AiciService } from "../services/AiciService";
+import { EmbeddingLogic } from "../logic/EmbeddingLogic";
+import { Markdown } from "../components/Markdown";
 
 interface Props { }
+
+/**
+ * Interface for component state.
+ */
 interface State extends BasePageState {
     model: PromptDto;
+    input: string;
     messages: AiciMessage[];
+    output: string;
 }
 
+/**
+ * Page component for editing prompts.
+ */
 class Page extends BasePage<Props, State> {
+    /**
+     * Constructor for the Page component.
+     * @param props - Component props.
+     */
     public constructor(props: Props) {
         super(props);
 
@@ -32,9 +47,16 @@ class Page extends BasePage<Props, State> {
                 title: "",
                 json: ""
             },
-            messages: []
+            input: "",
+            messages: [],
+            output: ""
         }
     }
+
+    /**
+     * Lifecycle method that runs after the component has been mounted.
+     * Retrieves prompt data based on GUID from query string.
+     */
     public async componentDidMount(): Promise<void> {
         try {
             await this.events.setLoading(true);
@@ -58,6 +80,11 @@ class Page extends BasePage<Props, State> {
             await ErrorMessage(this, err);
         }
     }
+
+    /**
+     * Removes a message from the list of messages based on the target index.
+     * @param target - Index of the message to be removed.
+     */
     private async removeClicked(target: number) {
         await this.events.setLoading(true);
 
@@ -78,6 +105,10 @@ class Page extends BasePage<Props, State> {
 
         await this.events.setLoading(false);
     }
+
+    /**
+     * Saves the current prompt model.
+     */
     private async saveClicked() {
         try {
             await this.events.setLoading(true);
@@ -94,6 +125,10 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Deletes the current prompt.
+     */
     private async deleteClicked() {
         try {
             await this.events.setLoading(true);
@@ -109,6 +144,10 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Suggests a title for the prompt based on chat responses.
+     */
     private async suggestClicked() {
         try {
             await this.events.setLoading(true);
@@ -130,14 +169,20 @@ class Page extends BasePage<Props, State> {
             await this.events.setLoading(false);
         }
     }
+
+    /**
+     * Appends a new message at a specific index within the chat history.
+     * @param role - The role of the new message sender (user/assistant).
+     * @param index - The index at which to append the new message.
+     */
     async appendClicked(role: string, index: number) {
         try {
             await this.events.setLoading(true);
-            
+
             const newMessages: AiciMessage[] = [];
-            for(let cnt = 0; cnt < this.state.messages.length; cnt++) {
+            for (let cnt = 0; cnt < this.state.messages.length; cnt++) {
                 newMessages.push(this.state.messages[cnt]);
-                if(cnt == index){
+                if (cnt == index) {
                     newMessages.push({
                         role: role == "user"
                             ? "user"
@@ -149,7 +194,7 @@ class Page extends BasePage<Props, State> {
                             ? "assistant"
                             : "user",
                         content: ""
-                    });        
+                    });
                 }
             }
 
@@ -169,16 +214,58 @@ class Page extends BasePage<Props, State> {
         }
     }
 
-    private countLines(text: string) {
+    /**
+     * Runs a prompt from a specific message index.
+     * @param index - The index of the message to run from.
+     */
+    async runClicked() {
+        const embeddingLogic = new EmbeddingLogic(this.state.messages, this.state.input);
+        try {
+            await this.events.setLoading(true);
+
+            while (embeddingLogic.completed.length < embeddingLogic.originals.length) {
+                await embeddingLogic.process();
+                await this.updateState({ output: embeddingLogic.markdown() });
+                await this.events.setLoading(false);
+            }
+
+            await Dialogue(this, "Done", "We have completed processing the messages!")
+        }
+        catch (err) {
+            await this.events.setLoading(false);
+            await this.updateState({ output: embeddingLogic.markdown() });
+            await ErrorMessage(this, err);
+        }
+        finally {
+            await this.events.setLoading(false);
+        }
+    }
+
+
+    /**
+     * Counts the number of lines in a given text.
+     * @param text - The text to count lines in.
+     * @returns The number of lines.
+     */
+    private countLines(text: string): number {
         return text.split("\n").length;
     }
-    public render(): React.ReactNode {
+
+    /**
+     * Renders the list of messages in the conversation.
+     * @returns An array of React nodes representing the messages.
+     */
+    private renderMessages(): React.ReactNode[] {
         const messages: React.ReactElement[] = [];
 
         this.state.messages.forEach((msg, index) => {
             messages.push(
                 <>
-                    <Field label={msg.role} key={index}>
+                    <Field label={
+                        msg.role == "user"
+                            ? "User"
+                            : "Assistant"
+                    } key={index}>
                         <TextArea
                             style={{
                                 height: this.countLines(msg.content) * 1.4 + 2 + "em"
@@ -211,6 +298,15 @@ class Page extends BasePage<Props, State> {
                 </>
             );
         });
+        return messages;
+    }
+
+    /**
+     * Renders the entire page component.
+     * @returns The rendered page.
+     */
+    public render(): React.ReactNode {
+        const messages = this.renderMessages();
 
         return (
             <Navigation
@@ -240,13 +336,28 @@ class Page extends BasePage<Props, State> {
                     </Field>
                     <Field>
                         <Button label="Suggest Name" onClick={this.suggestClicked.bind(this)} />
+                        <Button label="Run" onClick={this.runClicked.bind(this)} />
                         <Button label="Save" onClick={this.saveClicked.bind(this)} />
                         <Button label="Delete" onClick={this.deleteClicked.bind(this)} />
                     </Field>
 
-                    <Heading level={2}>Conversation</Heading>
+                    <Heading level={2}>Input</Heading>
+                    <Field label="Input">
+                        <TextArea
+                            rows={10}
+                            value={this.state.input}
+                            onChange={async (value) => {
+                                await this.updateState({
+                                    input: value
+                                });
+                            }}
+                        />
+                    </Field>
+
+                    <Heading level={2}>Messages</Heading>
                     {messages}
                 </Form>
+                <Markdown>{this.state.output}</Markdown>
             </Navigation>
         );
     }
@@ -257,9 +368,9 @@ window.onload = () => {
     const root = createRoot(element);
     root.render(<Page />)
 };
+
 window.onpageshow = (event) => {
     if (event.persisted) {
         window.location.reload();
     }
-};
-
+}

@@ -1,5 +1,6 @@
 import { Response as AiciResponse } from "common/src/models/aici/Response";
 import { Message as AiciMessage } from "common/src/models/aici/Message";
+import { File as AiciFile } from "common/src/models/aici/File";
 import { FetchWrapper } from "./FetchWrapper";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { LogDto } from "common/src/models/LogDto";
@@ -47,7 +48,7 @@ export class AiciService {
         });
         const base64 = btoa(binString);
 
-        const obj = {
+        const obj: AiciFile = {
             file: file.name,
             contents: base64
         };
@@ -61,6 +62,21 @@ export class AiciService {
             token: token
         });
         return corelation;
+    }
+    public static async download(token: string, file: string): Promise<AiciFile> {
+        const obj: AiciFile = {
+            file: file,
+            contents: ""
+        };
+
+        const response = await FetchWrapper.post<AiciFile>({
+            url: "/api/v0/aici/download",
+            body: obj,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
+
+        return response;
     }
 
     public static async uploadLogs(token: string, corelation: string): Promise<LogDto[]> {

@@ -40,7 +40,7 @@ export class TextArea extends React.Component<Props, State> {
         if (this.props.rows && !this.props.showAll) {
             style = {
                 ...style,
-                height: `${this.props.rows + 1}em`
+                height: `${this.props.rows * 1.25 + 1}em`
             };
         }
 

@@ -2,9 +2,12 @@ import express from "express";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { BaseService } from "./BaseService";
 import { Response as AiciResponse } from "common/src/models/aici/Response";
-import { AiciLogic } from "../logic/AiciLogic";
+import { File as AiciFile } from "common/src/models/aici/File";
 import { Logger } from "../Logger";
 import { LogDto } from "common/src/models/LogDto";
+import { ApiLogic } from "../logic/aici/ApiLogic";
+import { UploadLogic } from "../logic/aici/UploadLogic";
+import { VectorLogic } from "../logic/aici/VectorLogic";
 
 /**
  * AiciService class that implements various APIs related to chat, upload, and search functionalities.
@@ -24,6 +27,7 @@ export class AiciService extends BaseService {
 
         app.post("/api/v0/aici/chat", (req, resp) => { this.methodWrapper(req, resp, this.postChat) });
         app.post("/api/v0/aici/upload", (req, resp) => { this.methodWrapper(req, resp, this.postUpload) });
+        app.post("/api/v0/aici/download", (req, resp) => { this.methodWrapper(req, resp, this.postDownload) });
         app.get("/api/v0/aici/upload/:corelation", (req, resp) => { this.methodWrapper(req, resp, this.getUpload) });
         app.post("/api/v0/aici/search/:collection", (req, resp) => { this.methodWrapper(req, resp, this.postSearch) });
     }
@@ -40,7 +44,7 @@ export class AiciService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Aici:Chat", req, ds);
 
-        const aiResponse: AiciResponse = await AiciLogic.chat(ds, req.body);
+        const aiResponse: AiciResponse = await ApiLogic.chat(ds, req.body);
         return aiResponse;
     }
 
@@ -56,7 +60,15 @@ export class AiciService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Aici:Upload", req, ds);
 
-        AiciLogic.upload(logger, ds, req.body);
+        UploadLogic.upload(logger, req.body);
+    }
+
+    public async postDownload(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<AiciFile> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Aici:Download", req, ds);
+
+        const ret = await UploadLogic.download(logger, ds, req.body);
+        return ret;
     }
 
     /**
@@ -78,7 +90,7 @@ export class AiciService extends BaseService {
         if (!obj.limit)
             throw new Error("No input provided!  Expected TypeScript interface: `{ input: string, limit: number }`.");
 
-        const ret = AiciLogic.search(logger, ds, collection, obj.input, obj.limit);
+        const ret = await VectorLogic.search(ds, collection, obj.input, obj.limit);
         return ret;
     }
 
@@ -95,7 +107,7 @@ export class AiciService extends BaseService {
         await BaseService.checkSecurity(logger, "Aici:Upload", req, ds);
 
         const corelation = req.params["corelation"];
-        const ret = await AiciLogic.getUploadLogs(logger, ds, corelation);
+        const ret = await UploadLogic.getUploadLogs(ds, corelation);
         return ret;
     }
 }
