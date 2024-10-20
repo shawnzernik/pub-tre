@@ -30,6 +30,7 @@ interface State extends BasePageState {
     output: string;
     files: string;
     values: string;
+    status: string;
 }
 
 /**
@@ -54,7 +55,8 @@ class Page extends BasePage<Props, State> {
             messages: [],
             output: "",
             files: "",
-            values: ""
+            values: "",
+            status: "Not started.",
         }
     }
 
@@ -228,16 +230,22 @@ class Page extends BasePage<Props, State> {
         try {
             await this.events.setLoading(true);
 
+            this.updateState({ status: `${embeddingLogic.completed.length} of ${embeddingLogic.originals.length} prompts done; ${embeddingLogic.tokens} tokens; ${embeddingLogic.milliseconds / 1000} seconds` });
+
             while (embeddingLogic.completed.length < embeddingLogic.originals.length) {
                 await embeddingLogic.process();
                 await this.updateState({
                     output: embeddingLogic.markdownCompletions(),
                     files: embeddingLogic.markdownSaves(),
-                    values: embeddingLogic.markdownValues()
+                    values: embeddingLogic.markdownValues(),
+                    status: `${embeddingLogic.completed.length} of ${embeddingLogic.originals.length} prompts done; ${embeddingLogic.tokens} tokens; ${embeddingLogic.milliseconds / 1000} seconds`
                 });
                 await this.events.setLoading(false);
             }
 
+            await this.updateState({
+                status: `Done - ${embeddingLogic.completed.length} of ${embeddingLogic.originals.length} prompts done; ${embeddingLogic.tokens} tokens; ${embeddingLogic.milliseconds / 1000} seconds`
+            });
             await Dialogue(this, "Done", "We have completed processing the messages!")
         }
         catch (err) {
@@ -367,6 +375,9 @@ class Page extends BasePage<Props, State> {
                         />
                     </Field>
                 </Form>
+                <div>
+                    {this.state.status}
+                </div>
                 <Tabs
                     components={{
                         "Messages": <>

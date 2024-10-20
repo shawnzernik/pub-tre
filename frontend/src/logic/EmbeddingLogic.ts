@@ -4,7 +4,7 @@ import { Dictionary } from "common/src/Dictionary";
 import { AuthService } from "../services/AuthService";
 
 export class EmbeddingLogic {
-    private static fileRegexp = /<!!\s*FILE\s*([~\w-/\.]*)\s*(?:NOFILENAME)?\s*!!\/>/g;
+    private static fileRegexp = /<!!\s*FILE\s*([~\w-/\.]*)\s*([~\w-/\.]*)\s*(?:NOFILENAME)?\s*!!\/>/g;
     private static mdFileNameRegExp = /File(?:\s*name)\s*[\`\']([\S]*)[\`\']:/g
     private static mdFileContentRegExp = /\`\`\`(?:\S*)\n([\s\S]*)\n\`\`\`/g;
     private static equalsRegExp = /[Ee]quals:\s*(.*)/g;
@@ -69,7 +69,7 @@ export class EmbeddingLogic {
 
         const responseMessage = response.choices[0].message;
         this.completed.push(response.choices[0].message);
-        this.tokens = response.usage.total_tokens;
+        this.tokens += response.usage.total_tokens;
 
         await this.processResponse(originalAssistant, responseMessage);
     }
@@ -145,10 +145,17 @@ export class EmbeddingLogic {
         const matches = Array.from(ret.matchAll(EmbeddingLogic.fileRegexp));
         for (let match of matches) {
             const matchedText = match[0]; // matched text
-            const fileName = match[1]; // group
+
+            if (!match[1] || !match[2])
+                throw new Error(`Invalid file format!  Expected '<!! FILE VALUE_KEY_NAME path/to/file.ext !!/> or '<!! FILE VALUE_KEY_NAME path/to/file.ext NOFILENAME !!/>'.  Recieved '${match[0]}'.`);
+
+            const keyName = match[1]; // group 1: value's key
+            const fileName = match[2]; // group 2: file name
 
             const token = await AuthService.getToken();
             const aiciFile = await AiciService.download(token, fileName);
+
+            this.values[keyName] = aiciFile.file;
 
             let markdown = "\n";
 

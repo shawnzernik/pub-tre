@@ -27,7 +27,7 @@ To insert a key's value into a user prompt put percents (%) around it:
 
 Adding the following to a user prompt:
 
-`<!! FILE ~/ts-react-express-openai-aici/backend/src/data/UserEntity.ts NOFILENAME !!/>`
+`<!! FILE KEY_NAME_FOR_VALUE ~/ts-react-express-openai-aici/backend/src/data/UserEntity.ts NOFILENAME !!/>`
 
 will inject the file contents into the prompt:
 
@@ -35,9 +35,17 @@ will inject the file contents into the prompt:
 // file contents
 ```
 
+The `KEY_NAME_FOR_VALUE` will update the values map as follows:
+
+```
+values["KEY_NAME_FOR_VALUE"] = actual file name
+```
+
+Use the `KEY_NAME_FOR_VALUE` when referencing files.
+
 Adding the following to a user prompt:
 
-`<!! FILE ~/ts-react-express-openai-aici/backend/src/data/UserEntity.ts !!/>`
+`<!! FILE KEY_NAME_FOR_VALUE ~/ts-react-express-openai-aici/backend/src/data/UserEntity.ts !!/>`
 
 will inject the file contents into the prompt:
 

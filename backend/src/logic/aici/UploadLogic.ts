@@ -24,7 +24,7 @@ export class UploadLogic {
         return logs;
     }
     public static async download(logger: Logger, ds: EntitiesDataSource, body: AiciFile): Promise<AiciFile> {
-        if(!body.file || body.file === "undefined")
+        if (!body.file || body.file === "undefined")
             throw new Error("You must provide a file name!");
 
         let file: AiciFile | null = null;
@@ -41,7 +41,7 @@ export class UploadLogic {
     private static async downloadVector(ds: EntitiesDataSource, collection: string, file: string): Promise<AiciFile | null> {
         let vector = await VectorLogic.search(ds, collection, file, 1);
 
-        if(vector[0].score < 0.75)
+        if (vector[0].score < 0.75)
             throw new Error(`File '${file}' not found with confidence!`);
 
         return {
@@ -165,6 +165,9 @@ export class UploadLogic {
         }
     }
     private static saveUpload(upload: AiciFile, extension: string | undefined): string {
+        if (!fs.existsSync(Config.tempDirectory))
+            fs.mkdirSync(Config.tempDirectory, { recursive: true });
+
         const fileName = upload.file;
         const contents = upload.contents;
         if (!fileName || !contents)
