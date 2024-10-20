@@ -15,7 +15,7 @@ class Page extends BasePage<Props, State> {
                 topMenuGuid="b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3"
                 leftMenuGuid="5a8a209b-e6c1-42e4-8bc9-f144feec6d8e"
             >
-<Markdown>{`
+                <Markdown page={this}>{`
 # TypeScript React Express
 
 Copyright &copy; 2024 Shawn Zernik

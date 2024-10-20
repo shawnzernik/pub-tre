@@ -94,7 +94,7 @@ class Page extends BasePage<Props, State> {
                     this.state.logs
                         ? <>
                             <Heading level={2}>Logs</Heading>
-                            <Markdown>{this.state.logs}</Markdown>
+                            <Markdown page={this}>{this.state.logs}</Markdown>
                         </>
                         : <></>
                 }

@@ -148,7 +148,8 @@ class Page extends BasePage<Props, State> {
             const dto: PromptDto = {
                 guid: UUIDv4.generate(),
                 title: Date.now().toString(),
-                json: JSON.stringify(this.state.messages)
+                json: JSON.stringify(this.state.messages),
+                input: ""
             };
 
             const token = await AuthService.getToken();
@@ -189,7 +190,7 @@ class Page extends BasePage<Props, State> {
                     height: "calc(100vh - 25em)",
                     overflow: "auto"
                 }}>
-                    <Markdown>{markdown}</Markdown>
+                    <Markdown page={this}>{markdown}</Markdown>
                 </div>
 
                 <FlexRow gap="1em" style={{

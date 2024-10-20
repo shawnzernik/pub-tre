@@ -15,7 +15,7 @@ class Page extends BasePage<Props, State> {
                 topMenuGuid="b9aeb1c2-4f07-4e91-bbef-25ed565b6ab3"
                 leftMenuGuid="4fa7b2ae-953d-45ed-bc83-2194176b0c59"
             >
-<Markdown>{`
+                <Markdown page={this}>{`
 # Help
 
 The following help file can be modified.  This document is intended to provide end users documentation on system use.
@@ -29,7 +29,7 @@ To gain access to this system, please contact the system administrator to create
 The system provides two levels of navigation: the top menu, and children menu items on the left.  If you click the application icon/name in the top left, it will show or hide the menu.
 
 `}
-</Markdown>
+                </Markdown>
             </Navigation>
         );
     }

@@ -150,7 +150,7 @@ class Page extends BasePage<Props, State> {
                     </FlexRow>
                 </Form>
 
-                <Markdown>{md}</Markdown>
+                <Markdown page={this}>{md}</Markdown>
             </Navigation>
         );
     }

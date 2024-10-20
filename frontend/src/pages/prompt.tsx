@@ -17,6 +17,9 @@ import { AiciService } from "../services/AiciService";
 import { EmbeddingLogic } from "../logic/EmbeddingLogic";
 import { Markdown } from "../components/Markdown";
 import { Tabs } from "../components/Tabs";
+import { FlexRow } from "../components/FlexRow";
+import { DatasetDto } from "common/src/models/DatasetDto";
+import { DatasetService } from "../services/DatasetService";
 
 interface Props { }
 
@@ -30,6 +33,7 @@ interface State extends BasePageState {
     files: string;
     values: string;
     status: string;
+    embeddingLogic: EmbeddingLogic | null;
 }
 
 /**
@@ -56,6 +60,7 @@ class Page extends BasePage<Props, State> {
             files: "",
             values: "",
             status: "Not started",
+            embeddingLogic: null
         }
     }
 
@@ -229,7 +234,10 @@ class Page extends BasePage<Props, State> {
         try {
             await this.events.setLoading(true);
 
-            this.updateState({ status: `${embeddingLogic.completed.length} of ${embeddingLogic.originals.length} prompts done; ${embeddingLogic.tokens} tokens; ${embeddingLogic.milliseconds / 1000} seconds` });
+            this.updateState({
+                status: `${embeddingLogic.completed.length} of ${embeddingLogic.originals.length} prompts done; ${embeddingLogic.tokens} tokens; ${embeddingLogic.milliseconds / 1000} seconds`,
+                embeddingLogic: embeddingLogic
+            });
 
             while (embeddingLogic.completed.length < embeddingLogic.originals.length) {
                 await embeddingLogic.process();
@@ -237,13 +245,15 @@ class Page extends BasePage<Props, State> {
                     output: embeddingLogic.markdownCompletions(),
                     files: embeddingLogic.markdownSaves(),
                     values: embeddingLogic.markdownValues(),
-                    status: embeddingLogic.status
+                    status: embeddingLogic.status,
+                    embeddingLogic: embeddingLogic
                 });
                 await this.events.setLoading(false);
             }
 
             await this.updateState({
-                status: `Done - ${embeddingLogic.status}`
+                status: `Done - ${embeddingLogic.status}`,
+                embeddingLogic: embeddingLogic
             });
             await Dialogue(this, "Done", "We have completed processing the messages!")
         }
@@ -252,12 +262,38 @@ class Page extends BasePage<Props, State> {
             await this.updateState({
                 output: embeddingLogic.markdownCompletions(),
                 files: embeddingLogic.markdownSaves(),
-                values: embeddingLogic.markdownValues()
+                values: embeddingLogic.markdownValues(),
+                embeddingLogic: embeddingLogic
             });
             await ErrorMessage(this, err);
         }
         finally {
             await this.events.setLoading(false);
+        }
+    }
+
+    public async saveDatasetClicked() {
+        try {
+            await this.events.setLoading(true);
+
+            const dto: DatasetDto = {
+                guid: UUIDv4.generate(),
+                includeInTraining: false,
+                isUploaded: false,
+                json: JSON.stringify(this.state.embeddingLogic.completed),
+                title: Date.now().toString()
+            }
+
+            const token = await AuthService.getToken();
+            await DatasetService.save(token, dto);
+
+            await Dialogue(this, "Saved", "You dataset has been saved!");
+
+            await this.events.setLoading(false);
+        }
+        catch (err) {
+            await this.events.setLoading(false);
+            await ErrorMessage(this, err);
         }
     }
 
@@ -386,9 +422,17 @@ class Page extends BasePage<Props, State> {
                             <Heading level={2}>Messages</Heading>
                             {messages}
                         </>,
-                        "Files": <Markdown>{this.state.files}</Markdown>,
-                        "Values": <Markdown>{this.state.values}</Markdown>,
-                        "Output": <Markdown>{this.state.output}</Markdown>
+                        "Files": <Markdown page={this}>{this.state.files}</Markdown>,
+                        "Values": <Markdown page={this}>{this.state.values}</Markdown>,
+                        "Output": this.state.output
+                            ? <>
+                                <Markdown page={this}>{this.state.output}</Markdown>
+                                <br />
+                                <FlexRow>
+                                    <Button label="Save Dataset" onClick={this.saveDatasetClicked.bind(this)} />
+                                </FlexRow>
+                            </>
+                            : null
                     }}
                 />
 

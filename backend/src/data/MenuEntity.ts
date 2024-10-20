@@ -2,41 +2,77 @@ import { Entity, PrimaryColumn, Column } from "typeorm";
 import { CopyInterface } from "common/src/logic/CopyInterface";
 import { MenuDto } from "common/src/models/MenuDto";
 
+/**
+ * Represents the Menu entity in the database.
+ * Maps to the 'menus' table and implements the MenuDto and CopyInterface<MenuDto>.
+ */
 @Entity("menus")
 export class MenuEntity implements MenuDto, CopyInterface<MenuDto> {
-	@PrimaryColumn({ name: "guid", type: "uuid" })
-	public guid: string = "";
+    /**
+     * The unique identifier for the Menu.
+     * @type {string}
+     */
+    @PrimaryColumn({ name: "guid", type: "uuid" })
+    public guid: string = "";
 
-	@Column({ name: "parents_guid", type: "uuid", nullable: true })
-	public parentsGuid: string | null = null;
+    /**
+     * The GUID of the parent Menu.
+     * @type {string | null}
+     */
+    @Column({ name: "parents_guid", type: "uuid", nullable: true })
+    public parentsGuid: string | null = null;
 
-	@Column({ name: "order", type: "int" })
-	public order: number = 0;
+    /**
+     * The order of the Menu in the hierarchy.
+     * @type {number}
+     */
+    @Column({ name: "order", type: "int" })
+    public order: number = 0;
 
-	@Column({ name: "display", type: "varchar", length: 100 })
-	public display: string = "";
+    /**
+     * The display name of the Menu.
+     * @type {string}
+     */
+    @Column({ name: "display", type: "varchar", length: 100 })
+    public display: string = "";
 
-	@Column({ name: "bootstrap_icon", type: "varchar", length: 100 })
-	public bootstrapIcon: string = "";
+    /**
+     * The Bootstrap icon class associated with the Menu.
+     * @type {string}
+     */
+    @Column({ name: "bootstrap_icon", type: "varchar", length: 100 })
+    public bootstrapIcon: string = "";
 
-	@Column({ name: "url", type: "varchar", length: 250 })
-	public url: string = "";
+    /**
+     * The URL that the Menu points to.
+     * @type {string}
+     */
+    @Column({ name: "url", type: "varchar", length: 250 })
+    public url: string = "";
 
-	public copyFrom(source: MenuDto): void {
-		this.guid = source.guid;
-		this.parentsGuid = source.parentsGuid;
+    /**
+     * Copies properties from the source MenuDto to this instance.
+     * @param {MenuDto} source - The source MenuDto to copy from.
+     */
+    public copyFrom(source: MenuDto): void {
+        this.guid = source.guid;
+        this.parentsGuid = source.parentsGuid;
         this.order = source.order;
         this.display = source.display;
         this.bootstrapIcon = source.bootstrapIcon;
         this.url = source.url;
-	}
-	
-	public copyTo(dest: MenuDto): void {
-		dest.guid = this.guid;
-		dest.parentsGuid = this.parentsGuid;
-		dest.order = this.order;
-		dest.display = this.display;
-		dest.bootstrapIcon = this.bootstrapIcon;
-		dest.url = this.url;
-	}
+    }
+
+    /**
+     * Copies properties from this instance to the destination MenuDto.
+     * @param {MenuDto} dest - The destination MenuDto to copy to.
+     */
+    public copyTo(dest: MenuDto): void {
+        dest.guid = this.guid;
+        dest.parentsGuid = this.parentsGuid;
+        dest.order = this.order;
+        dest.display = this.display;
+        dest.bootstrapIcon = this.bootstrapIcon;
+        dest.url = this.url;
+    }
 }
