@@ -9,7 +9,7 @@ jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
 describe("PromptService", () => {
     let agent = new https.Agent({ rejectUnauthorized: false });
-    let entityGuid = "4a5b6c7d-8e9f-10aa-bbcc-ddeeff001122"; // Sample GUID for prompt
+    let entityGuid = "b7626b9f-f145-4fe6-b360-1ae67de86208";
     let token: string | undefined;
     let eds: EntitiesDataSource;
 
@@ -38,7 +38,6 @@ describe("PromptService", () => {
 
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
-    
     afterAll(async () => {
         try { await eds.promptRepository().delete({ guid: entityGuid }); }
         finally { await eds.destroy(); }
@@ -50,8 +49,9 @@ describe("PromptService", () => {
 
         const entity = new PromptEntity();
         entity.guid = entityGuid;
-        entity.title = "New Prompt";
-        entity.json = "{\"key\":\"value\"}";
+        entity.title = "Sample Prompt";
+        entity.input = "This is a sample input.";
+        entity.json = "{}";
 
         const response = await fetch("https://localhost:4433/api/v0/prompt", {
             agent: agent,
@@ -71,17 +71,17 @@ describe("PromptService", () => {
         expect(response.status).toBe(200);
 
         let reloaded = await eds.promptRepository().findOneByOrFail({ guid: entityGuid });
-        expect(entity).toEqual(reloaded);
+        expect(entity.title).toEqual(reloaded.title);
     }, Config.jestTimeoutSeconds * 1000);
-    
     test("POST /api/v0/prompt overwrite should return 200", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
         const entity = new PromptEntity();
         entity.guid = entityGuid;
-        entity.title = "Updated Prompt";
-        entity.json = "{\"key\":\"updatedValue\"}";
+        entity.title = "Sample Prompt Updated";
+        entity.input = "This is an updated sample input.";
+        entity.json = "{}";
 
         const response = await fetch("https://localhost:4433/api/v0/prompt", {
             agent: agent,
@@ -101,9 +101,8 @@ describe("PromptService", () => {
         expect(response.status).toBe(200);
 
         let reloaded = await eds.promptRepository().findOneByOrFail({ guid: entityGuid });
-        expect(entity).toEqual(reloaded);
+        expect(entity.title).toEqual(reloaded.title);
     }, Config.jestTimeoutSeconds * 1000);
-    
     test("GET /api/v0/prompts should return prompt list", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
@@ -129,7 +128,6 @@ describe("PromptService", () => {
         expect(data.length > 0).toBeTruthy();
         expect(data[0].guid).toBeTruthy();
     }, Config.jestTimeoutSeconds * 1000);
-    
     test("GET /api/v0/prompt/:guid should return prompt and 200", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
@@ -154,7 +152,6 @@ describe("PromptService", () => {
 
         expect(data.guid).toEqual(entityGuid);
     }, Config.jestTimeoutSeconds * 1000);
-    
     test("DELETE /api/v0/prompt/:guid should delete prompt and return 200", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");

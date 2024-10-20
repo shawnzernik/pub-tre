@@ -25,7 +25,6 @@ interface Props { }
  */
 interface State extends BasePageState {
     model: PromptDto;
-    input: string;
     messages: AiciMessage[];
     output: string;
     files: string;
@@ -49,9 +48,9 @@ class Page extends BasePage<Props, State> {
             model: {
                 guid: UUIDv4.generate(),
                 title: "",
-                json: ""
+                json: "",
+                input: ""
             },
-            input: "",
             messages: [],
             output: "",
             files: "",
@@ -226,7 +225,7 @@ class Page extends BasePage<Props, State> {
      * @param index - The index of the message to run from.
      */
     async runClicked() {
-        const embeddingLogic = new EmbeddingLogic(this.state.messages, this.state.input);
+        const embeddingLogic = new EmbeddingLogic(this.state.messages, this.state.model.input);
         try {
             await this.events.setLoading(true);
 
@@ -346,11 +345,11 @@ class Page extends BasePage<Props, State> {
                         <Input
                             value={this.state.model.title}
                             onChange={async (value) => {
-                                const newPrompt = this.jsonCopy(this.state.model);
-                                newPrompt.title = value;
+                                const newModel = this.jsonCopy(this.state.model);
+                                newModel.title = value;
 
                                 await this.updateState({
-                                    model: newPrompt
+                                    model: newModel
                                 });
                             }}
                         />
@@ -366,10 +365,13 @@ class Page extends BasePage<Props, State> {
                     <Field label="Input">
                         <TextArea
                             rows={10}
-                            value={this.state.input}
+                            value={this.state.model.input}
                             onChange={async (value) => {
+                                const newModel = this.jsonCopy(this.state.model);
+                                newModel.input = value;
+
                                 await this.updateState({
-                                    input: value
+                                    model: newModel
                                 });
                             }}
                         />
