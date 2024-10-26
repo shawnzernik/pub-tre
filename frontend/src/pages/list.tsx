@@ -19,6 +19,10 @@ import { MenuDto } from "common/src/models/MenuDto";
 import { ListService } from "../services/ListService";
 import { AuthService } from "../services/AuthService";
 import { MenuService } from "../services/MenuService";
+import { MenuLogic } from "common/src/logic/MenuLogic";
+import { ListFilterService } from "../services/ListFilterService";
+import { ListFilterDto } from "common/src/models/ListFilterDto";
+import { ListFilterEditList } from "./subpages/ListFilterEditList";
 
 interface Props { }
 
@@ -27,6 +31,8 @@ interface Props { }
  */
 interface State extends BasePageState {
     model: ListDto;
+    filters: ListFilterDto[];
+    showAddFilterButton: boolean;
 }
 
 /**
@@ -57,7 +63,9 @@ class Page extends BasePage<Props, State> {
                 sql: "",
                 urlKey: "",
                 editUrl: ""
-            }
+            },
+            filters: [],
+            showAddFilterButton: false
         };
     }
 
@@ -66,14 +74,6 @@ class Page extends BasePage<Props, State> {
      */
     public async componentDidMount(): Promise<void> {
         this.events.setLoading(true);
-
-        const menuCompare = (a: MenuDto, b: MenuDto) => {
-            if (a.display < b.display)
-                return -1;
-            if (a.display > b.display)
-                return 1;
-            return 0;
-        };
 
         // load all menus
         const token = await AuthService.getToken();
@@ -89,7 +89,7 @@ class Page extends BasePage<Props, State> {
             topMenuDictionary[menu.guid] = menu;
             topMenuList.push(menu);
         });
-        topMenuList.sort(menuCompare);
+        topMenuList.sort(MenuLogic.compareDisplay);
 
         // create & organize left menu data
         const leftMenuList: MenuDto[] = [];
@@ -100,7 +100,7 @@ class Page extends BasePage<Props, State> {
             menu.display = topMenuDictionary[menu.parentsGuid].display + " > " + menu.display;
             leftMenuList.push(menu);
         });
-        leftMenuList.sort(menuCompare);
+        leftMenuList.sort(MenuLogic.compareDisplay);
 
         // load select options
         this.topMenuOptions.push(<SelectOption key="" display="" value="" />);
@@ -119,8 +119,14 @@ class Page extends BasePage<Props, State> {
             return;
         }
 
+        // load models
         const model = await ListService.get(token, guid);
-        await this.updateState({ model: model });
+        const filters = await ListFilterService.listByParentList(token, guid);
+        await this.updateState({
+            model: model,
+            filters: filters,
+            showAddFilterButton: true
+        });
         this.events.setLoading(false);
     }
 
@@ -156,6 +162,23 @@ class Page extends BasePage<Props, State> {
             await ErrorMessage(this, err);
             await this.events.setLoading(false);
         }
+    }
+
+    public addFilterClicked() {
+        const newFilters = this.jsonCopy(this.state.filters);
+        newFilters.push({
+            guid: UUIDv4.generate(),
+            label: "",
+            listsGuid: this.state.model.guid,
+            sqlColumn: "",
+            sqlType: "",
+            defaultCompare: "",
+            defaultValue: "",
+            optionsSql: ""
+        });
+        this.updateState({
+            filters: newFilters
+        });
     }
 
     /**
@@ -238,8 +261,19 @@ class Page extends BasePage<Props, State> {
                         }}
                     /></Field>
                 </Form>
+                <ListFilterEditList
+                    value={this.state.filters}
+                    onChange={async (list) => {
+                        await this.updateState({ filters: list });
+                    }}
+                />
                 <FlexRow gap="1em">
                     <Button label="Save" onClick={this.saveClicked.bind(this)} />
+                    {
+                        this.state.showAddFilterButton
+                            ? <Button label="Add Filter" onClick={this.addFilterClicked.bind(this)} />
+                            : null
+                    }
                     <Button label="Delete" onClick={this.deleteClicked.bind(this)} />
                 </FlexRow>
             </Navigation >

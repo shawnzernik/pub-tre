@@ -33,8 +33,18 @@ export class BasePage<P, S extends BasePageState> extends React.Component<P, S> 
      * @param model - The model to be copied.
      * @returns A deep copy of the provided model.
      */
-    protected jsonCopy<T>(model: T): T {
+    public static jsonCopy<T>(model: T): T {
         return JSON.parse(JSON.stringify(model)) as T;
+    }
+
+    /**
+     * Creates a deep copy of an object using JSON serialization.
+     * 
+     * @param model - The model to be copied.
+     * @returns A deep copy of the provided model.
+     */
+    public jsonCopy<T>(model: T): T {
+        return BasePage.jsonCopy(model);
     }
 
     /**

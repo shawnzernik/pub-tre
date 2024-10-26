@@ -23,6 +23,7 @@ export class ListFilterService extends BaseService {
         app.get("/api/v0/list_filters", (req, resp) => { this.methodWrapper(req, resp, this.getList) });
         app.post("/api/v0/list_filter", (req, resp) => { this.methodWrapper(req, resp, this.postSave) });
         app.delete("/api/v0/list_filter/:guid", (req, resp) => { this.methodWrapper(req, resp, this.deleteGuid) });
+        app.get("/api/v0/list/:guid/filters", (req, resp) => { this.methodWrapper(req, resp, this.getListByParentList) });
     }
 
     /**
@@ -53,6 +54,18 @@ export class ListFilterService extends BaseService {
         await BaseService.checkSecurity(logger, "ListFilter:List", req, ds);
 
         const ret = await ds.listFilterRepository().find();
+        return ret;
+    }
+
+    public async getListByParentList(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<ListFilterDto[]> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "ListFilter:List", req, ds);
+
+        const guid = req.params["guid"];
+        const ret = await ds.listFilterRepository().find({
+            where: { listsGuid: guid },
+            order: { listsGuid: "ASC" }
+        });
         return ret;
     }
 
