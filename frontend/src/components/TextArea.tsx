@@ -66,6 +66,7 @@ export class TextArea extends React.Component<Props, State> {
 
         return (
             <textarea
+                wrap="off"
                 id={this.props.id}
                 ref={this.textAreaRef}
                 style={style}

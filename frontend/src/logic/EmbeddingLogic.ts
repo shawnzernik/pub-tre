@@ -8,11 +8,13 @@ import { AuthService } from "../services/AuthService";
  */
 export class EmbeddingLogic {
     private static fileRegexp = /<!!\s*FILE\s*([~\w-/\.]*)\s*([~\w-/\.]*)\s*(?:NOFILENAME)?\s*!!\/>/g;
+    private static projectRegExp = /<!!\s*PROJECT\s*([~\w-/\.]*)\s*([~\w-/\.]*)\s*(?:NOFILENAME)?\s*!!\/>/g;
     private static mdFileNameRegExp = /File(?:\s*name)\s*[\`\']([\S]*)[\`\']:/g;
     private static mdFileContentRegExp = /\`\`\`(?:\S*)\n([\s\S]*)\n\`\`\`/g;
-    private static equalsRegExp = /[Ee]quals:\s*(.*)/g;
-    private static saveRegExp = /[Ss]ave:\s*([^\s%]*)/g;
-    private static setRegExp = /[Ss]et:\s*([^\s%]*)/g;
+    private static equalsRegExp = /Equals:\s*(.*)/g;
+    private static saveRegExp = /Save:\s*([^\s%]*)/g;
+    private static inputSetRegExp = /Set:\s*([^\s%]*)\s*=\s*(.*)/g;
+    private static setRegExp = /Set:\s*([^\s%]*)/g;
 
     /**
      * Original messages received.
@@ -54,7 +56,33 @@ export class EmbeddingLogic {
      */
     public constructor(originals: AiciMessage[], input?: string) {
         this.originals = originals;
-        this.values["INPUT"] = input;
+
+        if (input) {
+            const split = input.split("\n");
+            if (split.length == 1) {
+                const matches = Array.from(input.matchAll(EmbeddingLogic.inputSetRegExp));
+                if (matches.length == 0)
+                    this.values["INPUT"] = input;
+                else {
+                    this.values["INPUT"] = "%INPUT%";
+                    for (let match of matches) {
+                        const key = match[1];
+                        const value = match[2];
+                        this.values[key] = value;
+                    }
+                }
+            } else {
+                for (let line of split) {
+                    const matches = Array.from(line.matchAll(EmbeddingLogic.inputSetRegExp));
+                    for (let match of matches) {
+                        const key = match[1];
+                        const value = match[2];
+                        this.values[key] = value;
+                    }
+                }
+                this.values["INPUT"] = "%INPUT%";
+            }
+        }
 
         let savePrompt = "";
         savePrompt += "\n";
@@ -67,7 +95,6 @@ export class EmbeddingLogic {
         savePrompt += "// code goes here\n";
         savePrompt += "```\n";
         savePrompt += "\n";
-
         this.values["SAVE_PROMPT"] = savePrompt;
     }
 
@@ -88,7 +115,10 @@ export class EmbeddingLogic {
 
         const started = Date.now();
 
-        let message = this.processValues(originalUser.content);
+        let message = originalUser.content;
+        message = this.processValues(message);
+        message = await this.processProject(message);
+        message = this.processValues(message);
         message = await this.processFiles(message);
         message = this.processValues(message);
 
@@ -229,7 +259,7 @@ export class EmbeddingLogic {
             const matchedText = match[0]; // matched text
 
             if (!match[1] || !match[2])
-                throw new Error(`Invalid file format!  Expected '<!! FILE VALUE_KEY_NAME path/to/file.ext !!/> or '<!! FILE VALUE_KEY_NAME path/to/file.ext NOFILENAME !!/>'.  Recieved '${match[0]}'.`);
+                throw new Error(`Invalid file format!  Expected /${EmbeddingLogic.fileRegexp.source}/g.  Received '${match[0]}'.`);
 
             const keyName = match[1]; // group 1: value's key
             const fileName = match[2]; // group 2: file name
@@ -257,6 +287,42 @@ export class EmbeddingLogic {
         return ret;
     }
 
+    private async processProject(original: string): Promise<string> {
+        let ret = original;
+
+        const iterable = ret.matchAll(EmbeddingLogic.projectRegExp);
+        const matches = Array.from(iterable);
+        for (let match of matches) {
+            const matchedText = match[0]; // matched text
+
+            if (!match[1] || !match[2])
+                throw new Error(`Invalid project format!  Expected /${EmbeddingLogic.projectRegExp.source}/g.  Received '${match[0]}'.`);
+
+            const keyName = match[1]; // group 1: value's key
+            const fileName = match[2]; // group 2: file name
+
+            const token = await AuthService.getToken();
+            const aiciFile = await AiciService.project(token, fileName);
+
+            this.values[keyName] = aiciFile.file;
+
+            let markdown = "\n";
+
+            if (!matchedText.includes("NOFILENAME")) {
+                markdown += "File name `" + aiciFile.file + "`:\n";
+                markdown += "\n";
+            }
+
+            markdown += "```\n";
+            markdown += aiciFile.contents.replace(/`/g, "\`");
+            markdown += "\n```\n";
+            markdown += "\n";
+
+            ret = ret.replace(this.createRegExpForLiteral(matchedText), markdown);
+        };
+
+        return ret;
+    }
     /**
      * Creates a regular expression for literal text, escaping special characters.
      * @param literal The literal text to escape.
@@ -352,7 +418,7 @@ export class EmbeddingLogic {
             ret += "**" + key + "**:\n";
             ret += "\n";
             ret += "```\n";
-            ret += this.values[key].replace(/`/g, "\\`");
+            ret += (this.values[key] ? this.values[key] : "").replace(/`/g, "\\`");
             ret += "\n```\n";
             ret += "\n";
         }

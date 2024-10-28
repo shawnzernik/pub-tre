@@ -55,7 +55,7 @@ class Page extends BasePage<Props, State> {
                 json: "",
                 input: ""
             },
-            messages: [],
+            messages: [{ role: "user", content: "" }, { role: "assistant", content: "" }],
             output: "",
             files: "",
             values: "",
@@ -74,7 +74,7 @@ class Page extends BasePage<Props, State> {
 
             const guid = this.queryString("guid");
             if (!guid)
-                throw new Error("You must save a chat history to create a new prompt.");
+                return;
 
             const token = await AuthService.getToken();
             const prompt = await PromptService.get(token, guid);

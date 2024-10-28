@@ -28,6 +28,7 @@ export class AiciService extends BaseService {
         app.post("/api/v0/aici/chat", (req, resp) => { this.methodWrapper(req, resp, this.postChat) });
         app.post("/api/v0/aici/upload", (req, resp) => { this.methodWrapper(req, resp, this.postUpload) });
         app.post("/api/v0/aici/download", (req, resp) => { this.methodWrapper(req, resp, this.postDownload) });
+        app.post("/api/v0/aici/project", (req, resp) => { this.methodWrapper(req, resp, this.postProject) });
         app.get("/api/v0/aici/upload/:corelation", (req, resp) => { this.methodWrapper(req, resp, this.getUpload) });
         app.post("/api/v0/aici/search/:collection", (req, resp) => { this.methodWrapper(req, resp, this.postSearch) });
     }
@@ -75,7 +76,15 @@ export class AiciService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Aici:Download", req, ds);
 
-        const ret = await UploadLogic.download(logger, ds, req.body);
+        const ret = await UploadLogic.download(ds, req.body);
+        return ret;
+    }
+
+    public async postProject(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<AiciFile> {
+        await logger.trace();
+        await BaseService.checkSecurity(logger, "Aici:Project", req, ds);
+
+        const ret = await UploadLogic.project(ds, req.body);
         return ret;
     }
 

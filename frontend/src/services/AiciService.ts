@@ -114,6 +114,21 @@ export class AiciService {
 
         return response;
     }
+    public static async project(token: string, file: string): Promise<AiciFile> {
+        const obj: AiciFile = {
+            file: file,
+            contents: ""
+        };
+
+        const response = await FetchWrapper.post<AiciFile>({
+            url: "/api/v0/aici/project",
+            body: obj,
+            corelation: UUIDv4.generate(),
+            token: token
+        });
+
+        return response;
+    }
 
     /**
      * Retrieves log entries associated with a specific correlation ID.

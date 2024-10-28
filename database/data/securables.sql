@@ -48,6 +48,7 @@ INSERT INTO "securables" ("guid", "display_name") VALUES
 ('094322e3-de92-43c6-873d-79ce6bb94ea8', 'Aici:Chat'),
 ('828134c2-ae24-46bf-87b8-55efaa4f41af', 'Aici:Upload'),
 ('a1f76365-9617-4026-a584-75721d8d951a', 'Aici:Download'),
+('fcdde54a-6f87-480d-97d7-cd456a252f2f', 'Aici:Project'),
 ('a2410626-adc1-4e47-b54c-bd2e6a547fbd', 'Aici:Embedding'),
 ('49a13828-eb18-48a1-aecf-a5037853c0cc', 'Aici:Clone'),
 ('0b23b8f4-8654-4d1a-b9ea-ef5bece463aa', 'Aici:Train'),

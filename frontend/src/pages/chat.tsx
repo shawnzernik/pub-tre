@@ -15,6 +15,7 @@ import { UUIDv4 } from "common/src/logic/UUIDv4";
 import { DatasetService } from "../services/DatasetService";
 import { PromptDto } from "common/src/models/PromptDto";
 import { PromptService } from "../services/PromptService";
+import { Tabs } from "../components/Tabs";
 
 interface Props { }
 
@@ -126,9 +127,6 @@ class Page extends BasePage<Props, State> {
                 messages: newMessages
             });
 
-            const convo = document.getElementById("convo");
-            convo.scrollTop = convo.scrollHeight;
-
             await this.events.setLoading(false);
         }
         catch (err) {
@@ -215,37 +213,51 @@ class Page extends BasePage<Props, State> {
                 topMenuGuid="a4b3b92f-3037-4780-a5c2-3d9d85d6b5a4"
                 leftMenuGuid="b3d886a8-dd3d-426a-9ddf-1e18cbb7e224"
             >
-                <div id="convo" style={{
-                    width: "100%",
-                    height: "calc(100vh - 25em)",
-                    overflow: "auto"
-                }}>
-                    <Markdown page={this}>{markdown}</Markdown>
-                </div>
-
-                <FlexRow gap="1em" style={{
-                    borderTop: "1pt solid " + Theme.mediumText,
-                    paddingTop: "1em"
-                }}>
-                    <span>Input: {this.state.inputTokens}</span>
-                    <span>New: {this.state.outputTokens - this.state.inputTokens}</span>
-                    <span>Output: {this.state.outputTokens}</span>
-                    <span>Seconds: {this.state.seconds.toFixed(2)}</span>
-                    <span>T/S: {(this.state.outputTokens / this.state.seconds).toFixed(2)}</span>
-                </FlexRow>
-                <TextArea rows={10}
-                    monospace={true}
-                    value={this.state.user}
-                    onChange={async (value) => {
-                        await this.updateState({ user: value });
+                <Tabs
+                    components={{
+                        "Send Message":
+                            <div
+                                style={{ display: "flex", flexDirection: "column", gap: "1em", height: "calc(100vh - 12em)" }}
+                            >
+                                <div></div>
+                                <TextArea
+                                    style={{ flexGrow: "1", flexShrink: "1", height: "100%" }}
+                                    monospace={true}
+                                    value={this.state.user}
+                                    onChange={async (value) => {
+                                        await this.updateState({ user: value });
+                                    }}
+                                ></TextArea>
+                                <FlexRow
+                                    gap="1em"
+                                    style={{ flexGrow: "0", flexShrink: "0" }}
+                                >
+                                    <Button label="Submit" onClick={this.submitClicked.bind(this)} />
+                                    <Button label="Reset" onClick={this.resetClicked.bind(this)} />
+                                    <Button label="Save Dataset" onClick={this.saveDatasetClicked.bind(this)} />
+                                    <Button label="Save Prompt" onClick={this.savePromptClicked.bind(this)} />
+                                </FlexRow>
+                            </div>,
+                        "Conversation": <>
+                            <div style={{
+                                width: "100%",
+                                overflow: "auto"
+                            }}>
+                                <Markdown page={this}>{markdown}</Markdown>
+                            </div>
+                            <FlexRow gap="1em" style={{
+                                borderTop: "1pt solid " + Theme.mediumText,
+                                paddingTop: "1em"
+                            }}>
+                                <span>Input: {this.state.inputTokens}</span>
+                                <span>New: {this.state.outputTokens - this.state.inputTokens}</span>
+                                <span>Output: {this.state.outputTokens}</span>
+                                <span>Seconds: {this.state.seconds.toFixed(2)}</span>
+                                <span>T/S: {(this.state.outputTokens / this.state.seconds).toFixed(2)}</span>
+                            </FlexRow>
+                        </>
                     }}
-                ></TextArea>
-                <FlexRow gap="1em">
-                    <Button label="Submit" onClick={this.submitClicked.bind(this)} />
-                    <Button label="Reset" onClick={this.resetClicked.bind(this)} />
-                    <Button label="Save Dataset" onClick={this.saveDatasetClicked.bind(this)} />
-                    <Button label="Save Prompt" onClick={this.savePromptClicked.bind(this)} />
-                </FlexRow>
+                />
             </Navigation>
         );
     }

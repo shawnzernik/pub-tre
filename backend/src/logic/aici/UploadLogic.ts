@@ -41,16 +41,22 @@ export class UploadLogic {
      * @param body - The AiciFile object containing file download information.
      * @returns The downloaded AiciFile object.
      */
-    public static async download(logger: Logger, ds: EntitiesDataSource, body: AiciFile): Promise<AiciFile> {
+    public static async download(ds: EntitiesDataSource, body: AiciFile): Promise<AiciFile> {
         if (!body.file || body.file === "undefined")
             throw new Error("You must provide a file name!");
 
-        let file: AiciFile | null = null;
-        file = UploadLogic.downloadFile(ds, body.file);
+        const file = await UploadLogic.downloadVector(ds, Config.qdrantNameCollection, body.file);
         if (file)
             return file;
 
-        file = await UploadLogic.downloadVector(ds, Config.qdrantNameCollection, body.file);
+        throw new Error(`Could not locate file or embedding by name '${body.file}'!`);
+    }
+
+    public static async project(ds: EntitiesDataSource, body: AiciFile): Promise<AiciFile> {
+        if (!body.file || body.file === "undefined")
+            throw new Error("You must provide a file name!");
+
+        const file = await UploadLogic.downloadFile(ds, body.file);
         if (file)
             return file;
 
@@ -85,20 +91,22 @@ export class UploadLogic {
      * @param requested - The name of the requested file.
      * @returns An AiciFile object if the file exists and is accessible, or null if not found.
      */
-    private static downloadFile(ds: EntitiesDataSource, requested: string): AiciFile | null {
+    private static async downloadFile(ds: EntitiesDataSource, requested: string): Promise<AiciFile | null> {
+        const setting = await ds.settingRepository().findByKey("Aici:Project");
+
         let file = requested;
         if (file.startsWith("~/"))
-            file = path.join(Config.tempDirectory, file.substring(2, file.length));
+            file = path.join(setting.value, file.substring(2, file.length));
 
         file = path.resolve(file);
-        const temp = path.resolve(Config.tempDirectory);
+        const temp = path.resolve(setting.value);
         if (!file.startsWith(temp))
             return null;
         if (!fs.existsSync(file))
             return null;
 
         return {
-            file: file,
+            file: requested,
             contents: fs.readFileSync(file, { encoding: "utf8" })
         }
     }
