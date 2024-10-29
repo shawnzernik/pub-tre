@@ -7,11 +7,25 @@ import { AuthService } from "../services/AuthService";
 import { ListDto } from "common/src/models/ListDto";
 import { Heading } from "../components/Heading";
 import { Table } from "../components/Table";
+import { ListFilterService } from "../services/ListFilterService";
+import { ListFilterDto } from "common/src/models/ListFilterDto";
+import { Form } from "../components/Form";
+import { Field } from "../components/Field";
+import { Select } from "../components/Select";
+import { SelectOption } from "../components/SelectOption";
+import { Dictionary } from "common/src/Dictionary";
+import { FlexRow } from "../components/FlexRow";
+import { Button } from "../components/Button";
+import { Input } from "../components/Input";
 
 interface Props { }
 interface State extends BasePageState {
     items: any[];
     list?: ListDto;
+    filtersByGuid: Dictionary<ListFilterDto>;
+    selectedFilter: string;
+    filterOptions: React.ReactElement[];
+    filters: ListFilterDto[];
 }
 
 /**
@@ -27,7 +41,11 @@ class Page extends BasePage<Props, State> {
 
         this.state = {
             ...BasePage.defaultState,
-            items: []
+            items: [],
+            filtersByGuid: {},
+            selectedFilter: "",
+            filterOptions: [],
+            filters: []
         };
     }
 
@@ -40,12 +58,39 @@ class Page extends BasePage<Props, State> {
 
         const token = await AuthService.getToken();
         const list = await ListService.getUrlKey(token, this.queryString("url_key"));
-        await this.updateState({ list: list });
+        const items = await ListService.getItems(token, list.guid, []);
 
-        const items = await ListService.getItems(token, this.state.list.guid, []);
-        await this.updateState({ items: items });
+        const filters = await ListFilterService.listByParentList(token, list.guid);
+        filters.sort((a, b) => {
+            if (a.label < b.label) return -1;
+            if (a.label == b.label) return 0;
+            return 1;
+        });
+
+        const options: React.ReactElement[] = [];
+        const filtersByGuid: Dictionary<ListFilterDto> = {};
+        options.push(<SelectOption value="" display="" />);
+        for (const filter of filters) {
+            options.push(<SelectOption value={filter.guid} display={filter.label} />)
+            filtersByGuid[filter.guid] = filter;
+        }
+
+        await this.updateState({
+            list: list,
+            items: items,
+            filtersByGuid: filtersByGuid,
+            filterOptions: options
+        });
 
         this.events.setLoading(false);
+    }
+
+    private async addFilterClicked(): Promise<void> {
+        const newFilter = this.jsonCopy(this.state.filtersByGuid[this.state.selectedFilter]);
+        const filters = this.jsonCopy(this.state.filters);
+        filters.push(newFilter);
+
+        await this.updateState({ filters: filters });
     }
 
     /**
@@ -77,6 +122,25 @@ class Page extends BasePage<Props, State> {
             rows.push(<tr>{row}</tr>);
         });
 
+        const filters: React.ReactElement[] = [];
+        for (const filter of this.state.filters)
+            filters.push(
+                <>
+                    <Form>
+                        <Field label={filter.label}>
+                            <Select />
+                            <Input />
+                        </Field>
+                    </Form>
+                </>
+            );
+        if (filters.length > 0)
+            filters.push(
+                <FlexRow gap="1em">
+                    <Button label="Search" onClick={() => { }} />
+                </FlexRow>
+            );
+
         return (
             <Navigation
                 state={this.state} events={this.events}
@@ -84,6 +148,18 @@ class Page extends BasePage<Props, State> {
                 leftMenuGuid={this.state.list.leftMenuGuid}
             >
                 <Heading level={1}>{this.state.list.title}</Heading>
+                <Form>
+                    <Field label="Filter"><Select
+                        onChange={async (value) => {
+                            await this.updateState({ selectedFilter: value });
+                        }}
+                        value={this.state.selectedFilter}
+                    >{this.state.filterOptions}</Select></Field>
+                </Form>
+                <FlexRow gap="1em">
+                    <Button label="Add Filter" onClick={this.addFilterClicked.bind(this)} />
+                </FlexRow>
+                {filters}
                 <Table
                     items={this.state.items}
                     primaryKey="guid"

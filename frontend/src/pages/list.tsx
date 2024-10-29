@@ -133,11 +133,22 @@ class Page extends BasePage<Props, State> {
     /**
      * Handles the save button click event.
      */
-    public async saveClicked() {
+    public async saveClicked(filterToDelete?: ListFilterDto) {
         this.events.setLoading(true);
         try {
             const token = await AuthService.getToken();
-            await ListService.save(token, this.state.model);
+
+            const promises: Promise<void>[] = [];
+            promises.push(ListService.save(token, this.state.model));
+
+            for (const filter of this.state.filters)
+                if (filterToDelete.guid == filter.guid)
+                    promises.push(ListFilterService.delete(token, filterToDelete.guid))
+                else
+                    promises.push(ListFilterService.save(token, filter));
+
+            await Promise.all(promises);
+
             window.location.replace("/static/pages/list.html?guid=" + this.state.model.guid);
             return;
         }
@@ -261,12 +272,6 @@ class Page extends BasePage<Props, State> {
                         }}
                     /></Field>
                 </Form>
-                <ListFilterEditList
-                    value={this.state.filters}
-                    onChange={async (list) => {
-                        await this.updateState({ filters: list });
-                    }}
-                />
                 <FlexRow gap="1em">
                     <Button label="Save" onClick={this.saveClicked.bind(this)} />
                     {
@@ -276,6 +281,13 @@ class Page extends BasePage<Props, State> {
                     }
                     <Button label="Delete" onClick={this.deleteClicked.bind(this)} />
                 </FlexRow>
+                <ListFilterEditList
+                    value={this.state.filters}
+                    onChange={async (list) => {
+                        await this.updateState({ filters: list });
+                    }}
+                    onDelete={this.saveClicked.bind(this)}
+                />
             </Navigation >
         );
     }
