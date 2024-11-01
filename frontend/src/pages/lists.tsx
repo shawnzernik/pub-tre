@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Navigation } from "../components/Navigation";
+import { ErrorMessage, Navigation } from "../components/Navigation";
 import { BasePage, BasePageState } from "../components/BasePage";
 import { ListService } from "../services/ListService";
 import { AuthService } from "../services/AuthService";
@@ -17,6 +17,7 @@ import { Dictionary } from "common/src/Dictionary";
 import { FlexRow } from "../components/FlexRow";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
+import { ListFilterOptions } from "./subpages/ListFilterCompareOptions";
 
 interface Props { }
 interface State extends BasePageState {
@@ -32,6 +33,7 @@ interface State extends BasePageState {
  * Represents the Page component that displays a list of items.
  */
 class Page extends BasePage<Props, State> {
+    private searched = false;
     /**
      * Creates an instance of the Page component.
      * @param props - The props for the component.
@@ -58,7 +60,9 @@ class Page extends BasePage<Props, State> {
 
         const token = await AuthService.getToken();
         const list = await ListService.getUrlKey(token, this.queryString("url_key"));
-        const items = await ListService.getItems(token, list.guid, []);
+        let items = [];
+        if (list.autoload || this.searched)
+            items = await ListService.getItems(token, list.guid, this.state.filters);
 
         const filters = await ListFilterService.listByParentList(token, list.guid);
         filters.sort((a, b) => {
@@ -85,6 +89,10 @@ class Page extends BasePage<Props, State> {
         this.events.setLoading(false);
     }
 
+    /**
+     * Handles the click event for adding a filter.
+     * Copies the selected filter and adds it to the list of filters.
+     */
     private async addFilterClicked(): Promise<void> {
         const newFilter = this.jsonCopy(this.state.filtersByGuid[this.state.selectedFilter]);
         const filters = this.jsonCopy(this.state.filters);
@@ -123,23 +131,55 @@ class Page extends BasePage<Props, State> {
         });
 
         const filters: React.ReactElement[] = [];
-        for (const filter of this.state.filters)
+        for (let cnt = 0; cnt < this.state.filters.length; cnt++) {
+            const filter = this.state.filters[cnt];
             filters.push(
                 <>
                     <Form>
                         <Field label={filter.label}>
-                            <Select />
-                            <Input />
+                            <Select
+                                value={filter.defaultCompare ? filter.defaultCompare : ""}
+                                onChange={async (value) => {
+                                    const newFilters = this.jsonCopy(this.state.filters);
+                                    newFilters[cnt].defaultCompare = value;
+                                    await this.updateState({ filters: newFilters });
+                                }}
+                            >{ListFilterOptions.forType(filter.sqlType)}</Select>
+                            <Input
+                                value={filter.defaultValue ? filter.defaultValue : ""}
+                                onChange={async (value) => {
+                                    const newFilters = this.jsonCopy(this.state.filters);
+                                    newFilters[cnt].defaultValue = value;
+                                    await this.updateState({ filters: newFilters });
+                                }}
+                            />
+                            <Button label="Remove" onClick={async () => {
+                                const newFilters: ListFilterDto[] = [];
+                                this.state.filters.forEach((value, index) => {
+                                    if (index != cnt)
+                                        newFilters.push(value);
+                                });
+                                await this.updateState({ filters: newFilters });
+                            }} />
                         </Field>
                     </Form>
                 </>
             );
-        if (filters.length > 0)
-            filters.push(
-                <FlexRow gap="1em">
-                    <Button label="Search" onClick={() => { }} />
-                </FlexRow>
-            );
+        }
+        filters.push(
+            <FlexRow gap="1em">
+                <Button label="Search" onClick={async () => {
+                    this.searched = true;
+                    try {
+                        await this.componentDidMount();
+                    }
+                    catch (err) {
+                        await this.events.setLoading(false);
+                        await ErrorMessage(this, err);
+                    }
+                }} />
+            </FlexRow>
+        );
 
         return (
             <Navigation

@@ -26,7 +26,7 @@ export class ListLogic {
      * @returns A promise that resolves to an array of retrieved items.
      */
     public async getItems(eds: EntitiesDataSource, filters: ListFilterDto[]): Promise<any[]> {
-        let sql = ` SELECT * FROM (${this.entity.sql}) WHERE 1=1 `;
+        let sql = ` SELECT * FROM (\n\n${this.entity.sql}\n\n) tbl WHERE 1=1 `;
         const params: any[] = [];
 
         filters.forEach((filter) => {
@@ -49,7 +49,7 @@ export class ListLogic {
             throw new Error("Default compare is not set!");
 
         let value: any;
-        let where = ` AND ${filter.sqlColumn} `;
+        let where = ` AND tbl."${filter.sqlColumn}" `;
         switch (filter.defaultCompare) {
             case "e":
                 value = convertDefaultValueToJsType(filter);

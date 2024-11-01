@@ -76,6 +76,7 @@ export class BaseService {
             resp.status(HttpStatus.OK).send({ data: ret } as ResponseDto<any>);
         } catch (err: any) {
             resp.status(HttpStatus.BAD_REQUEST).send({ error: err["message"] } as ResponseDto<any>);
+            console.error(err);
         } finally {
             await ds.destroy();
         }

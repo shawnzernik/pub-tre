@@ -51,13 +51,6 @@ module.exports = {
         menu: "./src/pages/menu.tsx",
         list: "./src/pages/list.tsx",
         setting: "./src/pages/setting.tsx",
-
-        upload: "./src/pages/upload.tsx",
-        finetune: "./src/pages/finetune.tsx",
-        chat: "./src/pages/chat.tsx",
-        search: "./src/pages/search.tsx",
-        dataset: "./src/pages/dataset.tsx",
-        prompt: "./src/pages/prompt.tsx",
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -116,12 +109,6 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: "./src/template.html",
-            filename: "../static/pages/list.html",
-            chunks: ["common", "list"],
-            title: "List Edit"
-        }),
-        new HtmlWebpackPlugin({
-            template: "./src/template.html",
             filename: "../static/pages/securable.html",
             chunks: ["common", "securable"],
             title: "Securable Edit"
@@ -144,41 +131,5 @@ module.exports = {
             chunks: ["common", "setting"],
             title: "Setting Edit"
         }),
-        new HtmlWebpackPlugin({
-            template: "./src/template.html",
-            filename: "../static/pages/upload.html",
-            chunks: ["common", "upload"],
-            title: "Upload Source Code"
-        }),
-        new HtmlWebpackPlugin({
-            template: "./src/template.html",
-            filename: "../static/pages/finetune.html",
-            chunks: ["common", "finetune"],
-            title: "Fine Tune"
-        }),
-        new HtmlWebpackPlugin({
-            template: "./src/template.html",
-            filename: "../static/pages/chat.html",
-            chunks: ["common", "chat"],
-            title: "Chat"
-        }),
-        new HtmlWebpackPlugin({
-            template: "./src/template.html",
-            filename: "../static/pages/search.html",
-            chunks: ["common", "search"],
-            title: "Search"
-        }),
-        new HtmlWebpackPlugin({
-            template: "./src/template.html",
-            filename: "../static/pages/dataset.html",
-            chunks: ["common", "dataset"],
-            title: "Data Set"
-        }),
-        new HtmlWebpackPlugin({
-            template: "./src/template.html",
-            filename: "../static/pages/prompt.html",
-            chunks: ["common", "prompt"],
-            title: "Prompt"
-        })
     ]
 };

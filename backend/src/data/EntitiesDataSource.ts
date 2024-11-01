@@ -5,7 +5,6 @@ import { PasswordEntity } from "./PasswordEntity";
 import { PermissionEntity } from "./PermissionEntity";
 import { SecurableEntity } from "./SecurableEntity";
 import { UserEntity } from "./UserEntity";
-import { FinetuneEntity } from "./FinetuneEntity";
 import { Config } from "../Config";
 import { UserRepository } from "./UserRepository";
 import { GroupRepository } from "./GroupRepository";
@@ -21,13 +20,8 @@ import { ListFilterEntity } from "./ListFilterEntity";
 import { SettingEntity } from "./SettingEntity";
 import { ListFilterRepository } from "./ListFilterRepository";
 import { SettingRepository } from "./SettingRepository";
-import { DatasetEntity } from "./DatasetEntity";
-import { DatasetRepository } from "./DatasetRepository";
 import { LogRepository } from "./LogRepository";
 import { LogEntity } from "./LogEntity";
-import { PromptEntity } from "./PromptEntity";
-import { PromptRepository } from "./PromptRepository";
-import { FinetuneRepository } from "./FinetuneRepository";
 
 /**
  * Custom DataSource class for managing entity repositories and database connections.
@@ -52,14 +46,11 @@ export class EntitiesDataSource extends DataSource {
                 PermissionEntity,
                 SecurableEntity,
                 UserEntity,
-                FinetuneEntity,
                 MenuEntity,
                 ListEntity,
                 ListFilterEntity,
                 SettingEntity,
-                DatasetEntity,
                 LogEntity,
-                PromptEntity,
             ],
         });
     }
@@ -158,18 +149,6 @@ export class EntitiesDataSource extends DataSource {
         return this._userRepository;
     }
 
-    private _finetuneRepository: FinetuneRepository | undefined;
-
-    /**
-     * Gets an instance of the FinetuneRepository.
-     * @returns The FinetuneRepository instance.
-     */
-    public finetuneRepository() {
-        if (!this._finetuneRepository)
-            this._finetuneRepository = new FinetuneRepository(FinetuneEntity, this.createEntityManager(), this.createQueryRunner());
-        return this._finetuneRepository;
-    }
-
     private _menuRepository: MenuRepository | undefined;
 
     /**
@@ -218,18 +197,6 @@ export class EntitiesDataSource extends DataSource {
         return this._settingRepository;
     }
 
-    private _datasetRepository: DatasetRepository | undefined;
-
-    /**
-     * Gets an instance of the DatasetRepository.
-     * @returns The DatasetRepository instance.
-     */
-    public datasetRepository() {
-        if (!this._datasetRepository)
-            this._datasetRepository = new DatasetRepository(DatasetEntity, this.createEntityManager(), this.createQueryRunner());
-        return this._datasetRepository;
-    }
-
     private _logRepository: LogRepository | undefined;
 
     /**
@@ -240,17 +207,5 @@ export class EntitiesDataSource extends DataSource {
         if (!this._logRepository)
             this._logRepository = new LogRepository(LogEntity, this.createEntityManager(), this.createQueryRunner());
         return this._logRepository;
-    }
-
-    private _promptRepository: PromptRepository | undefined;
-
-    /**
-     * Gets an instance of the PromptRepository.
-     * @returns The PromptRepository instance.
-     */
-    public promptRepository() {
-        if (!this._promptRepository)
-            this._promptRepository = new PromptRepository(PromptEntity, this.createEntityManager(), this.createQueryRunner());
-        return this._promptRepository;
     }
 }

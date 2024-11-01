@@ -1,4 +1,4 @@
-import process from "process"
+import process, { env } from "process"
 import { Logger, LogLevels } from "./Logger";
 
 /**
@@ -118,6 +118,8 @@ export class Config {
      * Default is 3.
      */
     public static embeddingBytesPerToken: number = Number.parseInt(process.env.EMBEDDING_BYTES_PER_TOKEN || "3");
+
+    public static embeddingMaxContextTokens: number = Number.parseInt(process.env.EMBEDDING_MAX_CONTEXT_TOKENS || "64536");
 
     /** 
      * Maximum tokens for embeddings. 

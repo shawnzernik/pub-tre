@@ -21,6 +21,10 @@ interface State {
 }
 
 export class Tabs extends React.Component<Props, State> {
+    public async setTab(name: string) {
+        this.setState({ activeLabel: name });
+    }
+
     /** 
      * Creates an instance of Tabs. 
      * Initializes the state with the first tab label.

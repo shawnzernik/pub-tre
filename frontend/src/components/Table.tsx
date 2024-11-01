@@ -3,6 +3,7 @@ import { TableTheme } from "./TableTheme";
 import { BootstrapIcon } from "./BootstrapIcon";
 import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
+import { BasePage } from "./BasePage";
 
 interface Props {
     items: any[];
@@ -26,26 +27,34 @@ export class Table extends React.Component<Props, State> {
         if (!this.props.items)
             return;
 
+        let items = BasePage.jsonCopy(this.props.items);
+
+        let dataLoaded = true;
+        if (items.length == 0) {
+            items.push({ "Table": "No data loaded!" })
+            dataLoaded = false;
+        }
+
         const keys: string[] = [];
-        if (this.props.items.length > 0) {
-            Object.keys(this.props.items[0]).forEach((key) => {
+        if (items.length > 0) {
+            Object.keys(items[0]).forEach((key) => {
                 if (key != this.props.primaryKey)
                     keys.push(key);
             });
         }
 
         const headers: React.ReactNode[] = [];
-        if (this.props.editUrl)
+        if (this.props.editUrl && dataLoaded)
             headers.push(<th style={TableTheme.tableHeadTd}></th>);
         keys.forEach((key) => {
             headers.push(<th style={TableTheme.tableHeadTd}>{key}</th>);
         });
 
         const rows: React.ReactNode[] = [];
-        this.props.items.forEach((item, index) => {
+        items.forEach((item, index) => {
             const row: React.ReactNode[] = [];
 
-            if (this.props.editUrl)
+            if (this.props.editUrl && dataLoaded)
                 row.push(<td
                     style={{ ...TableTheme.tableRowTd, textAlign: "center", cursor: "pointer" }}
                     onClick={() => {

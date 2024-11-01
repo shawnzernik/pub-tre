@@ -20,52 +20,20 @@ If your software can interact with users remotely through a computer network, yo
 
 You should also get your employer (if you work as a programmer) or school, if any, to sign a "copyright disclaimer" for the program, if necessary. For more information on this, and how to apply and follow the GNU AGPL, see <https://www.gnu.org/licenses/>.
 
-## Screen Shots
+## TS React Express
 
-![Login](login.png)
+This is an application bootstrapping framework.  It's a full stack system written in TypeScript:
 
-![License](license.png)
+- Backend  
+  TypeScript & Express
+- Frontend  
+  TypeScript & React
+- Data  
+  PostgreSQL & TypeORM
 
-## Getting it Running
+### Functional Requirements
 
-```
-
-cd backend
-npm run install
-npm tsc
-cd ../frontend
-npm run install
-npm run build
-
-cd ../database
-./0.0.0.sh
-
-cd ../backend
-npm run run
-```
-
-## Chat Maker
-
-This is a script that will populate markdown for use with Chat GPT to generate code.
-
-## Make Data Set
-
-This is for use with Aici to create a training dataset to feed to Gemini 2 model.  The idea is to train an AI model on the code base to make it more effective at completions.
-
-### Aici
-
-Aici is an 'AI Continuous Improvement' web system that trains and run AI models.  It allows the saving of responses as "suggestions" so you can correct them and feed it back to train the AI from the correction.
-
-[shawnzernik/aici](https://github.com/shawnzernik/aici)
-
-## Postgres
-
-This is a shell script that will boot up the Podman database.
-
-## Database
-
-This is the location where the database scripts are stored.
-
-## Common
-
-This is code that is reused both on the front end and backend.
+- Authentication
+- Authorizations
+- Lists
+-

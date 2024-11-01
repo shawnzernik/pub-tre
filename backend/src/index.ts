@@ -11,14 +11,10 @@ import { PasswordService } from "./services/PasswordService";
 import { PermissionService } from "./services/PermissionService";
 import { SecurableService } from "./services/SecurableService";
 import { UserService } from "./services/UserService";
-import { FinetuneService } from "./services/FinetuneService";
 import { MenuService } from "./services/MenusService";
 import { ListService } from "./services/ListService";
 import { ListFilterService } from "./services/ListFilterService";
 import { SettingService } from "./services/SettingService";
-import { AiciService } from "./services/AiciService";
-import { DatasetService } from "./services/DatasetService";
-import { PromptService } from "./services/PromptService";
 import { Logger } from "./Logger";
 import { UUIDv4 } from "common/src/logic/UUIDv4";
 
@@ -83,15 +79,10 @@ export class WebApp {
         new PermissionService(logger, this.app);
         new SecurableService(logger, this.app);
         new UserService(logger, this.app);
-        new FinetuneService(logger, this.app);
         new MenuService(logger, this.app);
         new ListService(logger, this.app);
         new ListFilterService(logger, this.app);
         new SettingService(logger, this.app);
-        new PromptService(logger, this.app);
-
-        new AiciService(logger, this.app);
-        new DatasetService(logger, this.app);
 
         logger.log(`HTTPS Cert Path: ${path.resolve(Config.httpsCertPath)}`);
         logger.log(`HTTPS Key Path: ${path.resolve(Config.httpsKeyPath)}`);

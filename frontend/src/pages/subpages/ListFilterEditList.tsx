@@ -11,6 +11,7 @@ import { SelectOption } from "../../components/SelectOption";
 import { Theme } from "../../components/Theme";
 import { FlexRow } from "../../components/FlexRow";
 import { Button } from "../../components/Button";
+import { ListFilterOptions } from "./ListFilterCompareOptions";
 
 interface Props {
     value: ListFilterDto[];
@@ -67,25 +68,7 @@ export class ListFilterEditList extends React.Component<Props, State> {
                                 this.props.onChange(newList);
                             }}
                         >
-                            <SelectOption display="" value="" />
-                            <SelectOption display="bigint" value="bigint" />
-                            <SelectOption display="bigserial" value="bigserial" />
-                            <SelectOption display="boolean" value="boolean" />
-                            <SelectOption display="bytea" value="bytea" />
-                            <SelectOption display="char" value="char" />
-                            <SelectOption display="date" value="date" />
-                            <SelectOption display="double" value="double" />
-                            <SelectOption display="int" value="int" />
-                            <SelectOption display="interval" value="interval" />
-                            <SelectOption display="money" value="money" />
-                            <SelectOption display="numberic" value="numberic" />
-                            <SelectOption display="real" value="real" />
-                            <SelectOption display="serial" value="serial" />
-                            <SelectOption display="smallint" value="smallint" />
-                            <SelectOption display="text" value="text" />
-                            <SelectOption display="time" value="time" />
-                            <SelectOption display="timestamp" value="timestamp" />
-                            <SelectOption display="varchar" value="varchar" />
+                            {ListFilterOptions.allTypes()}
                         </Select></Field>
                         <Field label="Options SQL"><TextArea
                             rows={10}
@@ -104,17 +87,7 @@ export class ListFilterEditList extends React.Component<Props, State> {
                                 this.props.onChange(newList);
                             }}
                         >
-                            <SelectOption display="" value="" />
-                            <SelectOption display="Equals" value="e" />
-                            <SelectOption display="Not Equal" value="ne" />
-                            <SelectOption display="Less Than" value="lt" />
-                            <SelectOption display="Less Then or Equals" value="lte" />
-                            <SelectOption display="Greater Than" value="gt" />
-                            <SelectOption display="Greater Than or Equals" value="gte" />
-                            <SelectOption display="Null" value="n" />
-                            <SelectOption display="Not Null" value="nn" />
-                            <SelectOption display="Contains" value="c" />
-                            <SelectOption display="Does Not Contain" value="dnc" />
+                            {ListFilterOptions.forType(this.props.value[cnt].sqlType)}
                         </Select></Field>
                         <Field label="Default Value" size={2}><Input
                             value={this.props.value[cnt].defaultValue}
