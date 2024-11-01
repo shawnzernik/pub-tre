@@ -40,6 +40,7 @@ SQL_FILES=(
     "data/anonymous.sql"
     "data/lists.sql"
     "data/settings.sql"
+    "data/list_filters.sql"
 )
 
 for SQL_FILE in "${SQL_FILES[@]}"; do
