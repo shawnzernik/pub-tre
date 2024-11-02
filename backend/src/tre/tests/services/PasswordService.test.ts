@@ -5,6 +5,8 @@ import { Config } from '../../../Config';
 import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { PasswordEntity } from '../../data/PasswordEntity';
 import { UserEntity } from '../../data/UserEntity';
+import { PasswordRepository } from '../../data/PasswordRepository';
+import { UserRepository } from '../../data/UserRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -24,14 +26,14 @@ describe("PasswordService", () => {
         eds = new EntitiesDataSource();
         await eds.initialize();
 
-        await eds.userRepository().save(userEntity);
+        await new UserRepository(eds).save(userEntity);
 
         const body = JSON.stringify({
             emailAddress: "administrator@localhost",
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -48,9 +50,9 @@ describe("PasswordService", () => {
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
     afterAll(async () => {
-        try { await eds.passwordRepository().delete({ guid: entityGuid }); }
+        try { await new PasswordRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat error */ }
-        try { await eds.userRepository().delete({ guid: entityGuid }); }
+        try { await new UserRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat error */ }
 
         await eds.destroy();
@@ -67,7 +69,7 @@ describe("PasswordService", () => {
         entity.salt = "SALT";
         entity.iterations = 100000;
 
-        const response = await fetch("https://localhost:4433/api/v0/password", {
+        const response = await fetch(Config.appUrl + "/api/v0/password", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -84,7 +86,7 @@ describe("PasswordService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.passwordRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new PasswordRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("POST /api/v0/password overwrite should return 200", async () => {
@@ -98,7 +100,7 @@ describe("PasswordService", () => {
         entity.salt = "SALTIE";
         entity.iterations = 100000;
 
-        const response = await fetch("https://localhost:4433/api/v0/password", {
+        const response = await fetch(Config.appUrl + "/api/v0/password", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -115,14 +117,14 @@ describe("PasswordService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.passwordRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new PasswordRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("GET /api/v0/passwords should return password list", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/passwords", {
+        const response = await fetch(Config.appUrl + "/api/v0/passwords", {
             agent: agent,
             method: "GET",
             headers: {
@@ -151,7 +153,7 @@ describe("PasswordService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/password/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/password/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -175,7 +177,7 @@ describe("PasswordService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/password/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/password/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -191,7 +193,7 @@ describe("PasswordService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.passwordRepository().findBy({ guid: entityGuid });
+        let entity = await new PasswordRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

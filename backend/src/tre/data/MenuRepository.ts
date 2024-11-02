@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { MenuEntity } from './MenuEntity';
 
 /**
@@ -6,4 +6,7 @@ import { MenuEntity } from './MenuEntity';
  * It provides an interface for interacting with the MenuEntity data in the database.
  */
 export class MenuRepository extends Repository<MenuEntity> {
+    public constructor(ds: DataSource) {
+        super(MenuEntity, ds.createEntityManager(), ds.createQueryRunner());
+    }
 }

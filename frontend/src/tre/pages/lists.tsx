@@ -1,22 +1,22 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { ErrorMessage, Navigation } from "../components/Navigation";
-import { BasePage, BasePageState } from "../components/BasePage";
+import { ErrorMessage, Navigation } from "../../tre/components/Navigation";
+import { BasePage, BasePageState } from "../../tre/components/BasePage";
 import { ListService } from "../services/ListService";
 import { AuthService } from "../services/AuthService";
 import { ListDto } from "common/src/tre/models/ListDto";
-import { Heading } from "../components/Heading";
-import { Table } from "../components/Table";
+import { Heading } from "../../tre/components/Heading";
+import { Table } from "../../tre/components/Table";
 import { ListFilterService } from "../services/ListFilterService";
 import { ListFilterDto } from "common/src/tre/models/ListFilterDto";
-import { Form } from "../components/Form";
-import { Field } from "../components/Field";
-import { Select } from "../components/Select";
-import { SelectOption } from "../components/SelectOption";
+import { Form } from "../../tre/components/Form";
+import { Field } from "../../tre/components/Field";
+import { Select } from "../../tre/components/Select";
+import { SelectOption } from "../../tre/components/SelectOption";
 import { Dictionary } from "common/src/tre/Dictionary";
-import { FlexRow } from "../components/FlexRow";
-import { Button } from "../components/Button";
-import { Input } from "../components/Input";
+import { FlexRow } from "../../tre/components/FlexRow";
+import { Button } from "../../tre/components/Button";
+import { Input } from "../../tre/components/Input";
 import { ListFilterOptions } from "../subpages/ListFilterCompareOptions";
 
 interface Props { }

@@ -4,11 +4,16 @@ import { BaseService } from "./BaseService";
 import { GroupDto } from "common/src/tre/models/GroupDto";
 import { GroupEntity } from "../data/GroupEntity";
 import { Logger } from "../Logger";
+import { GroupRepository } from "../data/GroupRepository";
 
 /**
  * Service for handling group-related operations.
  */
 export class GroupService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Creates an instance of GroupService.
      * @param logger - Logger instance for logging purposes.
@@ -37,7 +42,7 @@ export class GroupService extends BaseService {
         await BaseService.checkSecurity(logger, "Group:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.groupRepository().findOneBy({ guid: guid });
+        const ret = await new GroupRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -52,7 +57,7 @@ export class GroupService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Group:List", req, ds);
 
-        const ret = await ds.groupRepository().find();
+        const ret = await new GroupRepository(ds).find();
         return ret;
     }
 
@@ -69,7 +74,7 @@ export class GroupService extends BaseService {
 
         const entity = new GroupEntity();
         entity.copyFrom(req.body as GroupDto);
-        await ds.groupRepository().save([entity]);
+        await new GroupRepository(ds).save([entity]);
     }
 
     /**
@@ -84,6 +89,6 @@ export class GroupService extends BaseService {
         await BaseService.checkSecurity(logger, "Group:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.groupRepository().delete({ guid: guid });
+        await new GroupRepository(ds).delete({ guid: guid });
     }
 }

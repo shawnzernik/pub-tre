@@ -4,11 +4,16 @@ import { BaseService } from "./BaseService";
 import { SettingDto } from "common/src/tre/models/SettingDto";
 import { SettingEntity } from "../data/SettingEntity";
 import { Logger } from "../Logger";
+import { SettingRepository } from "../data/SettingRepository";
 
 /**
  * Service class for handling settings-related operations.
  */
 export class SettingService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Constructor for SettingService.
      * @param logger - Logger instance for logging.
@@ -37,7 +42,7 @@ export class SettingService extends BaseService {
         await BaseService.checkSecurity(logger, "Setting:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.settingRepository().findOneBy({ guid: guid });
+        const ret = await new SettingRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -52,7 +57,7 @@ export class SettingService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Setting:List", req, ds);
 
-        const ret = await ds.settingRepository().find();
+        const ret = await new SettingRepository(ds).find();
         return ret;
     }
 
@@ -69,7 +74,7 @@ export class SettingService extends BaseService {
 
         const entity = new SettingEntity();
         entity.copyFrom(req.body as SettingDto);
-        await ds.settingRepository().save([entity]);
+        await new SettingRepository(ds).save([entity]);
     }
 
     /**
@@ -84,6 +89,6 @@ export class SettingService extends BaseService {
         await BaseService.checkSecurity(logger, "Setting:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.settingRepository().delete({ guid: guid });
+        await new SettingRepository(ds).delete({ guid: guid });
     }
 }

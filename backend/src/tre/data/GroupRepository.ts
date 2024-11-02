@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { DataSource, EntityManager, QueryRunner, Repository } from 'typeorm';
 import { GroupEntity } from './GroupEntity';
 
 /**
@@ -7,4 +7,7 @@ import { GroupEntity } from './GroupEntity';
  * Extends the TypeORM Repository to provide database operations for GroupEntity.
  */
 export class GroupRepository extends Repository<GroupEntity> {
+    public constructor(ds: DataSource) {
+        super(GroupEntity, ds.createEntityManager(), ds.createQueryRunner());
+    }
 }

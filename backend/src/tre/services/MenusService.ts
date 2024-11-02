@@ -4,11 +4,16 @@ import { BaseService } from "./BaseService";
 import { MenuDto } from "common/src/tre/models/MenuDto";
 import { MenuEntity } from "../data/MenuEntity";
 import { Logger } from "../Logger";
+import { MenuRepository } from "../data/MenuRepository";
 
 /**
  * Service for managing menus.
  */
 export class MenuService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Constructor for MenuService.
      * @param logger - Logger instance for logging.
@@ -37,7 +42,7 @@ export class MenuService extends BaseService {
         await BaseService.checkSecurity(logger, "Menu:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.menuRepository().findOneBy({ guid: guid });
+        const ret = await new MenuRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
     /**
@@ -51,7 +56,7 @@ export class MenuService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Menu:List", req, ds);
 
-        const ret = await ds.menuRepository().find();
+        const ret = await new MenuRepository(ds).find();
         return ret;
     }
     /**
@@ -66,7 +71,7 @@ export class MenuService extends BaseService {
 
         const entity = new MenuEntity();
         entity.copyFrom(req.body as MenuDto);
-        await ds.menuRepository().save([entity]);
+        await new MenuRepository(ds).save([entity]);
     }
     /**
      * Deletes a menu by its GUID.
@@ -79,7 +84,7 @@ export class MenuService extends BaseService {
         await BaseService.checkSecurity(logger, "Menu:Delete", req, ds);
 
         const guid = req.params["guid"];
-        const results = await ds.menuRepository().delete({ guid: guid });
+        const results = await new MenuRepository(ds).delete({ guid: guid });
         if (results.affected != 1)
             throw Error(`Affected rows = ${results.affected}!`);
     }

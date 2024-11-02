@@ -5,11 +5,16 @@ import { BaseService } from "./BaseService";
 import { MembershipDto } from "common/src/tre/models/MembershipDto";
 import { MembershipLogic } from "../logic/MembershipLogic";
 import { Logger } from "../Logger";
+import { MembershipRepository } from "../data/MembershipsRepository";
 
 /**
  * Service class for managing memberships.
  */
 export class MembershipService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Constructor for MembershipService.
      * 
@@ -77,7 +82,7 @@ export class MembershipService extends BaseService {
         await BaseService.checkSecurity(logger, "Membership:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.membershipRepository().findOneBy({ guid: guid });
+        const ret = await new MembershipRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -93,7 +98,7 @@ export class MembershipService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Membership:List", req, ds);
 
-        const ret = await ds.membershipRepository().find();
+        const ret = await new MembershipRepository(ds).find();
         return ret;
     }
 
@@ -110,7 +115,7 @@ export class MembershipService extends BaseService {
 
         const entity = new MembershipEntity();
         entity.copyFrom(req.body as MembershipEntity);
-        await ds.membershipRepository().save([entity]);
+        await new MembershipRepository(ds).save([entity]);
     }
 
     /**
@@ -125,6 +130,6 @@ export class MembershipService extends BaseService {
         await BaseService.checkSecurity(logger, "Membership:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.membershipRepository().delete({ guid: guid });
+        await new MembershipRepository(ds).delete({ guid: guid });
     }
 }

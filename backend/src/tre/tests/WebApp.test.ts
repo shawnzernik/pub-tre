@@ -1,5 +1,6 @@
 import https from 'https';
 import fetch from "node-fetch";
+import { Config } from '../../Config';
 
 jest.setTimeout(0);
 
@@ -8,7 +9,7 @@ describe("WebApp", () => {
 
     test("GET /api/v0/health should return 200 with OK", async () => {
         const response = await fetch(
-            "https://localhost:4433/api/v0/health",
+            Config.appUrl + "/api/v0/health",
             { agent: agent }
         );
 
@@ -21,7 +22,7 @@ describe("WebApp", () => {
 
     test("GET /api/v0/liveness should return 200 with OK", async () => {
         const response = await fetch(
-            "https://localhost:4433/api/v0/liveness",
+            Config.appUrl + "/api/v0/liveness",
             { agent: agent }
         );
 

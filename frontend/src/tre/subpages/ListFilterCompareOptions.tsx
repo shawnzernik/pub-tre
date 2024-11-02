@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SelectOption } from "../components/SelectOption";
+import { SelectOption } from "../../tre/components/SelectOption";
 
 export class ListFilterOptions {
     public static allTypes(): any[] {

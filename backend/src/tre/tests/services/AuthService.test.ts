@@ -1,16 +1,17 @@
 import https from 'https';
 import fetch from "node-fetch";
+import { Config } from '../../../Config';
 
 describe("AuthService", () => {
     let agent = new https.Agent({ rejectUnauthorized: false });
 
     test("POST /api/v0/auth/login should return token", async () => {
-        const body = JSON.stringify({ 
-            emailAddress: "administrator@localhost", 
-            password: "Welcome123" 
+        const body = JSON.stringify({
+            emailAddress: "administrator@localhost",
+            password: "Welcome123"
         });
         const response = await fetch(
-            "https://localhost:4433/api/v0/auth/login",
+            Config.appUrl + "/api/v0/auth/login",
             {
                 agent: agent,
                 method: "POST",
@@ -30,12 +31,12 @@ describe("AuthService", () => {
         expect(jwtRegex.test(obj["data"])).toBeTruthy();
     });
     test("POST /api/v0/auth/login should error", async () => {
-        const body = JSON.stringify({ 
-            emailAddress: "administrator@localhost", 
-            password: "Welcome1234" 
+        const body = JSON.stringify({
+            emailAddress: "administrator@localhost",
+            password: "Welcome1234"
         });
         const response = await fetch(
-            "https://localhost:4433/api/v0/auth/login",
+            Config.appUrl + "/api/v0/auth/login",
             {
                 agent: agent,
                 method: "POST",
@@ -52,12 +53,12 @@ describe("AuthService", () => {
         expect(obj["error"]).toEqual("Invalid login!")
     });
     test("POST /api/v0/auth/token should return token", async () => {
-        const body = JSON.stringify({ 
-            emailAddress: "administrator@localhost", 
-            password: "Welcome123" 
+        const body = JSON.stringify({
+            emailAddress: "administrator@localhost",
+            password: "Welcome123"
         });
         let response = await fetch(
-            "https://localhost:4433/api/v0/auth/login",
+            Config.appUrl + "/api/v0/auth/login",
             {
                 agent: agent,
                 method: "POST",
@@ -73,11 +74,11 @@ describe("AuthService", () => {
         const token = obj["data"];
 
         response = await fetch(
-            "https://localhost:4433/api/v0/auth/renew",
+            Config.appUrl + "/api/v0/auth/renew",
             {
                 agent: agent,
                 method: "GET",
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 }
@@ -98,12 +99,12 @@ describe("AuthService", () => {
         expect(newToken).not.toEqual(token);
     });
     test("POST /api/v0/auth/token should error", async () => {
-        const body = JSON.stringify({ 
-            emailAddress: "administrator@localhost", 
-            password: "Welcome123" 
+        const body = JSON.stringify({
+            emailAddress: "administrator@localhost",
+            password: "Welcome123"
         });
         let response = await fetch(
-            "https://localhost:4433/api/v0/auth/login",
+            Config.appUrl + "/api/v0/auth/login",
             {
                 agent: agent,
                 method: "POST",
@@ -119,11 +120,11 @@ describe("AuthService", () => {
         const token = obj["data"];
 
         response = await fetch(
-            "https://localhost:4433/api/v0/auth/renew",
+            Config.appUrl + "/api/v0/auth/renew",
             {
                 agent: agent,
                 method: "GET",
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer bad${token}`
                 }

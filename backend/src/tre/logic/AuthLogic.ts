@@ -7,6 +7,9 @@ import { Config } from "../../Config";
 import { SecurableDto } from "common/src/tre/models/SecurableDto";
 import { UserEntity } from "../data/UserEntity";
 import { JwtToken } from "./JwtToken";
+import { PasswordRepository } from "../data/PasswordRepository";
+import { SecurableRepository } from "../data/SecurableRepository";
+import { UserRepository } from "../data/UserRepository";
 
 /**
  * Handles authentication logic, including user login and token management.
@@ -55,7 +58,7 @@ export class AuthLogic {
      * @throws Will throw an error if the anonymous user is not found.
      */
     public static async anonymousLogin(eds: EntitiesDataSource): Promise<AuthLogic> {
-        const user = await eds.userRepository().findOneBy({ emailAddress: "anonymous@localhost" });
+        const user = await new UserRepository(eds).findOneBy({ emailAddress: "anonymous@localhost" });
         if (!user)
             throw new Error(AuthLogic.invalidLoginMsg);
 
@@ -72,11 +75,11 @@ export class AuthLogic {
      * @throws Will throw an error if the login credentials are invalid.
      */
     public static async passwordLogin(eds: EntitiesDataSource, email: string, password: string): Promise<AuthLogic> {
-        const user = await eds.userRepository().findOneBy({ emailAddress: email });
+        const user = await new UserRepository(eds).findOneBy({ emailAddress: email });
         if (!user)
             throw new Error(AuthLogic.invalidLoginMsg);
 
-        const passwords = await eds.passwordRepository().findBy({ usersGuid: user.guid });
+        const passwords = await new PasswordRepository(eds).findBy({ usersGuid: user.guid });
         if (!passwords || passwords.length < 1)
             throw new Error(AuthLogic.invalidLoginMsg);
 
@@ -139,7 +142,7 @@ export class AuthLogic {
      * @returns A promise that resolves to an array of securable DTOs.
      */
     private static async loadAllowedSecurablesForUser(eds: EntitiesDataSource, user: UserDto): Promise<SecurableDto[]> {
-        const ret = await eds.securableRepository()
+        const ret = await new SecurableRepository(eds)
             .createQueryBuilder("s")
             .where(`s.guid IN (
                 SELECT

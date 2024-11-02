@@ -6,6 +6,9 @@ import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { MembershipEntity } from '../../data/MembershipEntity';
 import { GroupEntity } from '../../data/GroupEntity';
 import { UserEntity } from '../../data/UserEntity';
+import { MembershipRepository } from '../../data/MembershipsRepository';
+import { GroupRepository } from '../../data/GroupRepository';
+import { UserRepository } from '../../data/UserRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -30,15 +33,15 @@ describe("MembershipService", () => {
         eds = new EntitiesDataSource();
         await eds.initialize();
 
-        await eds.userRepository().save(userEntity);
-        await eds.groupRepository().save(groupEntity);
+        await new UserRepository(eds).save(userEntity);
+        await new GroupRepository(eds).save(groupEntity);
 
         const body = JSON.stringify({
             emailAddress: "administrator@localhost",
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -55,11 +58,11 @@ describe("MembershipService", () => {
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
     afterAll(async () => {
-        try { await eds.membershipRepository().delete({ guid: entityGuid }); }
+        try { await new MembershipRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat error */ }
-        try { await eds.userRepository().delete({ guid: entityGuid }); }
+        try { await new UserRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat error */ }
-        try { await eds.groupRepository().delete({ guid: entityGuid }); }
+        try { await new GroupRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat error */ }
 
         await eds.destroy();
@@ -75,7 +78,7 @@ describe("MembershipService", () => {
         entity.usersGuid = entityGuid;
         entity.isIncluded = true;
 
-        const response = await fetch("https://localhost:4433/api/v0/membership", {
+        const response = await fetch(Config.appUrl + "/api/v0/membership", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -92,7 +95,7 @@ describe("MembershipService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.membershipRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new MembershipRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("POST /api/v0/membership overwrite should return 200", async () => {
@@ -105,7 +108,7 @@ describe("MembershipService", () => {
         entity.usersGuid = entityGuid;
         entity.isIncluded = false;
 
-        const response = await fetch("https://localhost:4433/api/v0/membership", {
+        const response = await fetch(Config.appUrl + "/api/v0/membership", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -122,14 +125,14 @@ describe("MembershipService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.membershipRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new MembershipRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("GET /api/v0/memberships should return membership list", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/memberships", {
+        const response = await fetch(Config.appUrl + "/api/v0/memberships", {
             agent: agent,
             method: "GET",
             headers: {
@@ -157,7 +160,7 @@ describe("MembershipService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/membership/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/membership/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -181,7 +184,7 @@ describe("MembershipService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/membership/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/membership/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -197,7 +200,7 @@ describe("MembershipService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.membershipRepository().findBy({ guid: entityGuid });
+        let entity = await new MembershipRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

@@ -4,11 +4,16 @@ import { BaseService } from "./BaseService";
 import { PasswordDto } from "common/src/tre/models/PasswordDto";
 import { PasswordEntity } from "../data/PasswordEntity";
 import { Logger } from "../Logger";
+import { PasswordRepository } from "../data/PasswordRepository";
 
 /**
  * Service class for handling password-related operations.
  */
 export class PasswordService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Constructor for the PasswordService class.
      * @param logger - Logger instance for logging.
@@ -37,7 +42,7 @@ export class PasswordService extends BaseService {
         await BaseService.checkSecurity(logger, "Password:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.passwordRepository().findOneBy({ guid: guid });
+        const ret = await new PasswordRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -52,7 +57,7 @@ export class PasswordService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Password:List", req, ds);
 
-        const ret = await ds.passwordRepository().find();
+        const ret = await new PasswordRepository(ds).find();
         return ret;
     }
 
@@ -69,7 +74,7 @@ export class PasswordService extends BaseService {
 
         const entity = new PasswordEntity();
         entity.copyFrom(req.body as PasswordDto);
-        await ds.passwordRepository().save([entity]);
+        await new PasswordRepository(ds).save([entity]);
     }
 
     /**
@@ -84,6 +89,6 @@ export class PasswordService extends BaseService {
         await BaseService.checkSecurity(logger, "Password:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.passwordRepository().delete({ guid: guid });
+        await new PasswordRepository(ds).delete({ guid: guid });
     }
 }

@@ -8,11 +8,17 @@ import { UserDto } from "common/src/tre/models/UserDto";
 import { UserEntity } from "../data/UserEntity";
 import { PasswordLogic } from "../logic/PasswordLogic";
 import { Logger } from "../Logger";
+import { UserRepository } from "../data/UserRepository";
+import { PasswordRepository } from "../data/PasswordRepository";
 
 /**
  * Service for handling authentication related operations.
  */
 export class AuthService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Creates an instance of AuthService.
      * @param logger - Logger instance for logging purposes.
@@ -43,7 +49,7 @@ export class AuthService extends BaseService {
         await logger.trace();
         const logic = await BaseService.checkSecurity(logger, "Auth:Get:User", req, ds);
 
-        const ret = await ds.userRepository().findOneBy({ guid: logic.user!.guid });
+        const ret = await new UserRepository(ds).findOneBy({ guid: logic.user!.guid });
         if (!ret)
             throw new Error("Could not locate user for token!");
 
@@ -69,7 +75,7 @@ export class AuthService extends BaseService {
         if (entity.guid != logic.user!.guid)
             throw new Error("User being saved is not the active user!");
 
-        await ds.userRepository().save([entity]);
+        await new UserRepository(ds).save([entity]);
     }
 
     /**
@@ -88,7 +94,7 @@ export class AuthService extends BaseService {
         const passLogic = new PasswordLogic();
         const passEntity = await passLogic.reset(ds, login.user!.guid, req.body["newPassword"], req.body["confirmPassword"]);
 
-        await ds.passwordRepository().save([passEntity]);
+        await new PasswordRepository(ds).save([passEntity]);
     }
 
     /**

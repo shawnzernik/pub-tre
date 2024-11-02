@@ -1,20 +1,20 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { ErrorMessage, Navigation } from "../components/Navigation";
-import { BasePage, BasePageState } from "../components/BasePage";
-import { Heading } from "../components/Heading";
-import { Form } from "../components/Form";
-import { Field } from "../components/Field";
-import { Input } from "../components/Input";
+import { ErrorMessage, Navigation } from "../../tre/components/Navigation";
+import { BasePage, BasePageState } from "../../tre/components/BasePage";
+import { Heading } from "../../tre/components/Heading";
+import { Form } from "../../tre/components/Form";
+import { Field } from "../../tre/components/Field";
+import { Input } from "../../tre/components/Input";
 import { MenuDto } from "common/src/tre/models/MenuDto";
 import { UUIDv4 } from "common/src/tre/logic/UUIDv4";
-import { FlexRow } from "../components/FlexRow";
-import { Button } from "../components/Button";
-import { SelectOption } from "../components/SelectOption";
+import { FlexRow } from "../../tre/components/FlexRow";
+import { Button } from "../../tre/components/Button";
+import { SelectOption } from "../../tre/components/SelectOption";
 import { MenuService } from "../services/MenuService";
 import { MenuLogic } from "common/src/tre/logic/MenuLogic";
 import { AuthService } from "../services/AuthService";
-import { Select } from "../components/Select";
+import { Select } from "../../tre/components/Select";
 
 interface Props { }
 interface State extends BasePageState {

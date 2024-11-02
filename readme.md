@@ -1,6 +1,6 @@
 # TS React Express (TRE)
 
-The following is intended to be base code providing functionality for a modular system.
+The following is intended to be base code providing functionality for a modular system by which you can build a fully functional web application.  The intent is to keep it as lean as possible.
 
 ## 1. License
 

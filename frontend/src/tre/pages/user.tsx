@@ -1,15 +1,15 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Dialogue, ErrorMessage, Navigation } from "../components/Navigation";
-import { BasePage, BasePageState } from "../components/BasePage";
-import { Heading } from "../components/Heading";
-import { Field } from "../components/Field";
+import { Dialogue, ErrorMessage, Navigation } from "../../tre/components/Navigation";
+import { BasePage, BasePageState } from "../../tre/components/BasePage";
+import { Heading } from "../../tre/components/Heading";
+import { Field } from "../../tre/components/Field";
 import { UUIDv4 } from "common/src/tre/logic/UUIDv4";
 import { AuthService } from "../services/AuthService";
-import { Form } from "../components/Form";
-import { Input } from "../components/Input";
-import { Button } from "../components/Button";
-import { FlexRow } from "../components/FlexRow";
+import { Form } from "../../tre/components/Form";
+import { Input } from "../../tre/components/Input";
+import { Button } from "../../tre/components/Button";
+import { FlexRow } from "../../tre/components/FlexRow";
 import { UserDto } from "common/src/tre/models/UserDto";
 import { UserService } from "../services/UserService";
 

@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { SecurableEntity } from './SecurableEntity';
 
 /**
@@ -6,4 +6,7 @@ import { SecurableEntity } from './SecurableEntity';
  * @extends Repository<SecurableEntity>
  */
 export class SecurableRepository extends Repository<SecurableEntity> {
+    public constructor(ds: DataSource) {
+        super(SecurableEntity, ds.createEntityManager(), ds.createQueryRunner());
+    }
 }

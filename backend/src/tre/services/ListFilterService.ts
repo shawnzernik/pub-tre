@@ -4,11 +4,16 @@ import { BaseService } from "./BaseService";
 import { ListFilterDto } from "common/src/tre/models/ListFilterDto";
 import { ListFilterEntity } from "../data/ListFilterEntity";
 import { Logger } from "../Logger";
+import { ListFilterRepository } from "../data/ListFilterRepository";
 
 /**
  * Service class for managing list filters.
  */
 export class ListFilterService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Creates an instance of ListFilterService.
      * @param logger - Logger instance for logging.
@@ -38,7 +43,7 @@ export class ListFilterService extends BaseService {
         await BaseService.checkSecurity(logger, "ListFilter:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.listFilterRepository().findOneBy({ guid: guid });
+        const ret = await new ListFilterRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -53,7 +58,7 @@ export class ListFilterService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "ListFilter:List", req, ds);
 
-        const ret = await ds.listFilterRepository().find();
+        const ret = await new ListFilterRepository(ds).find();
         return ret;
     }
 
@@ -62,7 +67,7 @@ export class ListFilterService extends BaseService {
         await BaseService.checkSecurity(logger, "ListFilter:List", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.listFilterRepository().find({
+        const ret = await new ListFilterRepository(ds).find({
             where: { listsGuid: guid },
             order: { listsGuid: "ASC" }
         });
@@ -82,7 +87,7 @@ export class ListFilterService extends BaseService {
 
         const entity = new ListFilterEntity();
         entity.copyFrom(req.body as ListFilterDto);
-        await ds.listFilterRepository().save([entity]);
+        await new ListFilterRepository(ds).save([entity]);
     }
 
     /**
@@ -97,6 +102,6 @@ export class ListFilterService extends BaseService {
         await BaseService.checkSecurity(logger, "ListFilter:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.listFilterRepository().delete({ guid: guid });
+        await new ListFilterRepository(ds).delete({ guid: guid });
     }
 }

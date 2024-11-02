@@ -4,11 +4,16 @@ import { BaseService } from "./BaseService";
 import { SecurableDto } from "common/src/tre/models/SecurableDto";
 import { SecurableEntity } from "../data/SecurableEntity";
 import { Logger } from "../Logger";
+import { SecurableRepository } from "../data/SecurableRepository";
 
 /**
  * Service class for handling securable entities.
  */
 export class SecurableService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Creates an instance of SecurableService.
      * @param logger - The logger instance for logging.
@@ -37,7 +42,7 @@ export class SecurableService extends BaseService {
         await BaseService.checkSecurity(logger, "Securable:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.securableRepository().findOneBy({ guid: guid });
+        const ret = await new SecurableRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -52,7 +57,7 @@ export class SecurableService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Securable:List", req, ds);
 
-        const ret = await ds.securableRepository().find();
+        const ret = await new SecurableRepository(ds).find();
         return ret;
     }
 
@@ -68,7 +73,7 @@ export class SecurableService extends BaseService {
 
         const entity = new SecurableEntity();
         entity.copyFrom(req.body as SecurableDto);
-        await ds.securableRepository().save([entity]);
+        await new SecurableRepository(ds).save([entity]);
     }
 
     /**
@@ -82,6 +87,6 @@ export class SecurableService extends BaseService {
         await BaseService.checkSecurity(logger, "Securable:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.securableRepository().delete({ guid: guid });
+        await new SecurableRepository(ds).delete({ guid: guid });
     }
 }

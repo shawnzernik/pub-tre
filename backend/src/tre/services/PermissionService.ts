@@ -5,11 +5,16 @@ import { PermissionDto } from "common/src/tre/models/PermissionDto";
 import { PermissionEntity } from "../data/PermissionEntity";
 import { PermissionLogic } from "../logic/PermissionLogic";
 import { Logger } from "../Logger";
+import { PermissionRepository } from "../data/PermissionsRepository";
 
 /**
  * Service class for handling permission-related operations.
  */
 export class PermissionService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Initializes a new instance of the PermissionService class.
      * @param logger - The logger to be used for logging.
@@ -73,7 +78,7 @@ export class PermissionService extends BaseService {
         await BaseService.checkSecurity(logger, "Permission:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.permissionRepository().findOneBy({ guid: guid });
+        const ret = await new PermissionRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -88,7 +93,7 @@ export class PermissionService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "Permission:List", req, ds);
 
-        const ret = await ds.permissionRepository().find();
+        const ret = await new PermissionRepository(ds).find();
         return ret;
     }
 
@@ -105,7 +110,7 @@ export class PermissionService extends BaseService {
 
         const entity = new PermissionEntity();
         entity.copyFrom(req.body as PermissionDto);
-        await ds.permissionRepository().save([entity]);
+        await new PermissionRepository(ds).save([entity]);
     }
 
     /**
@@ -120,6 +125,6 @@ export class PermissionService extends BaseService {
         await BaseService.checkSecurity(logger, "Permission:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.permissionRepository().delete({ guid: guid });
+        await new PermissionRepository(ds).delete({ guid: guid });
     }
 }

@@ -1,6 +1,6 @@
 import * as React from "react";
-import { NavigationMessageEvents, NavigationMessageState } from "../components/Navigation";
-import { Message } from "../components/Message";
+import { NavigationMessageEvents, NavigationMessageState } from "../../tre/components/Navigation";
+import { Message } from "../../tre/components/Message";
 
 /**
  * Interface representing the state of the BasePage component.

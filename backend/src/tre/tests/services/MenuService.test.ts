@@ -4,6 +4,7 @@ import { MenuDto } from 'common/src/tre/models/MenuDto';
 import { Config } from '../../../Config';
 import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { MenuEntity } from '../../data/MenuEntity';
+import { MenuRepository } from '../../data/MenuRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -22,7 +23,7 @@ describe("MenuService", () => {
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -39,7 +40,7 @@ describe("MenuService", () => {
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
     afterAll(async () => {
-        try { await eds.menuRepository().delete({ guid: entityGuid }); }
+        try { await new MenuRepository(eds).delete({ guid: entityGuid }); }
         finally { await eds.destroy(); }
     }, Config.jestTimeoutSeconds * 1000);
 
@@ -54,7 +55,7 @@ describe("MenuService", () => {
         entity.bootstrapIcon = "trash";
         entity.url = "/bad/url";
 
-        const response = await fetch("https://localhost:4433/api/v0/menu", {
+        const response = await fetch(Config.appUrl + "/api/v0/menu", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -71,7 +72,7 @@ describe("MenuService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.menuRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new MenuRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("POST /api/v0/menu overwrite should return 200", async () => {
@@ -85,7 +86,7 @@ describe("MenuService", () => {
         entity.bootstrapIcon = "trash";
         entity.url = "/bad/url";
 
-        const response = await fetch("https://localhost:4433/api/v0/menu", {
+        const response = await fetch(Config.appUrl + "/api/v0/menu", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -102,14 +103,14 @@ describe("MenuService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.menuRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new MenuRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("GET /api/v0/menus should return menu list", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/menus", {
+        const response = await fetch(Config.appUrl + "/api/v0/menus", {
             agent: agent,
             method: "GET",
             headers: {
@@ -134,7 +135,7 @@ describe("MenuService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/menu/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/menu/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -158,7 +159,7 @@ describe("MenuService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/menu/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/menu/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -174,7 +175,7 @@ describe("MenuService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.menuRepository().findBy({ guid: entityGuid });
+        let entity = await new MenuRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

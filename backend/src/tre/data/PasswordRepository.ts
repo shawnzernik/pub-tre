@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { PasswordEntity } from './PasswordEntity';
 
 /**
@@ -6,4 +6,7 @@ import { PasswordEntity } from './PasswordEntity';
  * Inherits from the TypeORM Repository class specifically for PasswordEntity.
  */
 export class PasswordRepository extends Repository<PasswordEntity> {
+    public constructor(ds: DataSource) {
+        super(PasswordEntity, ds.createEntityManager(), ds.createQueryRunner());
+    }
 }

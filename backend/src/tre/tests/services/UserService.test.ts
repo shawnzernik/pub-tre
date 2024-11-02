@@ -4,6 +4,7 @@ import { UserDto } from 'common/src/tre/models/UserDto';
 import { Config } from '../../../Config';
 import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { UserEntity } from '../../data/UserEntity';
+import { UserRepository } from '../../data/UserRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -22,7 +23,7 @@ describe("UserService", () => {
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -39,7 +40,7 @@ describe("UserService", () => {
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
     afterAll(async () => {
-        try { await eds.userRepository().delete({ guid: entityGuid }); }
+        try { await new UserRepository(eds).delete({ guid: entityGuid }); }
         finally { await eds.destroy(); }
     }, Config.jestTimeoutSeconds * 1000);
 
@@ -53,7 +54,7 @@ describe("UserService", () => {
         entity.emailAddress = "deleteme@localhost";
         entity.smsPhone = "555-555-5555";
 
-        const response = await fetch("https://localhost:4433/api/v0/user", {
+        const response = await fetch(Config.appUrl + "/api/v0/user", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -70,7 +71,7 @@ describe("UserService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.userRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new UserRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity.displayName).toEqual(reloaded.displayName);
     }, Config.jestTimeoutSeconds * 1000);
     test("POST /api/v0/user overwrite should return 200", async () => {
@@ -83,7 +84,7 @@ describe("UserService", () => {
         entity.emailAddress = "deleteme@localhost";
         entity.smsPhone = "555-555-5555";
 
-        const response = await fetch("https://localhost:4433/api/v0/user", {
+        const response = await fetch(Config.appUrl + "/api/v0/user", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -100,14 +101,14 @@ describe("UserService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.userRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new UserRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity.displayName).toEqual(reloaded.displayName);
     }, Config.jestTimeoutSeconds * 1000);
     test("GET /api/v0/users should return user list", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/users", {
+        const response = await fetch(Config.appUrl + "/api/v0/users", {
             agent: agent,
             method: "GET",
             headers: {
@@ -132,7 +133,7 @@ describe("UserService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/user/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/user/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -156,7 +157,7 @@ describe("UserService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/user/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/user/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -172,7 +173,7 @@ describe("UserService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.userRepository().findBy({ guid: entityGuid });
+        let entity = await new UserRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

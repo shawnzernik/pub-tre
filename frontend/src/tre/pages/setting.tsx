@@ -1,17 +1,17 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { ErrorMessage, Navigation } from "../components/Navigation";
-import { BasePage, BasePageState } from "../components/BasePage";
-import { Heading } from "../components/Heading";
-import { Form } from "../components/Form";
-import { Field } from "../components/Field";
-import { Input } from "../components/Input";
-import { FlexRow } from "../components/FlexRow";
-import { Button } from "../components/Button";
+import { ErrorMessage, Navigation } from "../../tre/components/Navigation";
+import { BasePage, BasePageState } from "../../tre/components/BasePage";
+import { Heading } from "../../tre/components/Heading";
+import { Form } from "../../tre/components/Form";
+import { Field } from "../../tre/components/Field";
+import { Input } from "../../tre/components/Input";
+import { FlexRow } from "../../tre/components/FlexRow";
+import { Button } from "../../tre/components/Button";
 import { AuthService } from "../services/AuthService";
 import { SettingDto } from "common/src/tre/models/SettingDto";
 import { SettingService } from "../services/SettingService";
-import { TextArea } from "../components/TextArea";
+import { TextArea } from "../../tre/components/TextArea";
 
 interface Props { }
 interface State extends BasePageState {

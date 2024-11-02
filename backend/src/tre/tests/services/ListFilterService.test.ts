@@ -6,6 +6,8 @@ import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { ListFilterEntity } from '../../data/ListFilterEntity';
 import { ListEntity } from '../../data/ListEntity';
 import { UUIDv4 } from 'common/src/tre/logic/UUIDv4';
+import { ListFilterRepository } from '../../data/ListFilterRepository';
+import { ListRepository } from '../../data/ListRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -28,14 +30,14 @@ describe("ListFilterService", () => {
         eds = new EntitiesDataSource();
         await eds.initialize();
 
-        await eds.listRepository().save(listEntity);
+        await new ListRepository(eds).save(listEntity);
 
         const body = JSON.stringify({
             emailAddress: "administrator@localhost",
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -53,9 +55,9 @@ describe("ListFilterService", () => {
     }, Config.jestTimeoutSeconds * 1000);
 
     afterAll(async () => {
-        try { await eds.listFilterRepository().delete({ guid: entityGuid }); }
+        try { await new ListFilterRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat err */ }
-        try { await eds.listRepository().delete({ guid: entityGuid }); }
+        try { await new ListRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat err */ }
 
         await eds.destroy();
@@ -72,7 +74,7 @@ describe("ListFilterService", () => {
         entity.sqlColumn = "column_name";
         entity.sqlType = "string";
 
-        const response = await fetch("https://localhost:4433/api/v0/list_filter", {
+        const response = await fetch(Config.appUrl + "/api/v0/list_filter", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -89,7 +91,7 @@ describe("ListFilterService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.listFilterRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new ListFilterRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
 
@@ -97,7 +99,7 @@ describe("ListFilterService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/list_filters", {
+        const response = await fetch(Config.appUrl + "/api/v0/list_filters", {
             agent: agent,
             method: "GET",
             headers: {
@@ -123,7 +125,7 @@ describe("ListFilterService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/list_filter/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/list_filter/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -148,7 +150,7 @@ describe("ListFilterService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/list_filter/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/list_filter/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -164,7 +166,7 @@ describe("ListFilterService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.listFilterRepository().findBy({ guid: entityGuid });
+        let entity = await new ListFilterRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

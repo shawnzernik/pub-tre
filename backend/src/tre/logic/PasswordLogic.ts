@@ -4,6 +4,8 @@ import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { SettingLogic } from "./SettingLogic";
 import { UUIDv4 } from "common/src/tre/logic/UUIDv4";
 import { PasswordLogic as CommonPasswordLogic } from "common/src/tre/logic/PasswordLogic";
+import { SettingRepository } from "../data/SettingRepository";
+import { UserRepository } from "../data/UserRepository";
 
 /**
  * Handles password-related operations, including hashing and resetting passwords.
@@ -67,7 +69,7 @@ export class PasswordLogic extends CommonPasswordLogic {
      */
     public async reset(ds: EntitiesDataSource, usersGuid: string, password: string, confirm: string): Promise<PasswordEntity> {
         // Retrieve the user entity by GUID
-        const userEntity = await ds.userRepository().findOneBy({ guid: usersGuid });
+        const userEntity = await new UserRepository(ds).findOneBy({ guid: usersGuid });
         if (!userEntity)
             throw new Error(`Could not locate user by GUID '${usersGuid}'!`);
 
@@ -79,7 +81,7 @@ export class PasswordLogic extends CommonPasswordLogic {
             throw new Error("The password and confirm do not match!");
 
         // Retrieve and apply minimum length setting
-        let settingEntity = await ds.settingRepository().findByKey(CommonPasswordLogic.MINIMUM_LENGTH_SETTING);
+        let settingEntity = await new SettingRepository(ds).findByKey(CommonPasswordLogic.MINIMUM_LENGTH_SETTING);
         let settingLogic = new SettingLogic(settingEntity);
 
         const minLength = settingLogic.integerValue();
@@ -87,31 +89,31 @@ export class PasswordLogic extends CommonPasswordLogic {
             throw new Error(`Password provided is less than ${minLength} characters in length!`);
 
         // Retrieve and enforce lowercase requirement
-        settingEntity = await ds.settingRepository().findByKey(CommonPasswordLogic.REQUIRE_LOWERCASE_SETTING);
+        settingEntity = await new SettingRepository(ds).findByKey(CommonPasswordLogic.REQUIRE_LOWERCASE_SETTING);
         settingLogic = new SettingLogic(settingEntity);
         if (settingLogic.booleanValue() && !/[a-z]/.test(password))
             throw new Error("The password must have lowercase characters!");
 
         // Retrieve and enforce numeric requirement
-        settingEntity = await ds.settingRepository().findByKey(CommonPasswordLogic.REQUIRE_NUMBER_SETTING);
+        settingEntity = await new SettingRepository(ds).findByKey(CommonPasswordLogic.REQUIRE_NUMBER_SETTING);
         settingLogic = new SettingLogic(settingEntity);
         if (settingLogic.booleanValue() && !/[0-9]/.test(password))
             throw new Error("The password must have numbers!");
 
         // Retrieve and enforce symbol requirement
-        settingEntity = await ds.settingRepository().findByKey(CommonPasswordLogic.REQUIRE_SYMBOLS_SETTING);
+        settingEntity = await new SettingRepository(ds).findByKey(CommonPasswordLogic.REQUIRE_SYMBOLS_SETTING);
         settingLogic = new SettingLogic(settingEntity);
         if (settingLogic.booleanValue() && !/[^A-Za-z0-9]/.test(password))
             throw new Error("The password must have symbols!");
 
         // Retrieve and enforce uppercase requirement
-        settingEntity = await ds.settingRepository().findByKey(CommonPasswordLogic.REQUIRE_UPPERCASE_SETTING);
+        settingEntity = await new SettingRepository(ds).findByKey(CommonPasswordLogic.REQUIRE_UPPERCASE_SETTING);
         settingLogic = new SettingLogic(settingEntity);
         if (settingLogic.booleanValue() && !/[A-Z]/.test(password))
             throw new Error("The password must have uppercase characters!");
 
         // Retrieve and set iterations for hashing
-        settingEntity = await ds.settingRepository().findByKey(CommonPasswordLogic.ITERATIONS_SETTING);
+        settingEntity = await new SettingRepository(ds).findByKey(CommonPasswordLogic.ITERATIONS_SETTING);
         settingLogic = new SettingLogic(settingEntity);
         this.entity.iterations = settingLogic.integerValue();
         this.entity.usersGuid = userEntity.guid;

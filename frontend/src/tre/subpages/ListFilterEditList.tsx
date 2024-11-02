@@ -1,16 +1,16 @@
 import * as React from "react";
 import { ListFilterOptions } from "./ListFilterCompareOptions";
 import { ListFilterDto } from "common/src/tre/models/ListFilterDto";
-import { BasePage } from "../components/BasePage";
-import { Button } from "../components/Button";
-import { Field } from "../components/Field";
-import { FlexRow } from "../components/FlexRow";
-import { Form } from "../components/Form";
-import { Heading } from "../components/Heading";
-import { Input } from "../components/Input";
-import { Select } from "../components/Select";
-import { TextArea } from "../components/TextArea";
-import { Theme } from "../components/Theme";
+import { BasePage } from "../../tre/components/BasePage";
+import { Button } from "../../tre/components/Button";
+import { Field } from "../../tre/components/Field";
+import { FlexRow } from "../../tre/components/FlexRow";
+import { Form } from "../../tre/components/Form";
+import { Heading } from "../../tre/components/Heading";
+import { Input } from "../../tre/components/Input";
+import { Select } from "../../tre/components/Select";
+import { TextArea } from "../../tre/components/TextArea";
+import { Theme } from "../../tre/components/Theme";
 
 interface Props {
     value: ListFilterDto[];

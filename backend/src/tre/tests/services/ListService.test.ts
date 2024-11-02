@@ -6,6 +6,7 @@ import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { ListEntity } from '../../data/ListEntity';
 import { ListFilterDto } from 'common/src/tre/models/ListFilterDto';
 import { UUIDv4 } from 'common/src/tre/logic/UUIDv4';
+import { ListRepository } from '../../data/ListRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -25,7 +26,7 @@ describe("ListService", () => {
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -43,7 +44,7 @@ describe("ListService", () => {
     }, Config.jestTimeoutSeconds * 1000);
 
     afterAll(async () => {
-        try { await eds.listRepository().delete({ guid: entityGuid }); }
+        try { await new ListRepository(eds).delete({ guid: entityGuid }); }
         finally { await eds.destroy(); }
     }, Config.jestTimeoutSeconds * 1000);
 
@@ -59,7 +60,7 @@ describe("ListService", () => {
         entity.topMenuGuid = UUIDv4.generate();
         entity.sql = "SELECT * FROM lists";
 
-        const response = await fetch("https://localhost:4433/api/v0/list", {
+        const response = await fetch(Config.appUrl + "/api/v0/list", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -76,7 +77,7 @@ describe("ListService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.listRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new ListRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
 
@@ -92,7 +93,7 @@ describe("ListService", () => {
         entity.topMenuGuid = UUIDv4.generate();
         entity.sql = "SELECT * FROM lists";
 
-        let response = await fetch("https://localhost:4433/api/v0/list", {
+        let response = await fetch(Config.appUrl + "/api/v0/list", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -121,7 +122,7 @@ describe("ListService", () => {
             }
         ];
 
-        response = await fetch(`https://localhost:4433/api/v0/list/${entityGuid}/items`, {
+        response = await fetch(`${Config.appUrl}/api/v0/list/${entityGuid}/items`, {
             agent: agent,
             method: "POST",
             body: JSON.stringify(filters),
@@ -145,7 +146,7 @@ describe("ListService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/lists", {
+        const response = await fetch(Config.appUrl + "/api/v0/lists", {
             agent: agent,
             method: "GET",
             headers: {
@@ -171,7 +172,7 @@ describe("ListService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/list/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/list/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -196,7 +197,7 @@ describe("ListService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch(`https://localhost:4433/api/v0/list/url_key/${entityUrlKey}`, {
+        const response = await fetch(`${Config.appUrl}/api/v0/list/url_key/${entityUrlKey}`, {
             agent: agent,
             method: "GET",
             headers: {
@@ -221,7 +222,7 @@ describe("ListService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/list/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/list/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -237,7 +238,7 @@ describe("ListService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.listRepository().findBy({ guid: entityGuid });
+        let entity = await new ListRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

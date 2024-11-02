@@ -6,6 +6,9 @@ import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { PermissionEntity } from '../../data/PermissionEntity';
 import { GroupEntity } from '../../data/GroupEntity';
 import { SecurableEntity } from '../../data/SecurableEntity';
+import { PermissionRepository } from '../../data/PermissionsRepository';
+import { GroupRepository } from '../../data/GroupRepository';
+import { SecurableRepository } from '../../data/SecurableRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -28,15 +31,15 @@ describe("PermissionService", () => {
         eds = new EntitiesDataSource();
         await eds.initialize();
 
-        await eds.securableRepository().save(securableEntity);
-        await eds.groupRepository().save(groupEntity);
+        await new SecurableRepository(eds).save(securableEntity);
+        await new GroupRepository(eds).save(groupEntity);
 
         const body = JSON.stringify({
             emailAddress: "administrator@localhost",
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -53,11 +56,11 @@ describe("PermissionService", () => {
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
     afterAll(async () => {
-        try { await eds.permissionRepository().delete({ guid: entityGuid }); }
+        try { await new PermissionRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat error */ }
-        try { await eds.securableRepository().delete({ guid: entityGuid }); }
+        try { await new SecurableRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat error */ }
-        try { await eds.groupRepository().delete({ guid: entityGuid }); }
+        try { await new GroupRepository(eds).delete({ guid: entityGuid }); }
         catch (err) { /* eat error */ }
 
         await eds.destroy();
@@ -73,7 +76,7 @@ describe("PermissionService", () => {
         entity.isAllowed = true;
         entity.securablesGuid = entityGuid;
 
-        const response = await fetch("https://localhost:4433/api/v0/permission", {
+        const response = await fetch(Config.appUrl + "/api/v0/permission", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -90,7 +93,7 @@ describe("PermissionService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.permissionRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new PermissionRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("POST /api/v0/permission overwrite should return 200", async () => {
@@ -103,7 +106,7 @@ describe("PermissionService", () => {
         entity.isAllowed = false;
         entity.securablesGuid = entityGuid;
 
-        const response = await fetch("https://localhost:4433/api/v0/permission", {
+        const response = await fetch(Config.appUrl + "/api/v0/permission", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -120,14 +123,14 @@ describe("PermissionService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.permissionRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new PermissionRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("GET /api/v0/permissions should return permission list", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/permissions", {
+        const response = await fetch(Config.appUrl + "/api/v0/permissions", {
             agent: agent,
             method: "GET",
             headers: {
@@ -155,7 +158,7 @@ describe("PermissionService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/permission/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/permission/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -179,7 +182,7 @@ describe("PermissionService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/permission/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/permission/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -195,7 +198,7 @@ describe("PermissionService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.permissionRepository().findBy({ guid: entityGuid });
+        let entity = await new PermissionRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

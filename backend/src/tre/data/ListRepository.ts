@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ListEntity } from './ListEntity';
 
 /**
@@ -6,4 +6,7 @@ import { ListEntity } from './ListEntity';
  * It can be used to define custom data access methods for the ListEntity.
  */
 export class ListRepository extends Repository<ListEntity> {
+    public constructor(ds: DataSource) {
+        super(ListEntity, ds.createEntityManager(), ds.createQueryRunner());
+    }
 }

@@ -5,12 +5,18 @@ import { UserDto } from "common/src/tre/models/UserDto";
 import { UserEntity } from "../data/UserEntity";
 import { PasswordLogic } from "../logic/PasswordLogic";
 import { Logger } from "../Logger";
+import { UserRepository } from "../data/UserRepository";
+import { PasswordRepository } from "../data/PasswordRepository";
 
 /**
  * UserService class handles user-related operations
  * and defines API endpoints for user management.
  */
 export class UserService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Creates an instance of UserService.
      * @param logger - Logger instance for logging.
@@ -40,7 +46,7 @@ export class UserService extends BaseService {
         await BaseService.checkSecurity(logger, "User:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.userRepository().findOneBy({ guid: guid });
+        const ret = await new UserRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -55,7 +61,7 @@ export class UserService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "User:List", req, ds);
 
-        const ret = await ds.userRepository().find();
+        const ret = await new UserRepository(ds).find();
         return ret;
     }
 
@@ -71,7 +77,7 @@ export class UserService extends BaseService {
 
         const entity = new UserEntity();
         entity.copyFrom(req.body as UserDto);
-        await ds.userRepository().save([entity]);
+        await new UserRepository(ds).save([entity]);
     }
 
     /**
@@ -85,7 +91,7 @@ export class UserService extends BaseService {
         await BaseService.checkSecurity(logger, "User:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.userRepository().delete({ guid: guid });
+        await new UserRepository(ds).delete({ guid: guid });
     }
 
     /**
@@ -102,6 +108,6 @@ export class UserService extends BaseService {
 
         const passLogic = new PasswordLogic();
         const passEntity = await passLogic.reset(ds, guid, req.body["password"], req.body["confirm"]);
-        await ds.passwordRepository().save(passEntity);
+        await new PasswordRepository(ds).save(passEntity);
     }
 }

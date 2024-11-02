@@ -4,6 +4,7 @@ import { GroupDto } from 'common/src/tre/models/GroupDto';
 import { Config } from '../../../Config';
 import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { GroupEntity } from '../../data/GroupEntity';
+import { GroupRepository } from '../../data/GroupRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -22,7 +23,7 @@ describe("GroupsService", () => {
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -39,7 +40,7 @@ describe("GroupsService", () => {
         token = obj["data"] as string;
     }, Config.jestTimeoutSeconds * 1000);
     afterAll(async () => {
-        try { await eds.groupRepository().delete({ guid: entityGuid }); }
+        try { await new GroupRepository(eds).delete({ guid: entityGuid }); }
         finally { await eds.destroy(); }
     }, Config.jestTimeoutSeconds * 1000);
 
@@ -52,7 +53,7 @@ describe("GroupsService", () => {
         entity.displayName = "Delete Me";
         entity.isAdministrator = false;
 
-        const response = await fetch("https://localhost:4433/api/v0/group", {
+        const response = await fetch(Config.appUrl + "/api/v0/group", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -69,7 +70,7 @@ describe("GroupsService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.groupRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new GroupRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("POST /api/v0/group overwrite should return 200", async () => {
@@ -81,7 +82,7 @@ describe("GroupsService", () => {
         entity.displayName = "Delete Me - Duplicate";
         entity.isAdministrator = false;
 
-        const response = await fetch("https://localhost:4433/api/v0/group", {
+        const response = await fetch(Config.appUrl + "/api/v0/group", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -98,14 +99,14 @@ describe("GroupsService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.groupRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new GroupRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
     test("GET /api/v0/groups should return group list", async () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/groups", {
+        const response = await fetch(Config.appUrl + "/api/v0/groups", {
             agent: agent,
             method: "GET",
             headers: {
@@ -132,7 +133,7 @@ describe("GroupsService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/group/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/group/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -156,7 +157,7 @@ describe("GroupsService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/group/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/group/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -172,7 +173,7 @@ describe("GroupsService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.groupRepository().findBy({ guid: entityGuid });
+        let entity = await new GroupRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

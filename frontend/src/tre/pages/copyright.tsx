@@ -1,8 +1,8 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Navigation } from "../components/Navigation";
-import { BasePage, BasePageState } from "../components/BasePage";
-import { Markdown } from "../components/Markdown";
+import { Navigation } from "../../tre/components/Navigation";
+import { BasePage, BasePageState } from "../../tre/components/BasePage";
+import { Markdown } from "../../tre/components/Markdown";
 
 interface Props { }
 

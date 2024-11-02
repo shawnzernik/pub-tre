@@ -4,6 +4,7 @@ import { SettingDto } from 'common/src/tre/models/SettingDto';
 import { Config } from '../../../Config';
 import { EntitiesDataSource } from '../../data/EntitiesDataSource';
 import { SettingEntity } from '../../data/SettingEntity';
+import { SettingRepository } from '../../data/SettingRepository';
 
 jest.setTimeout(Config.jestTimeoutSeconds * 1000);
 
@@ -22,7 +23,7 @@ describe("SettingService", () => {
             password: "Welcome123"
         });
 
-        const response = await fetch("https://localhost:4433/api/v0/auth/login", {
+        const response = await fetch(Config.appUrl + "/api/v0/auth/login", {
             agent: agent,
             method: "POST",
             body: body,
@@ -40,7 +41,7 @@ describe("SettingService", () => {
     }, Config.jestTimeoutSeconds * 1000);
 
     afterAll(async () => {
-        try { await eds.settingRepository().delete({ guid: entityGuid }); }
+        try { await new SettingRepository(eds).delete({ guid: entityGuid }); }
         finally { await eds.destroy(); }
     }, Config.jestTimeoutSeconds * 1000);
 
@@ -53,7 +54,7 @@ describe("SettingService", () => {
         entity.key = "Test Setting";
         entity.value = "Test Value";
 
-        const response = await fetch("https://localhost:4433/api/v0/setting", {
+        const response = await fetch(Config.appUrl + "/api/v0/setting", {
             agent: agent,
             method: "POST",
             body: JSON.stringify(entity),
@@ -70,7 +71,7 @@ describe("SettingService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let reloaded = await eds.settingRepository().findOneByOrFail({ guid: entityGuid });
+        let reloaded = await new SettingRepository(eds).findOneByOrFail({ guid: entityGuid });
         expect(entity).toEqual(reloaded);
     }, Config.jestTimeoutSeconds * 1000);
 
@@ -78,7 +79,7 @@ describe("SettingService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/settings", {
+        const response = await fetch(Config.appUrl + "/api/v0/settings", {
             agent: agent,
             method: "GET",
             headers: {
@@ -104,7 +105,7 @@ describe("SettingService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/setting/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/setting/" + entityGuid, {
             agent: agent,
             method: "GET",
             headers: {
@@ -129,7 +130,7 @@ describe("SettingService", () => {
         if (!token)
             throw new Error("No token - did beforeAll() fail?");
 
-        const response = await fetch("https://localhost:4433/api/v0/setting/" + entityGuid, {
+        const response = await fetch(Config.appUrl + "/api/v0/setting/" + entityGuid, {
             agent: agent,
             method: "DELETE",
             headers: {
@@ -145,7 +146,7 @@ describe("SettingService", () => {
         expect(response.ok).toBeTruthy();
         expect(response.status).toBe(200);
 
-        let entity = await eds.settingRepository().findBy({ guid: entityGuid });
+        let entity = await new SettingRepository(eds).findBy({ guid: entityGuid });
         expect(entity.length).toEqual(0);
     }, Config.jestTimeoutSeconds * 1000);
 });

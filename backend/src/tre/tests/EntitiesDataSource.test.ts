@@ -1,13 +1,14 @@
 import { UUIDv4 } from "common/src/tre/logic/UUIDv4";
 import { EntitiesDataSource } from "../data/EntitiesDataSource";
 import { UserEntity } from "../data/UserEntity";
+import { UserRepository } from "../data/UserRepository";
 
 describe("EntitiesDataSource", () => {
     it("shall connect and CRUD user", async () => {
         const edm = new EntitiesDataSource();
         try {
             await edm.initialize();
-            const repo = edm.userRepository();
+            const repo = new UserRepository(edm);
 
             let entity: UserEntity = new UserEntity();
             entity.guid = UUIDv4.generate();

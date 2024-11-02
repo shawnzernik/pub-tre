@@ -6,11 +6,16 @@ import { ListEntity } from "../data/ListEntity";
 import { ListLogic } from "../logic/ListLogic";
 import { ListFilterDto } from "common/src/tre/models/ListFilterDto";
 import { Logger } from "../Logger";
+import { ListRepository } from "../data/ListRepository";
 
 /**
  * Service for managing lists.
  */
 export class ListService extends BaseService {
+    protected constructDataSource(): EntitiesDataSource {
+        return new EntitiesDataSource();
+    }
+
     /**
      * Creates an instance of ListService.
      * @param logger - Logger instance for logging.
@@ -41,7 +46,7 @@ export class ListService extends BaseService {
         await BaseService.checkSecurity(logger, "List:Items", req, ds);
 
         const guid = req.params["guid"];
-        const listDto = await ds.listRepository().findOneBy({ guid: guid });
+        const listDto = await new ListRepository(ds).findOneBy({ guid: guid });
         if (!listDto)
             throw new Error(`Could not locate list GUID ${guid}!`);
 
@@ -65,7 +70,7 @@ export class ListService extends BaseService {
         await BaseService.checkSecurity(logger, "List:Read", req, ds);
 
         const guid = req.params["guid"];
-        const ret = await ds.listRepository().findOneBy({ guid: guid });
+        const ret = await new ListRepository(ds).findOneBy({ guid: guid });
         return ret;
     }
 
@@ -81,7 +86,7 @@ export class ListService extends BaseService {
         await BaseService.checkSecurity(logger, "List:Read", req, ds);
 
         const urlKey = req.params["url_key"];
-        const ret = await ds.listRepository().findOneBy({ urlKey: urlKey });
+        const ret = await new ListRepository(ds).findOneBy({ urlKey: urlKey });
         return ret;
     }
 
@@ -96,7 +101,7 @@ export class ListService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurity(logger, "List:List", req, ds);
 
-        const ret = await ds.listRepository().find();
+        const ret = await new ListRepository(ds).find();
         return ret;
     }
 
@@ -113,7 +118,7 @@ export class ListService extends BaseService {
 
         const entity = new ListEntity();
         entity.copyFrom(req.body as ListDto);
-        await ds.listRepository().save([entity]);
+        await new ListRepository(ds).save([entity]);
     }
 
     /**
@@ -128,6 +133,6 @@ export class ListService extends BaseService {
         await BaseService.checkSecurity(logger, "List:Delete", req, ds);
 
         const guid = req.params["guid"];
-        await ds.listRepository().delete({ guid: guid });
+        await new ListRepository(ds).delete({ guid: guid });
     }
 }
