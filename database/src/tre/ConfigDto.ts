@@ -1,3 +1,3 @@
-import { Dictionary } from "common/src/tre/Dictionary";
+import { Dictionary } from "./Dictionary";
 
 export interface ConfigDto extends Dictionary<string[]> { }

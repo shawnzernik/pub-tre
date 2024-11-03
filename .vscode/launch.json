@@ -126,6 +126,68 @@
                 "<node_internals>/**"
             ],
             "preLaunchTask": "database build"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "database backup",
+            "program": "${workspaceFolder}/database/dist/index.js",
+            "args": [
+                "backup",
+                "TestBackup.sql"
+            ],
+            "cwd": "${workspaceFolder}/database",
+            "sourceMaps": true,
+            "protocol": "inspector",
+            "console": "integratedTerminal",
+            "outFiles": [
+                "${workspaceFolder}/database/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "preLaunchTask": "database build"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "database restore",
+            "program": "${workspaceFolder}/database/dist/index.js",
+            "args": [
+                "restore",
+                "TestBackup.sql"
+            ],
+            "cwd": "${workspaceFolder}/database",
+            "sourceMaps": true,
+            "protocol": "inspector",
+            "console": "integratedTerminal",
+            "outFiles": [
+                "${workspaceFolder}/database/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "preLaunchTask": "database build"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "database upgrade",
+            "program": "${workspaceFolder}/database/dist/index.js",
+            "args": [
+                "upgrade",
+            ],
+            "cwd": "${workspaceFolder}/database",
+            "sourceMaps": true,
+            "protocol": "inspector",
+            "console": "integratedTerminal",
+            "outFiles": [
+                "${workspaceFolder}/database/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "preLaunchTask": "database build"
         }
     ]
 }

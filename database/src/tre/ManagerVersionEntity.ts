@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column } from "typeorm";
-import { CopyInterface } from "common/src/tre/logic/CopyInterface";
+import { CopyInterface } from "./CopyInterface";
 import { ManagerVersionDto } from "./ManagerVersionDto";
 
 @Entity("manager_versions")

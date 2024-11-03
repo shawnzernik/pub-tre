@@ -4,12 +4,12 @@ import fs from "fs";
 import { Client } from "pg";
 import { ConfigDto } from "./ConfigDto";
 import { DataSource } from "typeorm";
-import { Config } from "../../../backend/src/Config";
 import { ManagerVersionEntity } from "./ManagerVersionEntity";
 import { Version } from "./Version";
 import { ManagerVersionRepository } from "./ManagerVersionRepository";
-import { UUIDv4 } from "common/src/tre/logic/UUIDv4";
+import { UUIDv4 } from "./UUIDv4";
 import { ManagerVersionDto } from "./ManagerVersionDto";
+import { Config } from "../Config";
 
 export class Manager {
     private logs: string = "";
@@ -32,7 +32,7 @@ export class Manager {
         this.log("Manager.execute() - " + action);
         if (action == "new")
             await this.newDatabase(config);
-        else if (action == "upgrade" && config[parm])
+        else if (action == "upgrade")
             await this.upgrade(config);
         else if (action == "backup" && parm)
             await this.backup(parm);
@@ -119,15 +119,12 @@ export class Manager {
         await this.dropDatabase();
         await this.createDatabase();
 
-        if (!fs.existsSync("temp"))
-            fs.mkdirSync("temp");
-
         const fullpath = path.join("temp", filename);
 
         this.log("Manager.restore() - " + fullpath);
 
         process.env["PGPASSWORD"] = Config.dbPassword;
-        const cmd = `psql -h "${Config.dbHost}" -p "${Config.dbPort}" -U "${Config.dbUsername}" -d "${Config.dbName}" - f "${fullpath}"`;
+        const cmd = `psql -h "${Config.dbHost}" -p "${Config.dbPort}" -U "${Config.dbUsername}" -d "${Config.dbName}" -f "${fullpath}"`;
         const out = await this.executeCmd(cmd);
 
         fs.writeFileSync(fullpath, out, { encoding: "utf8" });
@@ -235,7 +232,7 @@ export class Manager {
             const repo = new ManagerVersionRepository(ds);
             const managerVersion = await repo.findOne({
                 where: { success: true },
-                order: { occurred: "ASC" }
+                order: { occurred: "DESC" }
             });
 
             this.log("Manager.getCurrentVersion() - " + managerVersion!.version);
