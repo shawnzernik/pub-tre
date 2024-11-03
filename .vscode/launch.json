@@ -59,7 +59,7 @@
                     "url": "webpack://common/src",
                     "path": "${workspaceFolder}/frontend/src"
                 }
-            ],
+            ]
         },
         {
             "type": "node",
@@ -106,6 +106,26 @@
             "windows": {
                 "program": "${workspaceFolder}/frontend/node_modules/jest/bin/jest.cmd"
             }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "database new",
+            "program": "${workspaceFolder}/database/dist/index.js",
+            "args": [
+                "new"
+            ],
+            "cwd": "${workspaceFolder}/database",
+            "sourceMaps": true,
+            "protocol": "inspector",
+            "console": "integratedTerminal",
+            "outFiles": [
+                "${workspaceFolder}/database/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "preLaunchTask": "database build"
         }
     ]
 }
