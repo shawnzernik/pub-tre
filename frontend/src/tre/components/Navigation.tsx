@@ -247,7 +247,7 @@ export class Navigation extends React.Component<Props, State> {
                         }}
                     >
                         <BootstrapIcon style={NavigationTheme.stageTopMenuIcon} name="list" size={2} />
-                        &nbsp; Lago Vista Technology
+                        &nbsp; TypeScript React Express (TRE)
                     </div>
                     {topMenu}
                 </div>
@@ -257,7 +257,7 @@ export class Navigation extends React.Component<Props, State> {
                 </div>
                 <div style={NavigationTheme.stageBottom}>
                     <div style={NavigationTheme.stageBottomItem}>&copy; Copyright 2024, Shawn Zernik</div>
-                    <div style={NavigationTheme.stageBottomItem}>v0.0.0</div>
+                    <div style={NavigationTheme.stageBottomItem}>v0.1.0</div>
                     <div style={NavigationTheme.stageBottomItem}>{this.auth && this.auth.user ? this.auth.user.emailAddress : "user not found"}</div>
                 </div>
             </div>

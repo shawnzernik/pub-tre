@@ -90,6 +90,27 @@ npm run run
 
 [To build your application, look at the `backend/src/app/readme.md`.](./backend/src/app/readme.md)
 
+## 5. Containerization
+
+This application both uses containers, and can be a container.  First, we'll need Postgres access.  To configure to containers, we're using podman.  Start by creating the network and then the two containers:
+
+```
+podman network ls
+podman network create --driver=bridge lvt
+
+cd postgres
+./create.sh
+
+cd ..
+./podman.sh
+```
+
+You should now be able to connect to the website:
+
+`https://localhost:4433`
+
+For further configuration, use environment variables to override the config file.
+
 ## 5. To Do
 
 The following is a list of features, enhancements, and remediation to be implemented.

@@ -5,6 +5,8 @@ import { MenuDto } from "common/src/tre/models/MenuDto";
 import { MenuEntity } from "../data/MenuEntity";
 import { Logger } from "../Logger";
 import { MenuRepository } from "../data/MenuRepository";
+import { SecurableDto } from "common/src/tre/models/SecurableDto";
+import { SecurableRepository } from "../data/SecurableRepository";
 
 export class MenuService extends BaseService {
     protected constructDataSource(): EntitiesDataSource {
@@ -43,9 +45,24 @@ export class MenuService extends BaseService {
         await logger.trace();
         await BaseService.checkSecurityName(logger, "Menu:Save", req, ds);
 
-        const entity = new MenuEntity();
-        entity.copyFrom(req.body as MenuDto);
-        await new MenuRepository(ds).save([entity]);
+        const menuEntity = new MenuEntity();
+        menuEntity.copyFrom(req.body as MenuDto);
+        await new MenuRepository(ds).save([menuEntity]);
+
+        let parentEntity: MenuEntity | null = null;
+        if (menuEntity.parentsGuid)
+            parentEntity = await new MenuRepository(ds).findOneBy({ guid: menuEntity.parentsGuid });
+
+        let securableName = "Menu:Item";
+        if (parentEntity)
+            securableName += ":" + parentEntity.display;
+        securableName += ":" + menuEntity.display;
+
+        const securableDto: SecurableDto = {
+            guid: menuEntity.guid,
+            displayName: securableName
+        };
+        await new SecurableRepository(ds).save([securableDto]);
     }
 
     public async deleteGuid(logger: Logger, req: express.Request, ds: EntitiesDataSource): Promise<void> {
@@ -53,8 +70,12 @@ export class MenuService extends BaseService {
         await BaseService.checkSecurityName(logger, "Menu:Delete", req, ds);
 
         const guid = req.params["guid"];
-        const results = await new MenuRepository(ds).delete({ guid: guid });
+        let results = await new MenuRepository(ds).delete({ guid: guid });
         if (results.affected != 1)
-            throw Error(`Affected rows = ${results.affected}!`);
+            throw Error(`Affected menu rows = ${results.affected}!`);
+
+        results = await new SecurableRepository(ds).delete({ guid: guid });
+        if (results.affected != 1)
+            throw Error(`Affected securable rows = ${results.affected}!`);
     }
 }
