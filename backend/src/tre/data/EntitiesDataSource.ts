@@ -11,6 +11,8 @@ import { ListEntity } from "./ListEntity";
 import { ListFilterEntity } from "./ListFilterEntity";
 import { SettingEntity } from "./SettingEntity";
 import { LogEntity } from "./LogEntity";
+import { ContentEntity } from "./ContentEntity";
+import { PayloadEntity } from "./PayloadEntity";
 
 export class EntitiesDataSource extends DataSource {
     public constructor(options?: DataSourceOptions) {
@@ -33,6 +35,8 @@ export class EntitiesDataSource extends DataSource {
                 ListFilterEntity,
                 SettingEntity,
                 LogEntity,
+                ContentEntity,
+                PayloadEntity
             ],
         });
     }

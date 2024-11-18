@@ -26,5 +26,16 @@
         "0.0.1/data/lists.sql",
         "0.0.1/data/settings.sql",
         "0.0.1/data/list_filters.sql"
+    ],
+    "0.0.2": [
+        "0.0.2/tables/contents.sql",
+        "0.0.2/tables/payloads.sql",
+        "0.0.2/data/settings.sql",
+        "0.0.2/data/securables.sql",
+        "0.0.2/data/markdowns.sql",
+        "0.0.2/data/menus.sql",
+        "0.0.2/data/lists.sql",
+        "0.0.2/data/administrator.sql"
     ]
+
 }

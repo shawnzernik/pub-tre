@@ -51,6 +51,10 @@ module.exports = {
         menu: "./src/tre/pages/menu.tsx",
         list: "./src/tre/pages/list.tsx",
         setting: "./src/tre/pages/setting.tsx",
+        content: "./src/tre/pages/content.tsx",
+        markdown: "./src/tre/pages/markdown.tsx",
+
+        // add app pages
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -131,5 +135,19 @@ module.exports = {
             chunks: ["common", "setting"],
             title: "Setting Edit"
         }),
+        new HtmlWebpackPlugin({
+            template: "./src/tre/template.html",
+            filename: "../static/tre/pages/content.html",
+            chunks: ["common", "content"],
+            title: "Content Edit"
+        }),
+        new HtmlWebpackPlugin({
+            template: "./src/tre/template.html",
+            filename: "../static/tre/pages/markdown.html",
+            chunks: ["common", "markdown"],
+            title: "Markdown"
+        }),
+
+        // add app pages
     ]
 };
