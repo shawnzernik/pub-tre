@@ -3,7 +3,7 @@
     "version": "0.0.1",
     "scripts": {
         "build": "npx tsc",
-        "clean": "rm -R node_modules package-lock.json dist coverage",
+        "clean": "rm -fR node_modules package-lock.json dist coverage",
         "new": "node dist/index.js new",
         "update": "node dist/index.js update",
         "backup": "node dist/index.js backup",

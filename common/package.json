@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "scripts": {
         "build": "tsc",
-        "clean": "rm -R node_modules package-lock.json dist coverage"
+        "clean": "rm -fR node_modules package-lock.json dist coverage"
     },
     "devDependencies": {
         "@types/jest": "^29.5.12",

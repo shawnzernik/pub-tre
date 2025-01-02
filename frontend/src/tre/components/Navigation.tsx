@@ -12,24 +12,20 @@ import { AuthLogic } from "../logic/AuthLogic";
 import { SecurableDto } from "common/src/tre/models/SecurableDto";
 import { BasePage, BasePageState } from "./BasePage";
 
-
 export interface NavigationMessageEvents {
     setLoading: (value: boolean) => Promise<void>;
     setMessage: (value: Message) => Promise<void>;
 }
-
 
 export interface NavigationMessageState {
     loading: boolean;
     message?: Message;
 }
 
-
 export function ErrorMessage<P, S extends BasePageState>(page: BasePage<P, S>, err: any): Promise<string | void> {
     const msg = typeof (err) === "string" ? err : err instanceof Error ? err.message : `${err}`;
     return Dialogue<P, S>(page, "Error", msg, ["OK"]);
 }
-
 
 export function Dialogue<P, S extends BasePageState>(page: BasePage<P, S>, title: string, msg: string, buttons?: string[]): Promise<string | void> {
     let buttonsToUse = ["OK"];
@@ -66,7 +62,6 @@ interface State {
     activeTopMenuGuid: string;
     activeLeftMenuGuid: string;
 }
-
 
 export class Navigation extends React.Component<Props, State> {
     private rootMenus: MenuDto[] = [];
